@@ -20,12 +20,12 @@
 //Use the enum values to define different rendering modes 
 //The mode is used by the function display and the mode is 
 //chosen during execution with the keys 1-9
-enum DisplayModeType {TRIANGLE=1, FACE=2, CUBE=3, ARM=4, MESH=5,};
+enum DisplayModeType {TRIANGLE=1, FACE=2, CUBE=3, ARM=4, MESH=5, GAME=6};
 
-DisplayModeType DisplayMode = TRIANGLE;
+DisplayModeType DisplayMode = GAME;
 
-unsigned int W_fen = 960;  // screen width
-unsigned int H_fen = 540;  // screen height
+unsigned int W_fen = 800;  // screen width
+unsigned int H_fen = 600;  // screen height
 
 float LightPos[4] = {1,1,0.4,1};
 std::vector<float> MeshVertices;
@@ -33,7 +33,8 @@ std::vector<unsigned int> MeshTriangles;
 
 //Declare your own global variables here:
 Character character = Character();
-float characterMovementDelta = 0.07;
+std::vector<Character> enemies = {};
+
 
 ////////// Draw Functions 
 
@@ -164,8 +165,6 @@ void display( )
     glLightfv(GL_LIGHT0,GL_POSITION,LightPos);
 	drawLight();
 
-	character.draw();
-
 	switch( DisplayMode )
 	{
 	case TRIANGLE:
@@ -176,8 +175,13 @@ void display( )
 	case FACE:
 		drawUnitFace();
 		break;
-	//...
-
+	case GAME:
+		drawCoordSystem();
+		character.draw();
+		for (auto &enemy : enemies) {
+			enemy.draw();
+		}
+	break;
 	default:
 		
 		break;
@@ -190,7 +194,21 @@ void display( )
  */
 void animate( )
 {
+	if (rand() % 10000 < 5)
+	{
+		printf("Enemy generated\n");
+		Character enemy = Character();
+		enemy.position = Vec3Df(3, (rand()%2-1), 0);
+		enemy.movementDirection = Vec3Df(-1, 0, 0);
+		enemy.color = Vec3Df(0, 0, 1);
+		enemies.push_back(enemy);
+	}
 	character.animate();
+
+	for (auto &enemy : enemies)
+	{
+		enemy.animate();
+	}
 }
 
 
@@ -209,16 +227,16 @@ void keyboard(unsigned char key, int x, int y)
 	switch (key)
     {
 	case 'w':
-		character.directionOfMovement = Vec3Df(0, 1, 0);
+		character.movementDirection = Vec3Df(0, 1, 0);
 		break;
 	case 'a':
-		character.directionOfMovement = Vec3Df(-1, 0, 0);
+		character.movementDirection = Vec3Df(-1, 0, 0);
 		break;
 	case 's':
-		character.directionOfMovement = Vec3Df(0, -1, 0);
+		character.movementDirection = Vec3Df(0, -1, 0);
 		break;
 	case 'd':
-		character.directionOfMovement = Vec3Df(1, 0, 0);
+		character.movementDirection = Vec3Df(1, 0, 0);
 		break;
 	case 27:     // touche ESC
         exit(0);
@@ -240,7 +258,7 @@ void keyboardUp(unsigned char key, int x, int y)
 
 	if (key == 'w' || key == 'a' || key == 's' || key == 'd')
 	{
-		character.directionOfMovement = Vec3Df(0, 0, 0);
+		character.movementDirection = Vec3Df(0, 0, 0);
 	}
 }
 
@@ -485,7 +503,7 @@ int main(int argc, char** argv)
     glutInitDisplayMode( GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH );
 
     // position et taille de la fenetre
-    glutInitWindowPosition(200, 100);
+    glutInitWindowPosition(20, 80);
     glutInitWindowSize(W_fen,H_fen);
     glutCreateWindow(argv[0]);
 
@@ -498,7 +516,8 @@ int main(int argc, char** argv)
     tbInitTransform();     
     tbHelp();
          
-    
+	character.color = Vec3Df(1, 0, 0);
+	character.position = Vec3Df(-2, 0, 0);
 
 	// cablage des callback
     glutReshapeFunc(reshape);
