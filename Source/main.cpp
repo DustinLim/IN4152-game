@@ -190,14 +190,14 @@ void display( )
  */
 void animate( )
 {
-
+	character.animate();
 }
 
 
 //take keyboard input into account
 void keyboard(unsigned char key, int x, int y)
 {
-    printf("key %d pressed at %d,%d\n",key,x,y);
+    printf("Keydown %d, cursor pos (%d,%d)\n",key,x,y);
     fflush(stdout);
 
 	if ((key>='1')&&(key<='9'))
@@ -209,16 +209,16 @@ void keyboard(unsigned char key, int x, int y)
 	switch (key)
     {
 	case 'w':
-		character.position[1] += characterMovementDelta;
+		character.directionOfMovement = Vec3Df(0, 1, 0);
 		break;
 	case 'a':
-		character.position[0] -= characterMovementDelta;
+		character.directionOfMovement = Vec3Df(-1, 0, 0);
 		break;
 	case 's':
-		character.position[1] -= characterMovementDelta;
+		character.directionOfMovement = Vec3Df(0, -1, 0);
 		break;
 	case 'd':
-		character.position[0] += characterMovementDelta;
+		character.directionOfMovement = Vec3Df(1, 0, 0);
 		break;
 	case 27:     // touche ESC
         exit(0);
@@ -232,6 +232,18 @@ void keyboard(unsigned char key, int x, int y)
 		break;
     }
 }
+
+void keyboardUp(unsigned char key, int x, int y)
+{
+    printf("Keyup %d, cursor pos (%d,%d)\n",key,x,y);
+    fflush(stdout);
+
+	if (key == 'w' || key == 'a' || key == 's' || key == 'd')
+	{
+		character.directionOfMovement = Vec3Df(0, 0, 0);
+	}
+}
+
 
 
 //Nothing needed below this point
@@ -490,9 +502,11 @@ int main(int argc, char** argv)
 
 	// cablage des callback
     glutReshapeFunc(reshape);
-    glutKeyboardFunc(keyboard);
-    glutDisplayFunc(displayInternal);
-    glutMouseFunc(tbMouseFunc);    // traqueboule utilise la souris
+	glutIgnoreKeyRepeat(1); 
+    glutKeyboardFunc(keyboard); //call *once* on keydown
+	glutKeyboardUpFunc(keyboardUp);
+    glutDisplayFunc(displayInternal); 
+	glutMouseFunc(tbMouseFunc);    // traqueboule utilise la souris
     glutMotionFunc(tbMotionFunc);  // traqueboule utilise la souris
     glutIdleFunc(animate);
 

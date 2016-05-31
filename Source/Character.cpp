@@ -25,3 +25,9 @@ void Character::draw()
 	glEnd();
 	glPopMatrix();
 }
+
+void Character::animate()
+{
+	directionOfMovement.normalize();
+	position += directionOfMovement * movementSpeed;
+}
