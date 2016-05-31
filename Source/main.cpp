@@ -10,6 +10,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "Character.h"
+
 //START READING HERE!!!
 
 
@@ -22,16 +24,16 @@ enum DisplayModeType {TRIANGLE=1, FACE=2, CUBE=3, ARM=4, MESH=5,};
 
 DisplayModeType DisplayMode = TRIANGLE;
 
-unsigned int W_fen = 800;  // screen width
-unsigned int H_fen = 800;  // screen height
+unsigned int W_fen = 960;  // screen width
+unsigned int H_fen = 540;  // screen height
 
 float LightPos[4] = {1,1,0.4,1};
 std::vector<float> MeshVertices;
 std::vector<unsigned int> MeshTriangles;
 
 //Declare your own global variables here:
-int myVariableThatServesNoPurpose;
-
+Character character = Character();
+float characterMovementDelta = 0.07;
 
 ////////// Draw Functions 
 
@@ -162,6 +164,8 @@ void display( )
     glLightfv(GL_LIGHT0,GL_POSITION,LightPos);
 	drawLight();
 
+	character.draw();
+
 	switch( DisplayMode )
 	{
 	case TRIANGLE:
@@ -204,6 +208,18 @@ void keyboard(unsigned char key, int x, int y)
 	
 	switch (key)
     {
+	case 'w':
+		character.position[1] += characterMovementDelta;
+		break;
+	case 'a':
+		character.position[0] -= characterMovementDelta;
+		break;
+	case 's':
+		character.position[1] -= characterMovementDelta;
+		break;
+	case 'd':
+		character.position[0] += characterMovementDelta;
+		break;
 	case 27:     // touche ESC
         exit(0);
 	case 'L':
