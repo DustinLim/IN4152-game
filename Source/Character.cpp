@@ -26,8 +26,8 @@ void Character::draw()
 	glPopMatrix();
 }
 
-void Character::animate()
+void Character::animate(int deltaTime)
 {
 	movementDirection.normalize();
-	position += movementDirection * movementSpeed;
+	position += movementDirection * movementSpeed * ((float)deltaTime/1000);
 }

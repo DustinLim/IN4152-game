@@ -34,6 +34,7 @@ std::vector<unsigned int> MeshTriangles;
 //Declare your own global variables here:
 Character character = Character();
 std::vector<Character> enemies = {};
+int glutElapsedTime = 0; //in ms
 
 
 ////////// Draw Functions 
@@ -194,6 +195,10 @@ void display( )
  */
 void animate( )
 {
+	int currentTime = glutGet(GLUT_ELAPSED_TIME);
+	int deltaTime = currentTime - glutElapsedTime;
+	glutElapsedTime = currentTime;
+
 	if (rand() % 10000 < 5)
 	{
 		printf("Enemy generated\n");
@@ -203,11 +208,11 @@ void animate( )
 		enemy.color = Vec3Df(0, 0, 1);
 		enemies.push_back(enemy);
 	}
-	character.animate();
+	character.animate(deltaTime);
 
 	for (auto &enemy : enemies)
 	{
-		enemy.animate();
+		enemy.animate(deltaTime);
 	}
 }
 
