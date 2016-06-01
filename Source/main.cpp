@@ -10,7 +10,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "Character.h"
+#include "Entity.h"
 
 //START READING HERE!!!
 
@@ -32,8 +32,8 @@ std::vector<float> MeshVertices;
 std::vector<unsigned int> MeshTriangles;
 
 //Declare your own global variables here:
-Character character = Character();
-std::vector<Character> enemies = {};
+Entity character = Entity();
+std::vector<Entity> enemies = {};
 int glutElapsedTime = 0; //in ms
 
 
@@ -115,7 +115,7 @@ void animate( )
 
 void spawnEnemy(int value)
 {
-	Character enemy = Character();
+	Entity enemy = Entity();
 	enemy.position = Vec3Df(3, (rand()%3-1), 0);
 	enemy.movementDirection = Vec3Df(-1, 0, 0);
 	enemy.color = Vec3Df(0, 0, 1);

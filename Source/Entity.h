@@ -1,11 +1,11 @@
 #pragma once
 #include "Vec3D.h"
 
-class Character
+class Entity
 {
 public:
-	Character();
-	~Character(); //class destructor
+	Entity();
+	~Entity(); //class destructor
 
 	Vec3Df position = Vec3Df(0, 0, 0);
 	Vec3Df movementDirection = Vec3Df(0, 0, 0);

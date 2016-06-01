@@ -80,14 +80,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="argumentParser.h" />
-    <ClInclude Include="Character.h" />
+    <ClInclude Include="Entity.h" />
     <ClInclude Include="matrix.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="trackball.h" />
     <ClInclude Include="Vec3D.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Character.cpp" />
+    <ClCompile Include="Entity.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
