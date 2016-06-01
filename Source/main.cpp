@@ -25,8 +25,6 @@ unsigned int W_fen = 800;  // screen width
 unsigned int H_fen = 600;  // screen height
 
 float LightPos[4] = {1,1,0.4,1};
-std::vector<float> MeshVertices;
-std::vector<unsigned int> MeshTriangles;
 
 //Declare your own global variables here:
 Character character = Character();
@@ -209,28 +207,6 @@ void keyboardUp(unsigned char key, int x, int y)
 }
 
 
-
-//Nothing needed below this point
-//STOP READING //STOP READING //STOP READING 
-//STOP READING //STOP READING //STOP READING 
-//STOP READING //STOP READING //STOP READING 
-//STOP READING //STOP READING //STOP READING 
-//STOP READING //STOP READING //STOP READING 
-//STOP READING //STOP READING //STOP READING 
-//STOP READING //STOP READING //STOP READING 
-//STOP READING //STOP READING //STOP READING 
-//STOP READING //STOP READING //STOP READING 
-//STOP READING //STOP READING //STOP READING 
-//STOP READING //STOP READING //STOP READING 
-//STOP READING //STOP READING //STOP READING 
-//STOP READING //STOP READING //STOP READING 
-//STOP READING //STOP READING //STOP READING 
-//STOP READING //STOP READING //STOP READING 
-
-
-
-
-
 void displayInternal(void);
 void reshape(int w, int h);
 bool loadMesh(const char * filename);
@@ -258,11 +234,9 @@ void init()
 	glShadeModel(GL_SMOOTH);
 	//loadMesh("David.obj");
 
-	//Initialization of the landscape
 	initMountains();
-	initMountainTexture();
+	initMountainTextures();
 }
-
 
 /**
  * Programme principal

@@ -83,7 +83,9 @@
     <ClInclude Include="calcUtilities.h" />
     <ClInclude Include="Character.h" />
     <ClInclude Include="landscape.h" />
-    <ClInclude Include="loadppm.h" />
+    <ClInclude Include="loadppm.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="matrix.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="trackball.h" />

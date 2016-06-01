@@ -1,7 +1,7 @@
 #include "landscape.h"
 
 //an array of texture (indices)
-std::vector<GLuint> Texture;
+std::vector<GLuint> Textures;
 
 //vertices
 std::vector<float> SurfaceVertices3f;
@@ -56,7 +56,7 @@ void computeMountainShadows()
 void drawMountains()
 {
 	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, Texture[0]);
+	glBindTexture(GL_TEXTURE_2D, Textures[0]);
 
 	// start- and endpos are the start and end X-coördinate of a mountain fraction.
 	float endpos = -time + lengthX;
@@ -215,18 +215,18 @@ void initMountains()
 
 //this function loads the textures in the GPU memory
 //the function is called once when the program starts
-void initMountainTexture()
+void initMountainTextures()
 {
-	Texture.resize(1);
-	Texture[0] = 0;
+	Textures.resize(1);
+	Textures[0] = 0;
 
-	//PPMImage image = PPMImage("sand.ppm");
-	//glGenTextures(1, &Texture[0]);
+	std:PPMImage sand("C:/sand.ppm");
+	glGenTextures(0, &Textures[0]);
 
-	//glBindTexture(GL_TEXTURE_2D, Texture[0]);
-	//gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGB, image.sizeX, image.sizeY,
-	//	GL_RGB, GL_UNSIGNED_BYTE, image.data);
-	//glBindTexture(GL_TEXTURE_2D, 0);
+	glBindTexture(GL_TEXTURE_2D, Textures[0]);
+	gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGB, sand.sizeX, sand.sizeY,
+		GL_RGB, GL_UNSIGNED_BYTE, sand.data);
+	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 
