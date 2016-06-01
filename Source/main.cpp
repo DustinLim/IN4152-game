@@ -11,11 +11,8 @@
 #include <string.h>
 
 #include "Character.h"
+#include "landscape.h"
 
-//START READING HERE!!!
-
-
-//////Predefined global variables
 
 //Use the enum values to define different rendering modes 
 //The mode is used by the function display and the mode is 
@@ -70,27 +67,38 @@ void drawCoordSystem(float length=1)
 
 void drawLight()
 {
-	// TODO LIGHT
+	//remember all states of the GPU
+	glPushAttrib(GL_ALL_ATTRIB_BITS);
+	//deactivate the lighting state
+	glDisable(GL_LIGHTING);
+	//yellow sphere at light position
+	glColor3f(1, 1, 0);
+	glPushMatrix();
+	glTranslatef(LightPos[0], LightPos[1], LightPos[2]);
+	glutSolidSphere(0.1, 6, 6);
+	glPopMatrix();
+
+	//reset to previous state
+	glPopAttrib();
 }
 
 
 void display( )
 {
-	//set the light to the right position
-    glLightfv(GL_LIGHT0,GL_POSITION,LightPos);
-	drawLight();
-
 	switch( DisplayMode )
 	{
 	case GAME:
+		glLightfv(GL_LIGHT0, GL_POSITION, LightPos);
+		drawLight();
 		drawCoordSystem();
 		character.draw();
-		for (auto &enemy : enemies) {
+		for (auto &enemy : enemies) 
+		{
 			enemy.draw();
 		}
-	break;
+		drawMountains();
+		break;
 	default:
-		
 		break;
 	}
 }
@@ -101,6 +109,8 @@ void display( )
  */
 void animate( )
 {
+	moveMountains();
+
 	int currentTime = glutGet(GLUT_ELAPSED_TIME);
 	int deltaTime = currentTime - glutElapsedTime;
 	glutElapsedTime = currentTime;
@@ -159,6 +169,31 @@ void keyboard(unsigned char key, int x, int y)
 		//turn lighting off
 		glDisable(GL_LIGHTING);
 		break;
+	// MOVING THE LIGHT IN THE X,Y,Z DIRECTION
+	case 'f':
+		LightPos[0] -= 0.1;
+		computeMountainShadows();
+		break;
+	case 'h':
+		LightPos[0] += 0.1;
+		computeMountainShadows();
+		break;
+	case 't':
+		LightPos[1] += 0.1;
+		computeMountainShadows();
+		break;
+	case 'g':
+		LightPos[1] -= 0.1;
+		computeMountainShadows();
+		break;
+	case 'r':
+		LightPos[2] += 0.1;
+		computeMountainShadows();
+		break;
+	case 'y':
+		LightPos[2] -= 0.1;
+		computeMountainShadows();
+		break;		
     }
 }
 
@@ -222,6 +257,10 @@ void init()
     glPolygonMode(GL_BACK,GL_LINE);
 	glShadeModel(GL_SMOOTH);
 	//loadMesh("David.obj");
+
+	//Initialization of the landscape
+	initMountains();
+	initMountainTexture();
 }
 
 

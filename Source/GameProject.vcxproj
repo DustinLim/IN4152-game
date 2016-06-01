@@ -80,17 +80,24 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="argumentParser.h" />
+    <ClInclude Include="calcUtilities.h" />
     <ClInclude Include="Character.h" />
+    <ClInclude Include="landscape.h" />
+    <ClInclude Include="loadppm.h" />
     <ClInclude Include="matrix.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="trackball.h" />
     <ClInclude Include="Vec3D.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="calcUtilities.cpp" />
     <ClCompile Include="Character.cpp" />
+    <ClCompile Include="landscape.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="img_stars.ppm" />
+    <None Include="sand.ppm" />
     <None Include="test.pro" />
   </ItemGroup>
   <ItemGroup>
