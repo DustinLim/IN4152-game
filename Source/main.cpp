@@ -20,7 +20,7 @@
 //Use the enum values to define different rendering modes 
 //The mode is used by the function display and the mode is 
 //chosen during execution with the keys 1-9
-enum DisplayModeType {TRIANGLE=1, FACE=2, CUBE=3, ARM=4, MESH=5, GAME=6};
+enum DisplayModeType {GAME=6};
 
 DisplayModeType DisplayMode = GAME;
 
@@ -67,96 +67,10 @@ void drawCoordSystem(float length=1)
 	glPopAttrib();
 }
 
-/**
- * Several drawing functions for you to work on
-*/
-
-void drawTriangle()
-{
-	//a simple example of a drawing function for a triangle
-	//1) try changing its color to red
-	//2) try changing its vertex positions
-	//3) add a second triangle in blue
-	//4) add a global variable (initialized at 0), which represents the 
-	// x-coordinate of the first vertex of each triangle
-	//5) go to the function animate and increment this variable 
-	//by a small value - observe the animation.
-
-	glColor3f(1,1,1);
-	glNormal3f(0,0,1);
-	glBegin(GL_TRIANGLES);
-		glVertex3f(0,0,0);
-		glVertex3f(1,0,0);
-		glVertex3f(1,1,0);
-	glEnd();
-}
-
-
-void drawUnitFace()
-{
-	//1) draw a unit quad in the x,y plane oriented along the z axis
-	//2) make sure the orientation of the vertices is positive (counterclock wise)
-	//3) What happens if the order is inversed?
-}
-
-void drawUnitCube()
-{
-	//1) draw a cube using your function drawUnitFace
-	//rely on glTranslate, glRotate, glPushMatrix, and glPopMatrix
-	//the latter two influence the model matrix, as seen during the course.
-	//glPushMatrix stores the current matrix and puts a copy on 
-	//the top of a stack.
-	//glPopMatrix pops the top matrix on the stack
-
-}
-
-void drawArm()
-{
-	//produce a three-unit arm (upperarm, forearm, hand) making use of your 
-	//function drawUnitCube to define each of them
-	//1) define 3 global variables that control the angles 
-	//between the arm parts
-	//and add cases to the keyboard function to control these values
-	
-	//2) use these variables to define your arm
-	//use glScalef to achieve different arm length
-	//use glRotate/glTranslate to correctly place the elements
-	
-	//3 optional) make an animated snake out of these boxes 
-	//(an arm with 10 joints that moves using the animate function)
-}
 
 void drawLight()
 {
-	//1) use glutSolidSphere to draw a sphere at the light's position LightPos
-	//use glTranslatef to move it to the right location
-	//to make the light source bright, follow the drawCoordSystem function
-	//to deactivate the lighting temporarily and draw it in yellow
-
-	//2) make the light position controllable via the keyboard function
-
-	//3) add normal information to all your faces of the previous functions
-	//and observe the shading after pressing 'L' to activate the lighting
-	//you can use 'l' to turn it off again
-
-}
-
-
-void drawMesh()
-{
-	//1) use the mesh data structure;
-	//each triangle is defined with 3 consecutive indices in the MeshTriangles table
-	//these indices correspond to vertices stored in the MeshVertices table.
-	//provide a function that draws these triangles.
-
-	//2) compute the normals of these triangles
-
-	//3) try computing a normal per vertex as the average of the adjacent face normals
-	// call glNormal3f with the corresponding values before each vertex
-	// What do you observe with respect to the lighting?
-
-	//4) try loading your own model (export it from Blender as a Wavefront obj) and replace the provided mesh file.
-
+	// TODO LIGHT
 }
 
 
@@ -168,14 +82,6 @@ void display( )
 
 	switch( DisplayMode )
 	{
-	case TRIANGLE:
-		drawMesh();
-		drawCoordSystem();
-		drawTriangle();
-		break;
-	case FACE:
-		drawUnitFace();
-		break;
 	case GAME:
 		drawCoordSystem();
 		character.draw();
@@ -199,7 +105,7 @@ void animate( )
 	int deltaTime = currentTime - glutElapsedTime;
 	glutElapsedTime = currentTime;
 
-	if (rand() % 10000 < 5)
+	if (rand() % 10000 < 50)
 	{
 		printf("Enemy generated\n");
 		Character enemy = Character();
@@ -315,186 +221,8 @@ void init()
 	//draw backfacing polygons as outlined
     glPolygonMode(GL_BACK,GL_LINE);
 	glShadeModel(GL_SMOOTH);
-	loadMesh("David.obj");
+	//loadMesh("David.obj");
 }
-
-
-//load mesh
-//this code is NOT how you should load a mesh... it is a bit hacky...
-void centerAndScaleToUnit (std::vector<float> & vertices)
-{
-	if (vertices.size()%3!=0)
-	{
-		cout<<"ERROR while loading!!!\n";
-		return;
-	}		
-	
-	float x=0;
-	float y=0;
-	float z=0;
-    for  (unsigned int i = 0; i < vertices.size (); i+=3)
-	{ 
-		x += vertices[i];
-        y += vertices[i+1];
-        z += vertices[i+2];
-	}    
-
-
-	x /= vertices.size ()/3;
-	y /= vertices.size ()/3;
-	z /= vertices.size ()/3;
-
-    float maxD = 0;
-    for (unsigned int i = 0; i < vertices.size (); i+=3){
-        float dX= (vertices[i]-x);
-        float dY= (vertices[i+1]-y);
-        float dZ= (vertices[i+2]-z);
-
-		float m = sqrt(dX*dX+dY*dY+dZ*dZ);
-        if (m > maxD)
-            maxD = m;
-    }
-	float center[]={x,y,z};
-    for  (unsigned int i = 0; i < vertices.size (); i+=3)
-	{
-			vertices[i] = (vertices[i] - x) / maxD;
-			vertices[i+1] = (vertices[i+1] - y) / maxD;
-			vertices[i+2] = (vertices[i+2] - z) / maxD;
-	}
-}
-
-bool loadMesh(const char * filename)
-{
-    const unsigned int LINE_LEN=256;
-    char s[LINE_LEN];
-    FILE * in;
-#ifdef WIN32
-    errno_t error=fopen_s(&in, filename,"r");
-    if (error!=0)
-#else
-        in = fopen(filename,"r");
-    if (!(in))
-#endif
-        return false;
-
-	//temp stuff
-    float x, y, z;
-    std::vector<int> vhandles;
-
-
-
-    while(in && !feof(in) && fgets(s, LINE_LEN, in))
-    {
-        // vertex
-        if (strncmp(s, "v ", 2) == 0)
-        {
-            if (sscanf_s(s, "v %f %f %f", &x, &y, &z))
-                MeshVertices.push_back(x);
-				MeshVertices.push_back(y);
-				MeshVertices.push_back(z);
-        }
-        // face
-        else if (strncmp(s, "f ", 2) == 0)
-        {
-            int component(0), nV(0);
-            bool endOfVertex(false);
-            char *p0, *p1(s+2); //place behind the "f "
-
-            vhandles.clear();
-
-            while (*p1 == ' ') ++p1; // skip white-spaces
-
-            while (p1)
-            {
-                p0 = p1;
-
-                // overwrite next separator
-
-                // skip '/', '\n', ' ', '\0', '\r' <-- don't forget Windows
-                while (*p1 != '/' && *p1 != '\r' && *p1 != '\n' &&
-                       *p1 != ' ' && *p1 != '\0')
-                    ++p1;
-
-                // detect end of vertex
-                if (*p1 != '/') endOfVertex = true;
-
-                // replace separator by '\0'
-                if (*p1 != '\0')
-                {
-                    *p1 = '\0';
-                    p1++; // point to next token
-                }
-
-                // detect end of line and break
-                if (*p1 == '\0' || *p1 == '\n')
-                    p1 = 0;
-
-
-                // read next vertex component
-                if (*p0 != '\0')
-                {
-                    switch (component)
-                    {
-                    case 0: // vertex
-                        vhandles.push_back(atoi(p0)-1);
-                        break;
-
-                    case 1: // texture coord
-                        //assert(!vhandles.empty());
-                        //assert((unsigned int)(atoi(p0)-1) < texcoords.size());
-                        //_bi.set_texcoord(vhandles.back(), texcoords[atoi(p0)-1]);
-                        break;
-
-                    case 2: // normal
-                        //assert(!vhandles.empty());
-                        //assert((unsigned int)(atoi(p0)-1) < normals.size());
-                        //_bi.set_normal(vhandles.back(), normals[atoi(p0)-1]);
-                        break;
-                    }
-                }
-
-                ++component;
-
-                if (endOfVertex)
-                {
-                    component = 0;
-                    nV++;
-                    endOfVertex = false;
-                }
-            }
-
-
-            if (vhandles.size()>3)
-            {
-                //model is not triangulated, so let us do this on the fly...
-                //to have a more uniform mesh, we add randomization
-                unsigned int k=(false)?(rand()%vhandles.size()):0;
-                for (unsigned int i=0;i<vhandles.size()-2;++i)
-                {
-                    MeshTriangles.push_back(vhandles[(k+0)%vhandles.size()]);
-					MeshTriangles.push_back(vhandles[(k+i+1)%vhandles.size()]);
-					MeshTriangles.push_back(vhandles[(k+i+2)%vhandles.size()]);
-                }
-            }
-            else if (vhandles.size()==3)
-            {
-                MeshTriangles.push_back(vhandles[0]);
-				MeshTriangles.push_back(vhandles[1]);
-				MeshTriangles.push_back(vhandles[2]);
-            }
-            else
-            {
-                std::cout<<"TriMesh::LOAD: Unexpected number of face vertices (<3). Ignoring face \n";
-            }
-        }
-        memset(&s, 0, LINE_LEN);
-    }
-    fclose(in);
-    centerAndScaleToUnit (MeshVertices);
-	return true;
-}
-
-
 
 
 /**
