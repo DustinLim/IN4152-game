@@ -25,7 +25,8 @@ int numberOfGridpoints = numVertX * numVertZ;
 int numberOfTriangles = (numVertX - 1) * (numVertZ - 1) * 2;
 
 // SIZE VARIABLES
-double lengthX = (2.0/3.0) * M_PI;			// <- is thus the length in the x-direction.
+// IMPORTANT NOTE: In this implementation, all mountain ridge function need to have the same 'period', because a uniform lengthX is used.
+double lengthX = (2.0/3.0) * M_PI;			// <- is thus the length in the x-direction. 
 double lengthZ = 1;
 double stepSizeZ = lengthZ / (numVertZ - 1);
 double stepSizeX = lengthX / (numVertX - 1);
@@ -40,10 +41,11 @@ float xMoved1 = 3;				// Updates the transformation matrix to create flowing mou
 float speed1 = 0.01;			// Determines the moving speed of mountain ridge 1
 
 float xMoved2 = 3;
-float speed2 = 0.016;
+float speed2 = 0.026;
 
 double boundaryLeft = -5;	// Represents the end of the screen at the left side (minimum needed drawn point)
 double boundaryRight = 5;	// Represents the end of the screen at the right side (maximum needed drawn point)
+double depth = -3;			// Represents starting depth of the ridges.
 
 // Update the parameters needed to let the landscape move <- called in 'animate'
 void moveMountains( )
@@ -76,7 +78,7 @@ void drawMountainRidge(float xMoved, float speed, unsigned int textureNum, std::
 	float startpos = -xMoved;
 
 	glPushMatrix();
-	glTranslated(-xMoved, -1, 0);		// start position for drawing, which is moving in the -X direction.
+	glTranslated(-xMoved, -1, depth);		// start position for drawing, which is moving in the -X direction.
 
 	// Now, we only draw when our start position is inside the screen boundary.
 	while (startpos < boundaryRight)
@@ -272,7 +274,6 @@ void initMountainTextures()
 	Textures.resize(1);
 	Textures[0] = 0;
 
-	
 	PPMImage sand("./Textures/sand.ppm");
 	glGenTextures(1, &Textures[0]);
 

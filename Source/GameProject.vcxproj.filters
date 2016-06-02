@@ -45,6 +45,9 @@
     <ClInclude Include="loadppm.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="background.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -60,6 +63,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="loadppm.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="background.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

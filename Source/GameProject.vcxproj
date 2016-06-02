@@ -80,6 +80,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="argumentParser.h" />
+    <ClInclude Include="background.h" />
     <ClInclude Include="calcUtilities.h" />
     <ClInclude Include="Character.h" />
     <ClInclude Include="landscape.h" />
@@ -90,6 +91,7 @@
     <ClInclude Include="Vec3D.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="background.cpp" />
     <ClCompile Include="calcUtilities.cpp" />
     <ClCompile Include="Character.cpp" />
     <ClCompile Include="landscape.cpp" />

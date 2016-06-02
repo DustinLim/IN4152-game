@@ -12,6 +12,7 @@
 
 #include "Character.h"
 #include "landscape.h"
+#include "background.h"
 
 
 //Use the enum values to define different rendering modes 
@@ -89,13 +90,14 @@ void display( )
 		glLightfv(GL_LIGHT0, GL_POSITION, LightPos);
 		drawLight();
 		drawCoordSystem();
-		/*
+		
 		character.draw();
 		for (auto &enemy : enemies) 
 		{
 			enemy.draw();
 		}
-		*/
+		
+		drawBackground();
 		drawMountains();
 		break;
 	default:
@@ -110,6 +112,7 @@ void display( )
 void animate( )
 {
 	moveMountains();
+	moveBackground();
 
 	int currentTime = glutGet(GLUT_ELAPSED_TIME);
 	int deltaTime = currentTime - glutElapsedTime;
@@ -238,6 +241,7 @@ void init()
 
 	initMountains();
 	initMountainTextures();
+	initBackgroundTexture();
 }
 
 /**
