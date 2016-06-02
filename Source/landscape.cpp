@@ -45,7 +45,7 @@ float speed2 = 0.026;
 
 double boundaryLeft = -5;	// Represents the end of the screen at the left side (minimum needed drawn point)
 double boundaryRight = 5;	// Represents the end of the screen at the right side (maximum needed drawn point)
-double depth = -3;			// Represents starting depth of the ridges.
+double zDepth = -3;			// Represents starting depth of the ridges.
 
 // Update the parameters needed to let the landscape move <- called in 'animate'
 void moveMountains( )
@@ -78,7 +78,7 @@ void drawMountainRidge(float xMoved, float speed, unsigned int textureNum, std::
 	float startpos = -xMoved;
 
 	glPushMatrix();
-	glTranslated(-xMoved, -1, depth);		// start position for drawing, which is moving in the -X direction.
+	glTranslated(-xMoved, -1, zDepth);		// start position for drawing, which is moving in the -X direction.
 
 	// Now, we only draw when our start position is inside the screen boundary.
 	while (startpos < boundaryRight)
@@ -149,9 +149,9 @@ void createMountainRidge(int ridgeNumber)
 
 			float y;						// Every ridge will have it's own height function.
 			if (ridgeNumber == 1)
-				y = ((-(Z - scope)*(Z - scope) + scope*scope) / (scope*scope)) * (max(0, 0.3 *sin(3* X)+1));
+                y = ((-(Z - scope)*(Z - scope) + scope*scope) / (scope*scope)) * (std::max(0.0, 0.3 *sin(3* X)+1));
 			else
-				y = ((-(Z - scope)*(Z - scope) + scope*scope) / (scope*scope)) * (max(0, 0.3 *cos(3 * X) + 1));
+				y = ((-(Z - scope)*(Z - scope) + scope*scope) / (scope*scope)) * (std::max(0.0, 0.3 *cos(3 * X) + 1));
 
 			// Storing the absolute vertex coordinates.
 			vertices[index] = X;

@@ -1,7 +1,11 @@
 #if defined(_WIN32)
+#define NOMINMAX
 #include <windows.h>
-#endif
 #include <GL/glut.h>
+#elif defined (__APPLE__)
+#include <GLUT/glut.h>
+#endif
+
 #include <stdlib.h>
 #include <assert.h>
 #include <stdio.h>

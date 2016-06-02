@@ -7,7 +7,13 @@ BTW all comments here are French. :)
 */
 #ifndef TRAQUEBOULE
 #define TRAQUEBOULE
+
+#if defined(_WIN32)
 #include <GL/glut.h>
+#elif defined (__APPLE__)
+#include <GLUT/glut.h>
+#endif
+
 #include <math.h>
 #include "matrix.h"
 

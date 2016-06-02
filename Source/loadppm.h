@@ -7,9 +7,12 @@
 #include <fstream>
 #include <math.h>
 #if defined(_WIN32)
+#define NOMINMAX
 #include <windows.h>
-#endif
 #include <GL/gl.h>
+#elif defined (__APPLE__)
+#include <GLUT/glut.h>
+#endif
 
 using namespace std;
 

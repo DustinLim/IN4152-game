@@ -1,6 +1,10 @@
 #include "Entity.h"
-#include <GL/glut.h>
 
+#if defined(_WIN32)
+#include <GL/glut.h>
+#elif defined (__APPLE__)
+#include <GLUT/glut.h>
+#endif
 
 Entity::Entity()
 {

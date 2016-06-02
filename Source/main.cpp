@@ -1,7 +1,11 @@
 #if defined(_WIN32)
+#define NOMINMAX
 #include <windows.h>
-#endif
 #include <GL/glut.h>
+#elif defined (__APPLE__)
+#include <GLUT/glut.h>
+#endif
+
 #include <stdlib.h>
 #include <math.h>
 #include <assert.h>
@@ -40,9 +44,10 @@ void drawCoordSystem(float length=1)
 {
 	//draw simply colored axes
 	
-	//remember all states of the GPU
-	glPushAttrib(GL_ALL_ATTRIB_BITS);
-	//deactivate the lighting state
+	//remember GPU state
+    GLboolean lightingWasEnabled = glIsEnabled(GL_LIGHTING);
+
+    //deactivate the lighting state
 	glDisable(GL_LIGHTING);
 	//draw axes
 	glBegin(GL_LINES);
@@ -60,7 +65,9 @@ void drawCoordSystem(float length=1)
 	glEnd();
 	
 	//reset to previous state
-	glPopAttrib();
+    if (lightingWasEnabled) {
+        glEnable(GL_LIGHTING);
+    }
 }
 
 
