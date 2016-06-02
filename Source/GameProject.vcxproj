@@ -80,18 +80,30 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="argumentParser.h" />
+    <ClInclude Include="background.h" />
+    <ClInclude Include="calcUtilities.h" />
     <ClInclude Include="Entity.h" />
+    <ClInclude Include="landscape.h" />
+    <ClInclude Include="loadppm.h" />
     <ClInclude Include="matrix.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="trackball.h" />
     <ClInclude Include="Vec3D.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="background.cpp" />
+    <ClCompile Include="calcUtilities.cpp" />
     <ClCompile Include="Entity.cpp" />
+    <ClCompile Include="landscape.cpp" />
+    <ClCompile Include="loadppm.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="img_stars.ppm" />
     <None Include="test.pro" />
+    <None Include="Textures\brick.ppm" />
+    <None Include="Textures\checker.ppm" />
+    <None Include="Textures\sand.ppm" />
   </ItemGroup>
   <ItemGroup>
     <Object Include="Models\David.obj">
