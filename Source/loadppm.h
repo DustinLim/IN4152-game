@@ -1,4 +1,5 @@
 /* loadppm.h */
+
 #ifndef __LOADPPM_H
 #define __LOADPPM_H
 

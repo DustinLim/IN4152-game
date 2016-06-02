@@ -19,7 +19,7 @@ std::vector<float> TriangleNormals3f;
 
 // LANDSCAPE RESOLUTION VARIABLES
 // numVertX/numVertZ gives us the number of gridpoints in the X/Z direction
-int numVertX = 50;
+int numVertX = 100;
 int numVertZ = 10;
 int numberOfGridpoints = numVertX * numVertZ;
 int numberOfTriangles = (numVertX - 1) * (numVertZ - 1) * 2;
@@ -63,7 +63,7 @@ void drawMountains()
 	float startpos = -time;
 
 	glPushMatrix();
-	glTranslated(-time, -1, -4);		// start position for drawing, which is moving in the -X direction.
+	glTranslated(-time, -1, 0);		// start position for drawing, which is moving in the -X direction.
 
 	// Now, we only draw when our start position is inside the screen boundary.
 	while (startpos < boundaryRight)
@@ -119,16 +119,16 @@ void initMountains()
 			// Setting the Vertex-coordinates
 			float X = stepSizeX * x;
 			float Z = stepSizeZ * z;
-			float y = ((-(Z - scope)*(Z - scope) + scope*scope) / (scope*scope)) * (max(0, 3.3 *sin(3* X)+1));
+			float y = ((-(Z - scope)*(Z - scope) + scope*scope) / (scope*scope)) * (max(0, 0.3 *sin(3* X)+1));
 
 			SurfaceVertices3f[index] = stepSizeX * x;
 			SurfaceVertices3f[index + 2] = -stepSizeZ * z;
 			SurfaceVertices3f[index + 1] = y;
 						
 			// Setting the Colors - in this case following the coördinates and the 'B' value ('z' value) always 1;
-			SurfaceColors3f[index] = 0.5 + y;
-			SurfaceColors3f[index + 1] = 0.5 + y;
-			SurfaceColors3f[index + 2] = 0;
+			SurfaceColors3f[index] = (y >= 0.7) ? 1 : 0.5 + y;
+			SurfaceColors3f[index + 1] = (y >= 0.7) ? 1 : 0.5;
+			SurfaceColors3f[index + 2] = (y >= 0.8) ? 1 : 0;
 			
 			index += 3;
 
@@ -220,13 +220,15 @@ void initMountainTextures()
 	Textures.resize(1);
 	Textures[0] = 0;
 
-	std:PPMImage sand("C:/sand.ppm");
-	glGenTextures(0, &Textures[0]);
+	
+	PPMImage sand("./Textures/sand.ppm");
+	glGenTextures(1, &Textures[0]);
 
 	glBindTexture(GL_TEXTURE_2D, Textures[0]);
 	gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGB, sand.sizeX, sand.sizeY,
 		GL_RGB, GL_UNSIGNED_BYTE, sand.data);
 	glBindTexture(GL_TEXTURE_2D, 0);
+	
 }
 
 

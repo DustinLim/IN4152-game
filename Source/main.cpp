@@ -89,11 +89,13 @@ void display( )
 		glLightfv(GL_LIGHT0, GL_POSITION, LightPos);
 		drawLight();
 		drawCoordSystem();
+		/*
 		character.draw();
 		for (auto &enemy : enemies) 
 		{
 			enemy.draw();
 		}
+		*/
 		drawMountains();
 		break;
 	default:

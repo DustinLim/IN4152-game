@@ -83,9 +83,7 @@
     <ClInclude Include="calcUtilities.h" />
     <ClInclude Include="Character.h" />
     <ClInclude Include="landscape.h" />
-    <ClInclude Include="loadppm.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
-    </ClInclude>
+    <ClInclude Include="loadppm.h" />
     <ClInclude Include="matrix.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="trackball.h" />
@@ -95,12 +93,15 @@
     <ClCompile Include="calcUtilities.cpp" />
     <ClCompile Include="Character.cpp" />
     <ClCompile Include="landscape.cpp" />
+    <ClCompile Include="loadppm.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="img_stars.ppm" />
-    <None Include="sand.ppm" />
     <None Include="test.pro" />
+    <None Include="Textures\brick.ppm" />
+    <None Include="Textures\checker.ppm" />
+    <None Include="Textures\sand.ppm" />
   </ItemGroup>
   <ItemGroup>
     <Object Include="Models\David.obj">

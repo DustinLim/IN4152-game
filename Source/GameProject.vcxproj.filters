@@ -59,13 +59,22 @@
     <ClCompile Include="calcUtilities.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="loadppm.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="test.pro" />
-    <None Include="sand.ppm">
+    <None Include="img_stars.ppm">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="img_stars.ppm">
+    <None Include="Textures\brick.ppm">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Textures\checker.ppm">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Textures\sand.ppm">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>
