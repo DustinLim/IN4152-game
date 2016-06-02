@@ -10,7 +10,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "Character.h"
+#include "Entity.h"
 #include "landscape.h"
 #include "background.h"
 
@@ -28,8 +28,8 @@ unsigned int H_fen = 600;  // screen height
 float LightPos[4] = {1,1,0.4,1};
 
 //Declare your own global variables here:
-Character character = Character();
-std::vector<Character> enemies = {};
+Entity character = Entity();
+std::vector<Entity> enemies = {};
 int glutElapsedTime = 0; //in ms
 
 
@@ -107,7 +107,8 @@ void display( )
 
 
 /**
- * Animation
+ * Animation function, only put animation code here!
+ * That is to say, code that updates positioning of drawables.
  */
 void animate( )
 {
@@ -118,23 +119,24 @@ void animate( )
 	int deltaTime = currentTime - glutElapsedTime;
 	glutElapsedTime = currentTime;
 
-	if (rand() % 10000 < 50)
-	{
-		printf("Enemy generated\n");
-		Character enemy = Character();
-		enemy.position = Vec3Df(3, (rand()%2-1), 0);
-		enemy.movementDirection = Vec3Df(-1, 0, 0);
-		enemy.color = Vec3Df(0, 0, 1);
-		enemies.push_back(enemy);
-	}
 	character.animate(deltaTime);
-
 	for (auto &enemy : enemies)
 	{
 		enemy.animate(deltaTime);
 	}
 }
 
+void spawnEnemy(int value)
+{
+	Entity enemy = Entity();
+	enemy.position = Vec3Df(3, (rand()%3-1), 0);
+	enemy.movementDirection = Vec3Df(-1, 0, 0);
+	enemy.color = Vec3Df(0, 0, 1);
+	enemies.push_back(enemy);
+
+	// Repeat this
+	glutTimerFunc(1000, spawnEnemy, 0);
+}
 
 //take keyboard input into account
 void keyboard(unsigned char key, int x, int y)
@@ -280,6 +282,7 @@ int main(int argc, char** argv)
 	glutMouseFunc(tbMouseFunc);    // traqueboule utilise la souris
     glutMotionFunc(tbMotionFunc);  // traqueboule utilise la souris
     glutIdleFunc(animate);
+	glutTimerFunc(1000, spawnEnemy, 0);
 
     // lancement de la boucle principale
     glutMainLoop();

@@ -1,17 +1,17 @@
-#include "Character.h"
+#include "Entity.h"
 #include <GL/glut.h>
 
 
-Character::Character()
+Entity::Entity()
 {
 }
-Character::~Character()
+Entity::~Entity()
 {
 }
 
-void Character::draw()
+void Entity::draw()
 {
-	// Simple quad character
+	// Simple quad Entity
 	glPushMatrix();
 	glTranslatef(position[0], position[1], position[2]);
 	glColor3f(color[0], color[1], color[2]);
@@ -26,7 +26,7 @@ void Character::draw()
 	glPopMatrix();
 }
 
-void Character::animate(int deltaTime)
+void Entity::animate(int deltaTime)
 {
 	movementDirection.normalize();
 	position += movementDirection * movementSpeed * ((float)deltaTime/1000);

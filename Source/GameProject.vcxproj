@@ -82,7 +82,7 @@
     <ClInclude Include="argumentParser.h" />
     <ClInclude Include="background.h" />
     <ClInclude Include="calcUtilities.h" />
-    <ClInclude Include="Character.h" />
+    <ClInclude Include="Entity.h" />
     <ClInclude Include="landscape.h" />
     <ClInclude Include="loadppm.h" />
     <ClInclude Include="matrix.h" />
@@ -93,7 +93,7 @@
   <ItemGroup>
     <ClCompile Include="background.cpp" />
     <ClCompile Include="calcUtilities.cpp" />
-    <ClCompile Include="Character.cpp" />
+    <ClCompile Include="Entity.cpp" />
     <ClCompile Include="landscape.cpp" />
     <ClCompile Include="loadppm.cpp" />
     <ClCompile Include="main.cpp" />
