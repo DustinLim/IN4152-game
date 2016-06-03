@@ -37,6 +37,8 @@ std::vector<Entity> enemies = {};
 int glutElapsedTime = 0; //in ms
 
 Background background;
+std::vector<Ridge> mountains;
+int numberOfRidges = 2;
 
 
 ////////// Draw Functions 
@@ -107,7 +109,10 @@ void display( )
 		}
 		
 		background.draw();
-		drawMountains();
+		for (int i = 0; i < numberOfRidges; i++)
+		{
+			mountains[i].draw();
+		}
 		break;
 	default:
 		break;
@@ -121,7 +126,10 @@ void display( )
  */
 void animate( )
 {
-	moveMountains();
+	for (int i = 0; i < numberOfRidges; i++)
+	{
+		mountains[i].move();
+	}
 	background.move();
 
 	int currentTime = glutGet(GLUT_ELAPSED_TIME);
@@ -183,30 +191,24 @@ void keyboard(unsigned char key, int x, int y)
 		//turn lighting off
 		glDisable(GL_LIGHTING);
 		break;
-	// MOVING THE LIGHT IN THE X,Y,Z DIRECTION
+	// MOVING THE LIGHT IN THE X,Y,Z DIRECTION -> We should do something with shadows in a later stadium.
 	case 'f':
 		LightPos[0] -= 0.1;
-		computeMountainShadows();
 		break;
 	case 'h':
 		LightPos[0] += 0.1;
-		computeMountainShadows();
 		break;
 	case 't':
 		LightPos[1] += 0.1;
-		computeMountainShadows();
 		break;
 	case 'g':
 		LightPos[1] -= 0.1;
-		computeMountainShadows();
 		break;
 	case 'r':
 		LightPos[2] += 0.1;
-		computeMountainShadows();
 		break;
 	case 'y':
 		LightPos[2] -= 0.1;
-		computeMountainShadows();
 		break;		
     }
 }
@@ -250,9 +252,10 @@ void init()
 	glShadeModel(GL_SMOOTH);
 	//loadMesh("David.obj");
 
-	initMountains();
-	initMountainTextures();
 	background = Background();
+	mountains.resize(numberOfRidges);
+	mountains[0] = Ridge(1, 50, 10, -3, 0.01, -3, "./Textures/sand.ppm");
+	mountains[1] = Ridge(2, 50, 10, -3, 0.026, -4, "./Textures/sand.ppm");
 }
 
 /**
