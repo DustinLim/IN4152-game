@@ -37,6 +37,7 @@ Entity character = Entity();
 std::vector<Entity> enemies = {};
 std::vector<Entity> projectiles = {};
 int glutElapsedTime = 0; //in ms
+bool keyPressed[256]; //keyboard buffer
 
 
 ////////// Draw Functions 
@@ -159,39 +160,41 @@ Entity spawnProjectile(Vec3Df direction)
 	Entity projectile = Entity();
 	projectile.position = character.position;
 	projectile.movementDirection = direction;
-	projectile.movementSpeed = 2.0;
+	projectile.movementSpeed = 3.0;
 	projectile.size = 0.125;
 
 	projectiles.push_back(projectile);
 	return projectile;
 }
 
+void updateCharacterMovementDirection()
+{
+    // Update character movement
+    Vec3Df direction = Vec3Df(0, 0, 0);
+    if (keyPressed['w']) { direction += Vec3Df(0, 1, 0); }
+    if (keyPressed['a']) { direction += Vec3Df(-1, 0, 0); }
+    if (keyPressed['s']) { direction += Vec3Df(0, -1, 0); }
+    if (keyPressed['d']) { direction += Vec3Df(1, 0, 0); }
+    character.movementDirection = direction;
+}
+
 //take keyboard input into account
 void keyboard(unsigned char key, int x, int y)
 {
-    printf("Keydown %d, cursor pos (%d,%d)\n",key,x,y);
-    fflush(stdout);
+    //printf("Keydown %d, cursor pos (%d,%d)\n",key,x,y);
+    //fflush(stdout);
+    keyPressed[key] = true;
 
 	if ((key>='1')&&(key<='9'))
 	{
 		DisplayMode= (DisplayModeType) (key-'0');
 		return;
 	}
-	
+    
+    updateCharacterMovementDirection();
+    
 	switch (key)
     {
-	case 'w':
-		character.movementDirection = Vec3Df(0, 1, 0);
-		break;
-	case 'a':
-		character.movementDirection = Vec3Df(-1, 0, 0);
-		break;
-	case 's':
-		character.movementDirection = Vec3Df(0, -1, 0);
-		break;
-	case 'd':
-		character.movementDirection = Vec3Df(1, 0, 0);
-		break;
     case 'm': {
         if (MouseMode == MOUSE_MODE_SHOOTING) {
             MouseMode = MOUSE_MODE_CAMERA;
@@ -241,13 +244,11 @@ void keyboard(unsigned char key, int x, int y)
 
 void keyboardUp(unsigned char key, int x, int y)
 {
-    printf("Keyup %d, cursor pos (%d,%d)\n",key,x,y);
-    fflush(stdout);
+    //printf("Keyup %d, cursor pos (%d,%d)\n",key,x,y);
+    //fflush(stdout);
+    keyPressed[key] = false;
 
-	if (key == 'w' || key == 'a' || key == 's' || key == 'd')
-	{
-		character.movementDirection = Vec3Df(0, 0, 0);
-	}
+    updateCharacterMovementDirection();
 }
 
 // Returns for a given cursor coordinate, the intersection points it has
