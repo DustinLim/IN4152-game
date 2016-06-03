@@ -36,6 +36,8 @@ Entity character = Entity();
 std::vector<Entity> enemies = {};
 int glutElapsedTime = 0; //in ms
 
+Background background;
+
 
 ////////// Draw Functions 
 
@@ -104,7 +106,7 @@ void display( )
 			enemy.draw();
 		}
 		
-		drawBackground();
+		background.draw();
 		drawMountains();
 		break;
 	default:
@@ -120,7 +122,7 @@ void display( )
 void animate( )
 {
 	moveMountains();
-	moveBackground();
+	background.move();
 
 	int currentTime = glutGet(GLUT_ELAPSED_TIME);
 	int deltaTime = currentTime - glutElapsedTime;
@@ -250,7 +252,7 @@ void init()
 
 	initMountains();
 	initMountainTextures();
-	initBackgroundTexture();
+	background = Background();
 }
 
 /**

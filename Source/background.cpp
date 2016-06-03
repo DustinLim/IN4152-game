@@ -1,30 +1,28 @@
 #include "background.h"
 
-std::vector<GLuint> Texture;
+Background::Background()
+{
+	heightMin = -5;			// <- could we set abóve the plateau, so that it reduces drawing stuff :)
+	heightMax = 5;
+	widthMin = -6;
+	widthMax = 4;
+	depth = -5;
+	quadWidth = 3;
+	quadHeight = 3;
+	position = 0;
+	speed = 0.01;
 
-// BOUNDARY VALUES - should follow from the screen size.
-int heightMin = -5;			// <- could we set abóve the plateau, so that it reduces drawing stuff :)
-int heightMax = 5;
-int widthMin = -6;
-int widthMax = 4;
+	initTexture();
+}
 
-// Z-value for the background
-int depth = -5;
+Background::~Background() {}
 
-// RESOLUTION VARIABLES
-int quadWidth = 3;
-int quadHeight = 3;
-
-// Background Speed and 'startlocation'
-float position = 0;
-float speed = 0.01;
-
-void moveBackground()
+void Background::move()
 {
 	position = (position >= 1) ? 0 : position + 0.005;
 }
 
-void drawBackground()
+void Background::draw()
 {
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, Texture[0]);
@@ -66,7 +64,7 @@ void drawBackground()
 	glDisable(GL_TEXTURE_2D);
 }
 
-void initBackgroundTexture()
+void Background::initTexture()
 {
 	Texture.resize(1);
 	Texture[0] = 0;
