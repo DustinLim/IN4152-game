@@ -23,7 +23,6 @@
 //The mode is used by the function display and the mode is 
 //chosen during execution with the keys 1-9
 enum DisplayModeType {GAME=6};
-
 DisplayModeType DisplayMode = GAME;
 
 unsigned int W_fen = 800;  // screen width
@@ -34,6 +33,7 @@ float LightPos[4] = {1,1,0.4,1};
 //Declare your own global variables here:
 Entity character = Entity();
 std::vector<Entity> enemies = {};
+std::vector<Entity> projectiles = {};
 int glutElapsedTime = 0; //in ms
 
 
@@ -94,19 +94,23 @@ void display( )
 	switch( DisplayMode )
 	{
 	case GAME:
+	{
 		glLightfv(GL_LIGHT0, GL_POSITION, LightPos);
 		drawLight();
 		drawCoordSystem();
 		
 		character.draw();
-		for (auto &enemy : enemies) 
-		{
+		for (auto &enemy : enemies) {
 			enemy.draw();
+		}
+		for (auto &projectile : projectiles) {
+			projectile.draw();
 		}
 		
 		drawBackground();
 		drawMountains();
 		break;
+	}
 	default:
 		break;
 	}
@@ -127,13 +131,16 @@ void animate( )
 	glutElapsedTime = currentTime;
 
 	character.animate(deltaTime);
-	for (auto &enemy : enemies)
-	{
+	for (auto &enemy : enemies) {
 		enemy.animate(deltaTime);
+	}
+	for (auto &projectile : projectiles) {
+		projectile.animate(deltaTime);
 	}
 }
 
-void spawnEnemy(int value)
+// Method parameter is required to be registered by glutTimerFunc()
+void spawnEnemy(int unusedValue)
 {
 	Entity enemy = Entity();
 	enemy.position = Vec3Df(3, (rand()%3-1), 0);
@@ -143,6 +150,18 @@ void spawnEnemy(int value)
 
 	// Repeat this
 	glutTimerFunc(1000, spawnEnemy, 0);
+}
+
+Entity spawnProjectile(Vec3Df direction)
+{
+	Entity projectile = Entity();
+	projectile.position = character.position;
+	projectile.movementDirection = direction;
+	projectile.movementSpeed = 2.0;
+	projectile.size = 0.125;
+
+	projectiles.push_back(projectile);
+	return projectile;
 }
 
 //take keyboard input into account
@@ -171,6 +190,12 @@ void keyboard(unsigned char key, int x, int y)
 	case 'd':
 		character.movementDirection = Vec3Df(1, 0, 0);
 		break;
+	case ' ': {
+		spawnProjectile(Vec3Df(1, 0, 0));
+		spawnProjectile(Vec3Df(1, 1, 0));
+		spawnProjectile(Vec3Df(1, -1, 0));
+		break;
+	}
 	case 27:     // touche ESC
         exit(0);
 	case 'L':
@@ -298,10 +323,10 @@ int main(int argc, char** argv)
 }
 
 /**
- * Fonctions de gestion opengl à ne pas toucher
+ * This is the display callback function.
+ * It is called when GLUT determines that the normal plane for the window needs to be redisplayed.
+ * The entire normal plane region should be redisplayed in response to the callback.
  */
-// Actions d'affichage
-// Ne pas changer
 void displayInternal(void)
 {
     // Effacer tout
