@@ -24,6 +24,8 @@
 //chosen during execution with the keys 1-9
 enum DisplayModeType {GAME=6};
 DisplayModeType DisplayMode = GAME;
+enum MouseModeType {MOUSE_MODE_SHOOTING=0, MOUSE_MODE_CAMERA=1};
+MouseModeType MouseMode = MOUSE_MODE_SHOOTING;
 
 unsigned int W_fen = 800;  // screen width
 unsigned int H_fen = 600;  // screen height
@@ -190,12 +192,15 @@ void keyboard(unsigned char key, int x, int y)
 	case 'd':
 		character.movementDirection = Vec3Df(1, 0, 0);
 		break;
-	case ' ': {
-		spawnProjectile(Vec3Df(1, 0, 0));
-		spawnProjectile(Vec3Df(1, 1, 0));
-		spawnProjectile(Vec3Df(1, -1, 0));
-		break;
-	}
+    case 'm': {
+        if (MouseMode == MOUSE_MODE_SHOOTING) {
+            MouseMode = MOUSE_MODE_CAMERA;
+        }
+        else if (MouseMode == MOUSE_MODE_CAMERA) {
+            MouseMode = MOUSE_MODE_SHOOTING;
+        }
+        break;
+    }
 	case 27:     // touche ESC
         exit(0);
 	case 'L':
@@ -243,6 +248,63 @@ void keyboardUp(unsigned char key, int x, int y)
 	{
 		character.movementDirection = Vec3Df(0, 0, 0);
 	}
+}
+
+// Returns for a given cursor coordinate, the intersection points it has
+// when projected to the near and far clipping planes of the view frustum.
+// NOTE: inspired by http://stackoverflow.com/a/18247608
+void calculateMouseRay(int x, int y, Vec3Df *nearPoint, Vec3Df *farPoint)
+{
+    // Fetch transformation matrices
+    GLdouble modelview[16]; //world coordinates -> eye coordinates
+    GLdouble projection[16]; //eye coordinates -> clip coordinates
+    GLint viewport[4]; //normalized device coordinates -> window coordinates
+    glGetIntegerv(GL_VIEWPORT, viewport);
+    glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
+    glGetDoublev(GL_PROJECTION_MATRIX, projection);
+
+    // OpenGL uses a bottom-left origin,
+    // however the click coordinates we receive use top-left origin..
+    GLdouble winX = (GLdouble)x;
+    GLdouble winY = viewport[3] - (GLdouble)y;
+
+    // Get intersection points for the 'near' and 'far' clipping planes
+    GLdouble nearX, nearY, nearZ, farX, farY, farZ;
+    gluUnProject(winX, winY, 0.0,
+                 modelview, projection, viewport,
+                 &nearX, &nearY, &nearZ);
+    gluUnProject(winX, winY, 1.0,
+                 modelview, projection, viewport,
+                 &farX, &farY, &farZ);
+
+    *nearPoint = Vec3Df(nearX, nearY, nearZ);
+    *farPoint = Vec3Df(farX, farY, farZ);
+}
+
+void mouse(int button, int state, int x, int y)
+{
+    if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN &&
+        MouseMode == MOUSE_MODE_SHOOTING)
+    {
+        // Shooting in the correct direction is harder than it looks..
+        // We first determine the mouse ray that goes through the near and far clipping planes.
+        Vec3Df nearPoint, farPoint;
+        calculateMouseRay(x, y, &nearPoint, &farPoint);
+        Vec3Df ray = nearPoint - farPoint;
+
+        // Calculate the vertex where the mouse ray intersects the character plane
+        float fraction = (character.position[2] - farPoint[2]) / ray[2];
+        Vec3Df intersection = farPoint + (ray * fraction);
+
+        // We now know the correct direction
+        Vec3Df shootingDirection = intersection - character.position;
+        spawnProjectile(shootingDirection);
+    }
+    else if (MouseMode == MOUSE_MODE_CAMERA)
+    {
+        // Pass this event to trackball.h
+        tbMouseFunc(button, state, x, y);
+    }
 }
 
 
@@ -311,7 +373,7 @@ int main(int argc, char** argv)
     glutKeyboardFunc(keyboard); //call *once* on keydown
 	glutKeyboardUpFunc(keyboardUp);
     glutDisplayFunc(displayInternal); 
-	glutMouseFunc(tbMouseFunc);    // traqueboule utilise la souris
+	glutMouseFunc(mouse);
     glutMotionFunc(tbMotionFunc);  // traqueboule utilise la souris
     glutIdleFunc(animate);
 	glutTimerFunc(1000, spawnEnemy, 0);
