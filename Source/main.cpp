@@ -35,7 +35,7 @@ float LightPos[4] = {1,1,0.4,1};
 //Declare your own global variables here:
 Entity character = Entity();
 std::vector<Entity> enemies = {};
-std::vector<Entity> projectiles = {};
+std::vector<Projectile> projectiles = {};
 int glutElapsedTime = 0; //in ms
 bool keyPressed[256]; //keyboard buffer
 
@@ -155,11 +155,9 @@ void spawnEnemy(int unusedValue)
 	glutTimerFunc(1000, spawnEnemy, 0);
 }
 
-Entity spawnProjectile(Vec3Df direction)
+Projectile spawnProjectile(Vec3Df direction)
 {
-	Entity projectile = Entity();
-	projectile.position = character.position;
-	projectile.movementDirection = direction;
+    Projectile projectile = Projectile(character.position, direction);
 	projectile.movementSpeed = 3.0;
 	projectile.size = 0.125;
 
