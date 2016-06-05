@@ -17,6 +17,9 @@
 #include "Entity.h"
 #include "landscape.h"
 #include "background.h"
+#include "mesh.h"
+#include "grid.h"
+#include "Vertex.h"
 
 
 //Use the enum values to define different rendering modes 
@@ -30,18 +33,22 @@ MouseModeType MouseMode = MOUSE_MODE_SHOOTING;
 unsigned int W_fen = 800;  // screen width
 unsigned int H_fen = 600;  // screen height
 
-float LightPos[4] = {1,1,0.4,1};
+float LightPos[4] = {1,1,0.4f,1};
 
 //Declare your own global variables here:
 Entity character = Entity();
 std::vector<Entity> enemies = {};
 std::vector<Projectile> projectiles = {};
+std::vector<Mesh >meshes = {};
 int glutElapsedTime = 0; //in ms
 bool keyPressed[256]; //keyboard buffer
 
 Background background;
 std::vector<Ridge> mountains;
 int numberOfRidges = 2;
+
+//TODO remove this again
+int meshIndex = 0;
 
 
 ////////// Draw Functions 
@@ -119,6 +126,14 @@ void display( )
 		{
 			mountains[i].draw();
 		}
+
+		glEnable(GL_LIGHTING);
+		glPushMatrix();
+		glRotatef(-90.0f, 0.0f, 0.0f, 1.0f);
+		glRotatef(-90.0f, 0.0f, 1.0f, 0.0f);
+		meshes[meshIndex].drawSmooth();
+		glPopMatrix();
+		glDisable(GL_LIGHTING);
 		break;
 	}
 	default:
@@ -224,23 +239,26 @@ void keyboard(unsigned char key, int x, int y)
 		break;
 	// MOVING THE LIGHT IN THE X,Y,Z DIRECTION -> We should do something with shadows in a later stadium.
 	case 'f':
-		LightPos[0] -= 0.1;
+		LightPos[0] -= 0.1f;
 		break;
 	case 'h':
-		LightPos[0] += 0.1;
+		LightPos[0] += 0.1f;
 		break;
 	case 't':
-		LightPos[1] += 0.1;
+		LightPos[1] += 0.1f;
 		break;
 	case 'g':
-		LightPos[1] -= 0.1;
+		LightPos[1] -= 0.1f;
 		break;
 	case 'r':
-		LightPos[2] += 0.1;
+		LightPos[2] += 0.1f;
 		break;
 	case 'y':
-		LightPos[2] -= 0.1;
-		break;		
+		LightPos[2] -= 0.1f;
+		break;	
+	case '+':
+		meshIndex = ++meshIndex % meshes.size();
+		break;
     }
 }
 
@@ -313,7 +331,6 @@ void mouse(int button, int state, int x, int y)
 
 void displayInternal(void);
 void reshape(int w, int h);
-bool loadMesh(const char * filename);
 void init()
 {
     glDisable( GL_LIGHTING );
@@ -340,8 +357,21 @@ void init()
 
 	background = Background();
 	mountains.resize(numberOfRidges);
-	mountains[0] = Ridge(1, 50, 10, -3, 0.01, -3, "./Textures/sand.ppm");
-	mountains[1] = Ridge(2, 50, 10, -3, 0.026, -4, "./Textures/sand.ppm");
+	mountains[0] = Ridge(1, 50, 10, -3, 0.01f, -3, "./Textures/sand.ppm");
+	mountains[1] = Ridge(2, 50, 10, -3, 0.026f, -4, "./Textures/sand.ppm");
+
+
+	//TODO change mesh to correct object.
+	printf("Loading Mesh\n");
+	Mesh mesh = Mesh();
+	mesh.loadMesh("./Models/David.obj");
+	meshes.push_back(mesh);
+	printf("Creating Grid, 16\n");
+	meshes.push_back(Grid::getReduxMesh(mesh, 16));
+	printf("Creating Grid, 8\n");
+	meshes.push_back(Grid::getReduxMesh(mesh, 8));
+	printf("Creating Grid, 4\n");
+	meshes.push_back(Grid::getReduxMesh(mesh, 4));
 }
 
 /**
