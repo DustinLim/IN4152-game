@@ -23,8 +23,9 @@
 //The mode is used by the function display and the mode is 
 //chosen during execution with the keys 1-9
 enum DisplayModeType {GAME=6};
-
 DisplayModeType DisplayMode = GAME;
+enum MouseModeType {MOUSE_MODE_SHOOTING=0, MOUSE_MODE_CAMERA=1};
+MouseModeType MouseMode = MOUSE_MODE_SHOOTING;
 
 unsigned int W_fen = 800;  // screen width
 unsigned int H_fen = 600;  // screen height
@@ -34,7 +35,9 @@ float LightPos[4] = {1,1,0.4,1};
 //Declare your own global variables here:
 Entity character = Entity();
 std::vector<Entity> enemies = {};
+std::vector<Projectile> projectiles = {};
 int glutElapsedTime = 0; //in ms
+bool keyPressed[256]; //keyboard buffer
 
 
 ////////// Draw Functions 
@@ -94,19 +97,23 @@ void display( )
 	switch( DisplayMode )
 	{
 	case GAME:
+	{
 		glLightfv(GL_LIGHT0, GL_POSITION, LightPos);
 		drawLight();
 		drawCoordSystem();
 		
 		character.draw();
-		for (auto &enemy : enemies) 
-		{
+		for (auto &enemy : enemies) {
 			enemy.draw();
+		}
+		for (auto &projectile : projectiles) {
+			projectile.draw();
 		}
 		
 		drawBackground();
 		drawMountains();
 		break;
+	}
 	default:
 		break;
 	}
@@ -127,13 +134,16 @@ void animate( )
 	glutElapsedTime = currentTime;
 
 	character.animate(deltaTime);
-	for (auto &enemy : enemies)
-	{
+	for (auto &enemy : enemies) {
 		enemy.animate(deltaTime);
+	}
+	for (auto &projectile : projectiles) {
+		projectile.animate(deltaTime);
 	}
 }
 
-void spawnEnemy(int value)
+// Method parameter is required to be registered by glutTimerFunc()
+void spawnEnemy(int unusedValue)
 {
 	Entity enemy = Entity();
 	enemy.position = Vec3Df(3, (rand()%3-1), 0);
@@ -145,32 +155,53 @@ void spawnEnemy(int value)
 	glutTimerFunc(1000, spawnEnemy, 0);
 }
 
+Projectile spawnProjectile(Vec3Df direction)
+{
+    Projectile projectile = Projectile(character.position, direction);
+	projectile.movementSpeed = 3.0;
+	projectile.size = 0.125;
+
+	projectiles.push_back(projectile);
+	return projectile;
+}
+
+void updateCharacterMovementDirection()
+{
+    // Update character movement
+    Vec3Df direction = Vec3Df(0, 0, 0);
+    if (keyPressed['w']) { direction += Vec3Df(0, 1, 0); }
+    if (keyPressed['a']) { direction += Vec3Df(-1, 0, 0); }
+    if (keyPressed['s']) { direction += Vec3Df(0, -1, 0); }
+    if (keyPressed['d']) { direction += Vec3Df(1, 0, 0); }
+    character.movementDirection = direction;
+}
+
 //take keyboard input into account
 void keyboard(unsigned char key, int x, int y)
 {
-    printf("Keydown %d, cursor pos (%d,%d)\n",key,x,y);
-    fflush(stdout);
+    //printf("Keydown %d, cursor pos (%d,%d)\n",key,x,y);
+    //fflush(stdout);
+    keyPressed[key] = true;
 
 	if ((key>='1')&&(key<='9'))
 	{
 		DisplayMode= (DisplayModeType) (key-'0');
 		return;
 	}
-	
+    
+    updateCharacterMovementDirection();
+    
 	switch (key)
     {
-	case 'w':
-		character.movementDirection = Vec3Df(0, 1, 0);
-		break;
-	case 'a':
-		character.movementDirection = Vec3Df(-1, 0, 0);
-		break;
-	case 's':
-		character.movementDirection = Vec3Df(0, -1, 0);
-		break;
-	case 'd':
-		character.movementDirection = Vec3Df(1, 0, 0);
-		break;
+    case 'm': {
+        if (MouseMode == MOUSE_MODE_SHOOTING) {
+            MouseMode = MOUSE_MODE_CAMERA;
+        }
+        else if (MouseMode == MOUSE_MODE_CAMERA) {
+            MouseMode = MOUSE_MODE_SHOOTING;
+        }
+        break;
+    }
 	case 27:     // touche ESC
         exit(0);
 	case 'L':
@@ -211,13 +242,68 @@ void keyboard(unsigned char key, int x, int y)
 
 void keyboardUp(unsigned char key, int x, int y)
 {
-    printf("Keyup %d, cursor pos (%d,%d)\n",key,x,y);
-    fflush(stdout);
+    //printf("Keyup %d, cursor pos (%d,%d)\n",key,x,y);
+    //fflush(stdout);
+    keyPressed[key] = false;
 
-	if (key == 'w' || key == 'a' || key == 's' || key == 'd')
-	{
-		character.movementDirection = Vec3Df(0, 0, 0);
-	}
+    updateCharacterMovementDirection();
+}
+
+// Returns for a given cursor coordinate, the intersection points it has
+// when projected to the near and far clipping planes of the view frustum.
+// NOTE: inspired by http://stackoverflow.com/a/18247608
+void calculateMouseRay(int x, int y, Vec3Df *nearPoint, Vec3Df *farPoint)
+{
+    // Fetch transformation matrices
+    GLdouble modelview[16]; //world coordinates -> eye coordinates
+    GLdouble projection[16]; //eye coordinates -> clip coordinates
+    GLint viewport[4]; //normalized device coordinates -> window coordinates
+    glGetIntegerv(GL_VIEWPORT, viewport);
+    glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
+    glGetDoublev(GL_PROJECTION_MATRIX, projection);
+
+    // OpenGL uses a bottom-left origin,
+    // however the click coordinates we receive use top-left origin..
+    GLdouble winX = (GLdouble)x;
+    GLdouble winY = viewport[3] - (GLdouble)y;
+
+    // Get intersection points for the 'near' and 'far' clipping planes
+    GLdouble nearX, nearY, nearZ, farX, farY, farZ;
+    gluUnProject(winX, winY, 0.0,
+                 modelview, projection, viewport,
+                 &nearX, &nearY, &nearZ);
+    gluUnProject(winX, winY, 1.0,
+                 modelview, projection, viewport,
+                 &farX, &farY, &farZ);
+
+    *nearPoint = Vec3Df(nearX, nearY, nearZ);
+    *farPoint = Vec3Df(farX, farY, farZ);
+}
+
+void mouse(int button, int state, int x, int y)
+{
+    if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN &&
+        MouseMode == MOUSE_MODE_SHOOTING)
+    {
+        // Shooting in the correct direction is harder than it looks..
+        // We first determine the mouse ray that goes through the near and far clipping planes.
+        Vec3Df nearPoint, farPoint;
+        calculateMouseRay(x, y, &nearPoint, &farPoint);
+        Vec3Df ray = nearPoint - farPoint;
+
+        // Calculate the vertex where the mouse ray intersects the character plane
+        float fraction = (character.position[2] - farPoint[2]) / ray[2];
+        Vec3Df intersection = farPoint + (ray * fraction);
+
+        // We now know the correct direction
+        Vec3Df shootingDirection = intersection - character.position;
+        spawnProjectile(shootingDirection);
+    }
+    else if (MouseMode == MOUSE_MODE_CAMERA)
+    {
+        // Pass this event to trackball.h
+        tbMouseFunc(button, state, x, y);
+    }
 }
 
 
@@ -286,7 +372,7 @@ int main(int argc, char** argv)
     glutKeyboardFunc(keyboard); //call *once* on keydown
 	glutKeyboardUpFunc(keyboardUp);
     glutDisplayFunc(displayInternal); 
-	glutMouseFunc(tbMouseFunc);    // traqueboule utilise la souris
+	glutMouseFunc(mouse);
     glutMotionFunc(tbMotionFunc);  // traqueboule utilise la souris
     glutIdleFunc(animate);
 	glutTimerFunc(1000, spawnEnemy, 0);
@@ -298,10 +384,10 @@ int main(int argc, char** argv)
 }
 
 /**
- * Fonctions de gestion opengl à ne pas toucher
+ * This is the display callback function.
+ * It is called when GLUT determines that the normal plane for the window needs to be redisplayed.
+ * The entire normal plane region should be redisplayed in response to the callback.
  */
-// Actions d'affichage
-// Ne pas changer
 void displayInternal(void)
 {
     // Effacer tout
