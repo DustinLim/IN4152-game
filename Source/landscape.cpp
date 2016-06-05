@@ -1,84 +1,100 @@
 #include "landscape.h"
 
-//an array of texture (indices)
-std::vector<GLuint> Textures;
-
-// Vectors containing the mesh information for the first mountain ridge. The following notes:
-// TexCoords only have a X- and Y- coördinate.
-// For the triangle indices we have three successive entries: n1, n2, n3 represent a triangle, each n* is an index representing a vertex.
-// For the traingle normals we have three successive entries: xi,yi,zi of the normal of triangle 'i'
-std::vector<float> meshVertices1, meshNormals1, meshColors1, meshTexCoords1;
-std::vector<unsigned int> meshTriangles1;
-std::vector<float> triangleNormals1;
-
-// Vectors containing the mesh information for the second moutain ridge.
-std::vector<float> meshVertices2, meshNormals2, meshColors2, meshTexCoords2;
-std::vector<unsigned int> meshTriangles2;
-std::vector<float> triangleNormals2;
-
-
-// LANDSCAPE RESOLUTION VARIABLES 
-// numVertX/numVertZ gives us the number of gridpoints in the X/Z direction pér mountain ridge
-int numVertX = 50;
-int numVertZ = 10;
-int numberOfGridpoints = numVertX * numVertZ;
-int numberOfTriangles = (numVertX - 1) * (numVertZ - 1) * 2;
-
-// SIZE VARIABLES
-// IMPORTANT NOTE: In this implementation, all mountain ridge function need to have the same 'period', because a uniform lengthX is used.
-double lengthX = (2.0/3.0) * M_PI;			// <- is thus the length in the x-direction. 
-double lengthZ = 1;
-double stepSizeZ = lengthZ / (numVertZ - 1);
-double stepSizeX = lengthX / (numVertX - 1);
-
-// Used to create the 3D Z-relation, can be used to built to create multiple functions.
-double zMin = 0;
-double zMax = lengthZ;
-double scope = (zMax - zMin) / 2.0;
-
-// DISPLAY VARIABLES
-float xMoved1 = 3;				// Updates the transformation matrix to create flowing mountain ridge 1
-float speed1 = 0.01;			// Determines the moving speed of mountain ridge 1
-
-float xMoved2 = 3;
-float speed2 = 0.026;
-
-double boundaryLeft = -5;	// Represents the end of the screen at the left side (minimum needed drawn point)
-double boundaryRight = 5;	// Represents the end of the screen at the right side (maximum needed drawn point)
-double zDepth = -3;			// Represents starting depth of the ridges.
-
-// Update the parameters needed to let the landscape move <- called in 'animate'
-void moveMountains( )
+// One should not use this constructor!
+Ridge::Ridge()
 {
-	xMoved1 = xMoved1 + speed1;
-	xMoved2 = xMoved2 + speed2;
+	Ridge(0, 50, 10, 0, 0, 0, "./Textures/sand.ppm");
+}
+
+Ridge::Ridge(unsigned int rn, int resX, int resZ, float startPos, float spd, double depth, const char *texLoc)
+{
+	ridgeNumber = rn;
+
+	numVertX = resX;
+	numVertZ = resZ;
+	numberOfGridpoints = numVertX * numVertZ;
+	numberOfTriangles = (numVertX - 1) * (numVertZ - 1) * 2;
+
+	lengthX = getRidgePeriod();
+	stepSizeX = lengthX / (numVertX - 1);
+	lengthZ = 1;
+	stepSizeZ = lengthZ / (numVertZ - 1);
+
+	// For now the same for every ridge.
+	zMin = 0;
+	zMax = lengthZ;
+	scope = (zMax - zMin) / 2.0;
+
+	// DISPLAY VARIABLES
+	position = startPos;				
+	speed = spd;			
+	zDepth = depth;			
+	boundaryLeft = -5;			// For now the same for every ridge
+	boundaryRight = 5;			// For now the same for every ridge
+
+	// INIT the vectors and Textures;
+	initTexture(texLoc);
+
+	meshVertices.resize(3 * numberOfGridpoints);
+	meshNormals.resize(3 * numberOfGridpoints);
+	meshTexCoords.resize(2 * numberOfGridpoints);
+	meshTriangles.resize(3 * numberOfTriangles);
+	meshColors.resize(3 * numberOfGridpoints);
+	triangleNormals.resize(numberOfTriangles * 3);
+
+	// And create the ridge off course!
+	createRidge();
+}
+
+Ridge::~Ridge() {}
+
+float Ridge::getHeight(float X, float Z)
+{
+	if (ridgeNumber == 1)
+		return ((-(Z - scope)*(Z - scope) + scope*scope) / (scope*scope)) * (std::max(0.0, 0.3 *sin(3 * X) + 1));
+	if (ridgeNumber == 2)
+		return ((-(Z - scope)*(Z - scope) + scope*scope) / (scope*scope)) * (std::max(0.0, 0.3 *cos(3 * X) + 1));
+	else
+		return ((-(Z - scope)*(Z - scope) + scope*scope) / (scope*scope)) * (std::max(0.0, 0.3 *sin(3 * X) + 1));
+}
+
+float Ridge::getRidgePeriod()
+{
+	// For now, the period is always the same :)
+	if (ridgeNumber == 1)
+		return (2.0 / 3.0) * M_PI;
+	if (ridgeNumber == 2)
+		return (2.0 / 3.0) * M_PI;
+	else
+		return (2.0 / 3.0) * M_PI;
 }
 
 
-void computeMountainShadows()
+
+// Update the parameters needed to let the landscape move <- called in 'main->animate'
+void Ridge::move()
 {
-	// Doet nog niets :)
+	position -= speed;
 }
 
 
-void drawMountains()
+void Ridge::computeShadows()
 {
-	drawMountainRidge(xMoved1, speed1, 0, meshTriangles1, meshVertices1, meshTexCoords1, meshColors1, meshNormals1);
-	drawMountainRidge(xMoved2, speed2, 0, meshTriangles2, meshVertices2, meshTexCoords2, meshColors2, meshNormals2);
+	// Not implemented yet
 }
 
-void drawMountainRidge(float xMoved, float speed, unsigned int textureNum, std::vector<unsigned int> triangles, std::vector<float> vertices, 
-							std::vector<float> texcoords, std::vector<float> colors, std::vector<float> normals)
+
+void Ridge::draw()
 {
 	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, Textures[textureNum]);
+	glBindTexture(GL_TEXTURE_2D, Textures[0]);
 
 	// start- and endpos are the start and end X-coördinate of a mountain fraction.
-	float endpos = -xMoved + lengthX;
-	float startpos = -xMoved;
+	float endpos = position + lengthX;
+	float startpos = position;
 
 	glPushMatrix();
-	glTranslated(-xMoved, -1, zDepth);		// start position for drawing, which is moving in the -X direction.
+	glTranslated(position, -1, zDepth);		// start position for drawing, which is moving in the -X direction.
 
 	// Now, we only draw when our start position is inside the screen boundary.
 	while (startpos < boundaryRight)
@@ -86,18 +102,18 @@ void drawMountainRidge(float xMoved, float speed, unsigned int textureNum, std::
 		// we only stárt drawing as soon as our end position is in the screen.
 		if (endpos > boundaryLeft)
 		{
-			for (int t = 0; t < triangles.size(); t += 3)
+			for (int t = 0; t < meshTriangles.size(); t += 3)
 			{
 				glBegin(GL_TRIANGLES);
 
 				for (int triVertex = 0; triVertex < 3; ++triVertex)
 				{
-					int vIndex = triangles[t + triVertex];
+					int vIndex = meshTriangles[t + triVertex];
 
-					glTexCoord2fv(&(texcoords[2 * vIndex]));
-					glNormal3fv(&(normals[3 * vIndex]));
-					glColor3fv(&(colors[3 * vIndex]));
-					glVertex3fv(&(vertices[3 * vIndex]));
+					glTexCoord2fv(&(meshTexCoords[2 * vIndex]));
+					glNormal3fv(&(meshNormals[3 * vIndex]));
+					glColor3fv(&(meshColors[3 * vIndex]));
+					glVertex3fv(&(meshVertices[3 * vIndex]));
 				}
 				glEnd();
 			}
@@ -114,27 +130,8 @@ void drawMountainRidge(float xMoved, float speed, unsigned int textureNum, std::
 	glDisable(GL_TEXTURE_2D);
 }
 
-void initMountains()
+void Ridge::createRidge()
 {
-	createMountainRidge(1);
-	createMountainRidge(2);
-}
-
-void createMountainRidge(int ridgeNumber)
-{
-	std::vector<float> vertices, normals, colors, textcoords, triangleNormals;
-	std::vector<unsigned int> triangles;
-
-	vertices.resize(3 * numberOfGridpoints);
-	normals.resize(3 * numberOfGridpoints);
-	textcoords.resize(2 * numberOfGridpoints);
-	triangles.resize(3 * numberOfTriangles);
-	colors.resize(3 * numberOfGridpoints);
-	triangleNormals.resize(numberOfTriangles * 3);
-
-	// The mountain ridges will be places behind each other, thus the Z-coordinate needs a starting value;
-	double zStart = -zMax * (ridgeNumber - 1);
-	
 	int index = 0;				// index used in arrays where we take a 'three'-step
 	int indexTexture = 0;		// index used in the texture vector where we take a 'two'-step (we don't have a z-value)
 	
@@ -146,28 +143,23 @@ void createMountainRidge(int ridgeNumber)
 			// Setting the Vertex-coordinates
 			float X = stepSizeX * x;
 			float Z = stepSizeZ * z;		// relative coordinate, when we save we 'add' the zStart;
-
-			float y;						// Every ridge will have it's own height function.
-			if (ridgeNumber == 1)
-                y = ((-(Z - scope)*(Z - scope) + scope*scope) / (scope*scope)) * (std::max(0.0, 0.3 *sin(3* X)+1));
-			else
-				y = ((-(Z - scope)*(Z - scope) + scope*scope) / (scope*scope)) * (std::max(0.0, 0.3 *cos(3 * X) + 1));
+			float Y = getHeight(X, Z);
 
 			// Storing the absolute vertex coordinates.
-			vertices[index] = X;
-			vertices[index + 2] = -Z + zStart;
-			vertices[index + 1] = y;
+			meshVertices[index] = X;
+			meshVertices[index + 2] = -Z;
+			meshVertices[index + 1] = Y;
 						
-			// Setting the Colors - in this case following the coördinates and the 'B' value ('z' value) always 1;
-			colors[index] = (y >= 0.7) ? 1 : 0.5 + y;
-			colors[index + 1] = (y >= 0.7) ? 1 : 0.5;
-			colors[index + 2] = (y >= 0.8) ? 1 : 0;
+			// Setting the meshColors - in this case following the coördinates and the 'B' value ('z' value) always 1;
+			meshColors[index] = (Y >= 0.7) ? 1 : 0.5 + Y;
+			meshColors[index + 1] = (Y >= 0.7) ? 1 : 0.5;
+			meshColors[index + 2] = (Y >= 0.8) ? 1 : 0;
 			
 			index += 3;
 
 			// Define the texture coördinates (2D), using stepSize I guess -> How 'larger' the coördinate, how 'finer' the texture!
-			textcoords[indexTexture] = stepSizeX * x;
-			textcoords[indexTexture + 1] = stepSizeZ * z;
+			meshTexCoords[indexTexture] = stepSizeX * x;
+			meshTexCoords[indexTexture + 1] = stepSizeZ * z;
 			indexTexture += 2;
 		}
 	}
@@ -182,16 +174,16 @@ void createMountainRidge(int ridgeNumber)
 		{
 			if (row < (numVertZ - 1))		// Add an upstanding triangle
 			{
-				triangles[index] = g;
-				triangles[index + 1] = g + 1;
-				triangles[index + 2] = g + numVertX;
+				meshTriangles[index] = g;
+				meshTriangles[index + 1] = g + 1;
+				meshTriangles[index + 2] = g + numVertX;
 				index += 3;
 			}
 			if (row > 0)			// Add a downward triangle
 			{
-				triangles[index] = g;
-				triangles[index + 1] = g + 1 - numVertX;
-				triangles[index + 2] = g + 1;
+				meshTriangles[index] = g;
+				meshTriangles[index + 1] = g + 1 - numVertX;
+				meshTriangles[index + 2] = g + 1;
 				index += 3;
 			}
 		}
@@ -200,16 +192,16 @@ void createMountainRidge(int ridgeNumber)
 	}
 
 	// Calculation of all Vertex Normals, having the following steps:
-	// (1) calculate the normals of all triangles and save these. 
-	for (int i = 0; i < triangles.size(); i = i + 3)
+	// (1) calculate the normals of all meshTriangles and save these. 
+	for (int i = 0; i < meshTriangles.size(); i = i + 3)
 	{
-		float x1 = vertices[triangles[i + 1] * 3] - vertices[triangles[i] * 3];
-		float y1 = vertices[triangles[i + 1] * 3 + 1] - vertices[triangles[i] * 3 + 1];
-		float z1 = vertices[triangles[i + 1] * 3 + 2] - vertices[triangles[i] * 3 + 2];
+		float x1 = meshVertices[meshTriangles[i + 1] * 3] - meshVertices[meshTriangles[i] * 3];
+		float y1 = meshVertices[meshTriangles[i + 1] * 3 + 1] - meshVertices[meshTriangles[i] * 3 + 1];
+		float z1 = meshVertices[meshTriangles[i + 1] * 3 + 2] - meshVertices[meshTriangles[i] * 3 + 2];
 
-		float x2 = vertices[triangles[i + 2] * 3] - vertices[triangles[i] * 3];
-		float y2 = vertices[triangles[i + 2] * 3 + 1] - vertices[triangles[i] * 3 + 1];
-		float z2 = vertices[triangles[i + 2] * 3 + 2] - vertices[triangles[i] * 3 + 2];
+		float x2 = meshVertices[meshTriangles[i + 2] * 3] - meshVertices[meshTriangles[i] * 3];
+		float y2 = meshVertices[meshTriangles[i + 2] * 3 + 1] - meshVertices[meshTriangles[i] * 3 + 1];
+		float z2 = meshVertices[meshTriangles[i + 2] * 3 + 2] - meshVertices[meshTriangles[i] * 3 + 2];
 
 		std::vector<float> normal = calcNormal(x1, y1, z1, x2, y2, z2);
 		triangleNormals[i] = normal[0];
@@ -223,9 +215,9 @@ void createMountainRidge(int ridgeNumber)
 		std::vector<float> gpNormal;
 		gpNormal.resize(3);
 		int surfaces = 0;
-		for (int i = 0; i < triangles.size(); i++)
+		for (int i = 0; i < meshTriangles.size(); i++)
 		{
-			if (triangles[i] == g)
+			if (meshTriangles[i] == g)
 			{
 				int triangle = floor(i / 3);
 				gpNormal[0] += triangleNormals[(triangle * 3)];
@@ -240,41 +232,20 @@ void createMountainRidge(int ridgeNumber)
 		gpNormal[1] = gpNormal[1] / surfaces;
 		gpNormal[2] = gpNormal[2] / surfaces;
 		gpNormal = normalize(gpNormal);
-		normals[(g * 3)] = gpNormal[0];
-		normals[(g * 3) + 1] = gpNormal[1];
-		normals[(g * 3) + 2] = gpNormal[2];
+		meshNormals[(g * 3)] = gpNormal[0];
+		meshNormals[(g * 3) + 1] = gpNormal[1];
+		meshNormals[(g * 3) + 2] = gpNormal[2];
 	}
-
-
-	if (ridgeNumber == 1)
-	{
-		meshVertices1 = vertices;
-		meshNormals1 = normals;
-		meshColors1 = colors;
-		meshTexCoords1 = textcoords;
-		meshTriangles1 = triangles;
-		triangleNormals1 = triangleNormals;
-	}
-	if (ridgeNumber == 2)
-	{
-		meshVertices2 = vertices;
-		meshNormals2 = normals;
-		meshColors2 = colors;
-		meshTexCoords2 = textcoords;
-		meshTriangles2 = triangles;
-		triangleNormals2 = triangleNormals;
-	}
-
 }
 
 //this function loads the textures in the GPU memory
 //the function is called once when the program starts
-void initMountainTextures()
+void Ridge::initTexture(const char *texLoc)
 {
 	Textures.resize(1);
 	Textures[0] = 0;
 
-	PPMImage sand("./Textures/sand.ppm");
+	PPMImage sand(texLoc);
 	glGenTextures(1, &Textures[0]);
 
 	glBindTexture(GL_TEXTURE_2D, Textures[0]);
