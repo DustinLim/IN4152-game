@@ -32,14 +32,19 @@ unsigned int H_fen = 600;  // screen height
 
 float LightPos[4] = {1,1,0.4,1};
 
-//Declare your own global variables here:
+
+////////// Declare your own global variables here:
+
+// NOTE: In C++, declaring "Object instance;" will instantly call the Object constructor!
+// To do these forward declarations, use smart pointers (unique_ptr) instead.
+
 Entity character = Entity();
 std::vector<Entity> enemies = {};
 std::vector<Projectile> projectiles = {};
 int glutElapsedTime = 0; //in ms
 bool keyPressed[256]; //keyboard buffer
 
-Background background;
+unique_ptr<Background> background; //smart pointer needed
 std::vector<Ridge> mountains;
 int numberOfRidges = 2;
 
@@ -114,7 +119,7 @@ void display( )
 			projectile.draw();
 		}
 		
-		background.draw();
+		background->draw();
 		for (int i = 0; i < numberOfRidges; i++)
 		{
 			mountains[i].draw();
@@ -137,7 +142,7 @@ void animate( )
 	{
 		mountains[i].move();
 	}
-	background.move();
+	background->move();
 
 	int currentTime = glutGet(GLUT_ELAPSED_TIME);
 	int deltaTime = currentTime - glutElapsedTime;
@@ -338,7 +343,7 @@ void init()
 	glShadeModel(GL_SMOOTH);
 	//loadMesh("David.obj");
 
-	background = Background();
+	background.reset(new Background());
 	mountains.resize(numberOfRidges);
 	mountains[0] = Ridge(1, 50, 10, -3, 0.01, -3, "./Textures/sand.ppm");
 	mountains[1] = Ridge(2, 50, 10, -3, 0.026, -4, "./Textures/sand.ppm");
