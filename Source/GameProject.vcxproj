@@ -83,20 +83,25 @@
     <ClInclude Include="background.h" />
     <ClInclude Include="calcUtilities.h" />
     <ClInclude Include="Entity.h" />
+    <ClInclude Include="grid.h" />
     <ClInclude Include="landscape.h" />
     <ClInclude Include="loadppm.h" />
     <ClInclude Include="matrix.h" />
+    <ClInclude Include="mesh.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="trackball.h" />
     <ClInclude Include="Vec3D.h" />
+    <ClInclude Include="Vertex.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="background.cpp" />
     <ClCompile Include="calcUtilities.cpp" />
     <ClCompile Include="Entity.cpp" />
+    <ClCompile Include="grid.cpp" />
     <ClCompile Include="landscape.cpp" />
     <ClCompile Include="loadppm.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="mesh.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="img_stars.ppm" />
