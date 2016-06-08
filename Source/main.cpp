@@ -13,6 +13,7 @@
 #include "argumentParser.h"
 #include <stdio.h>
 #include <string.h>
+#include <memory>
 
 #include "Entity.h"
 #include "landscape.h"
