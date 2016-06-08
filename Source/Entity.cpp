@@ -20,11 +20,12 @@ void Entity::draw()
 	glColor3f(color[0], color[1], color[2]);
 	glNormal3f(0, 0, 1);
 	glBegin(GL_QUADS);
-	float offset = size/2.0f;
-	glVertex3f(-offset, -offset, 0);
-	glVertex3f(offset, -offset, 0);
-	glVertex3f(offset, offset, 0);
-	glVertex3f(-offset, offset, 0);
+	float offsetW = width / 2.0f;
+	float offsetH = height / 2.0f;
+	glVertex3f(-offsetW, -offsetH, 0);
+	glVertex3f(offsetW, -offsetH, 0);
+	glVertex3f(offsetW, offsetH, 0);
+	glVertex3f(-offsetW, offsetH, 0);
 	glEnd();
 	glPopMatrix();
 }
@@ -33,6 +34,17 @@ void Entity::animate(int deltaTime)
 {
 	movementDirection.normalize();
 	position += movementDirection * movementSpeed * ((float)deltaTime/1000);
+}
+
+std::vector<Vec3Df> Entity::getBoundingBox() {
+	Vec3Df topLeft = Vec3Df(position[0] - width / 2.0f, position[1] - height / 2.0f, position[2]);
+	Vec3Df bottomRight = Vec3Df(position[0] + width / 2.0f, position[1] + height / 2.0f, position[2]);
+
+	//float angle = atan2f(movementDirection[1], movementDirection[0]);
+	//float y = sin(angle) * (width / 2.0f);
+	//float x = sin(angle) * (width / 2.0f);
+	std::vector<Vec3Df> list = { topLeft, bottomRight };
+	return list;
 }
 
 Projectile::Projectile(Vec3Df spawnPoint, Vec3Df direction)
@@ -58,11 +70,12 @@ void Projectile::draw()
     glTranslatef(propelledDistance, 0, 0);
     
     glBegin(GL_QUADS);
-    float offset = size/2.0f;
-    glVertex3f(-offset, -offset, 0);
-    glVertex3f(offset, -offset, 0);
-    glVertex3f(offset, offset, 0);
-    glVertex3f(-offset, offset, 0);
+    float offsetW = width/2.0f;
+	float offsetH = height/ 2.0f;
+    glVertex3f(-offsetW, -offsetH, 0);
+    glVertex3f(offsetW, -offsetH, 0);
+    glVertex3f(offsetW, offsetH, 0);
+    glVertex3f(-offsetW, offsetH, 0);
     glEnd();
     
     glPopMatrix();

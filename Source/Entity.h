@@ -1,11 +1,9 @@
 #pragma once
-
 #include "commonOpenGL.h"
-
 #include "Vec3D.h"
 #include "argumentParser.h"
-
 #include "SOIL.h"
+#include <vector>
 
 class Entity
 {
@@ -21,11 +19,14 @@ public:
 	float movementSpeed = 1; //units per second
     
     // Appearance
-	float size = 0.5;
+	float width = 0.5f;
+	float height = 0.5f;
 	Vec3Df color = Vec3Df(1, 1, 1);
 
 	void draw();
 	void animate(int deltaTime);
+
+	std::vector<Vec3Df> getBoundingBox();
 };
 
 class Projectile: public Entity
