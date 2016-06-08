@@ -212,7 +212,29 @@ void animate( )
 		boss.animate(deltaTime);
 
 	collisionDetection();
+}
 
+void collisionDetection() {
+	//Check if any bullets hit
+	for (std::vector<Projectile>::iterator projectile = projectiles.begin(); projectile != projectiles.end();) {
+		bool broken = false;
+		for (std::vector<Entity>::iterator enemy = enemies.begin(); enemy != enemies.end();) {
+			if (isHit((*projectile), (*enemy))) {
+				enemy = enemies.erase(enemy);
+				projectile = projectiles.erase(projectile);
+				broken = true;
+				break;
+			}
+			else {
+				++enemy;
+			}
+		}
+		if (!broken) {
+			projectile++;
+		}
+	}
+
+	//Check if anything went outside the viewport
 	for (std::vector<Entity>::iterator enemy = enemies.begin(); enemy != enemies.end();) {
 		if ((*enemy).getBoundingBox()[1][0] < topLeft[0]) {
 			enemy = enemies.erase(enemy);
@@ -232,24 +254,18 @@ void animate( )
 			++projectile;
 		}
 	}
-}
 
-void collisionDetection() {
-	for (std::vector<Projectile>::iterator projectile = projectiles.begin(); projectile != projectiles.end();) {
-		bool broken = false;
-		for (std::vector<Entity>::iterator enemy = enemies.begin(); enemy != enemies.end();) {
-			if (isHit((*projectile), (*enemy))) {
-				enemy = enemies.erase(enemy);
-				projectile = projectiles.erase(projectile);
-				broken = true;
-				break;
-			}
-			else {
-				++enemy;
-			}
+	//Check if the player didn't hit an enemy
+	for (std::vector<Entity>::iterator enemy = enemies.begin(); enemy != enemies.end();) {
+		if (isHit(character, (*enemy))) {
+			enemy = enemies.erase(enemy);
+			Vec3Df col = character.color;
+			col[0] = fminf(1, col[0] + 0.1f);
+			col[1] = fmaxf(0, col[1] - 0.1f);
+			character.color = col;
 		}
-		if (!broken) {
-			projectile++;
+		else {
+			++enemy;
 		}
 	}
 }
