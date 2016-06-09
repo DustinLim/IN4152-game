@@ -48,6 +48,15 @@
     <ClInclude Include="background.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="grid.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="mesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Vertex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -68,6 +77,12 @@
     <ClCompile Include="background.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="grid.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="test.pro" />
@@ -86,6 +101,9 @@
   </ItemGroup>
   <ItemGroup>
     <Object Include="Models\David.obj">
+      <Filter>Resource Files</Filter>
+    </Object>
+    <Object Include="Models\hoofd.obj">
       <Filter>Resource Files</Filter>
     </Object>
   </ItemGroup>
