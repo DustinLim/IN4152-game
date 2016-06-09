@@ -31,7 +31,9 @@ private:
 	float body_height;
 	float body_radius;
 	Vec3Df center = Vec3Df();
-	Vec3Df position;
+
+	const Vec3Df* target;
+	float scale;
 
 	float leg_size;
 	float toe_distance_factor;
@@ -57,13 +59,15 @@ private:
 
 public:
 	//float speed = 0.1;
+	Vec3Df position;
 
-	Boss(Vec3Df pos = Vec3Df(0, 0, 0), float speed = 1);
+	Boss(Vec3Df pos = Vec3Df(0, 0, 0), float speed = 1, float scale = 1);
 	void animate(float delta);
 	
-	void drawBoss(float scale = 1.0);
+	void drawBoss();
 	void moveBody(Vec3Df delta);
 
 	void setDestination(Vec3Df dest, float speed);
 	void setWalkingSpeed(float speed);
+	void setTarget(const Vec3Df* target);
 };

@@ -106,7 +106,7 @@ void Leg::drawLeg()
 
 
 
-Boss::Boss(Vec3Df pos, float speed)
+Boss::Boss(Vec3Df pos, float speed, float scale)
 {
 	position = pos;
 	destination = pos;
@@ -114,6 +114,7 @@ Boss::Boss(Vec3Df pos, float speed)
 	body_height = 0.375;
 	body_radius = 0.5;
 	center = Vec3Df(0, 0.625, 0);
+	this->scale = scale;
 
 	leg_size = 1.0;
 	//the length of the stretched leg is leg_size * toe_distance_factor
@@ -182,55 +183,68 @@ void Boss::drawBody()
 		glPushMatrix();
 			glColor3f(1.0, 1.0, 0.5);
 			//gluCylinder draws along the Z-axis, so we rotate to make Z point up
-			glRotatef(90, 1, 0, 0);
+			glRotatef(-90, 1, 0, 0);
 			//gluCylinder puts a corner at the axis, we want the middle of an edge
 			glRotatef(180 / slices, 0, 0, 1);
 			//Move to the bottom of the body and draw it
-			glTranslatef(0, 0, body_height / 2.0);
+			glTranslatef(0, 0, -body_height / 2.0);
 			gluCylinder(gluNewQuadric(), 0.5, 0, 0, slices, 1);
 			//Move to the top of the straight part and draw it
-			glTranslatef(0, 0, -body_height);
 			gluCylinder(gluNewQuadric(), 0.5, 0.5, body_height, slices, 1);
 			//Move to the top of the sloped part and draw it plus the top
-			glTranslatef(0, 0, -body_height / 2.0);
-			gluCylinder(gluNewQuadric(), 0.25, 0.5, body_height/2.0, slices, 1);
+			glTranslatef(0, 0, body_height);
+			gluCylinder(gluNewQuadric(), 0.5, 0.25, body_height/2.0, slices, 1);
+			glTranslatef(0, 0, body_height / 2.0);
 			gluCylinder(gluNewQuadric(), 0, 0.25, 0, slices, 1);
 		glPopMatrix();
-		//Draw the head
-		drawHead();
 	glPopMatrix();
-	//Draw the legs
-	for (int i = 0; i < 6; i++)
-		legs[i].drawLeg();
+	
 	
 }
 
 void Boss::drawHead()
 {
-	float head_radius = 1.5*body_radius;
 	glPushMatrix();
+		glTranslatef(0, -body_height, 0);
+		float head_radius = 1.5*body_radius;
 		//Draw the eye
-		glTranslatef(0, body_height/2.0 + head_radius, 0);
+		glTranslatef(center[0], 1.5*body_height + head_radius + center[1], center[2]);
+		if (target != NULL)
+		{
+			//The vector from the player to the boss head
+			Vec3Df delta = *target - (position + scale*(center + Vec3Df(0, body_height / 2.0 + head_radius, 0)));
+			//The angles to aim at the player
+			float angle_y = -atan2f(delta[2], delta[0]) * 180 / M_PI;
+			float angle_z = atan2(delta[1], sqrtf(delta[0] * delta[0] + delta[2] * delta[2])) * 180 / M_PI;
+			glRotatef(angle_y, 0, 1, 0);
+			glRotatef(angle_z, 0, 0, 1);
+		}
 		glColor3f(1, 1, 1);
 		gluSphere(gluNewQuadric(), head_radius, 16, 16);
 		//Draw the iris
-		glTranslatef(-0.5*head_radius, 0, 0);
+		glTranslatef(0.5*head_radius, 0, 0);
 		glColor3f(0, 0.2, 1);
 		gluSphere(gluNewQuadric(), head_radius*0.6, 16, 16);
 		//Draw the pupil
-		glTranslatef(-0.5*head_radius, 0, 0);
+		glTranslatef(0.5*head_radius, 0, 0);
 		glColor3f(0, 0, 0);
 		gluSphere(gluNewQuadric(), head_radius*0.2, 16, 16);
 	glPopMatrix();
 }
 
-void Boss::drawBoss(float scale)
+void Boss::drawBoss()
 {
 	glPushMatrix();
 	glTranslatef(position[0], position[1], position[2]);
 		glScalef(scale, scale, scale);
 		drawBody();
+		//Draw the head
+		drawHead();
+		//Draw the legs
+		for (int i = 0; i < 6; i++)
+			legs[i].drawLeg();
 	glPopMatrix();
+
 }
 
 void Boss::init()
@@ -275,4 +289,9 @@ void Boss::setWalkingSpeed(float speed)
 		cycle = 1 - cycle;
 	walking_speed = speed;
 	cycle_duration = step_size / abs(walking_speed);
+}
+
+void Boss::setTarget(const Vec3Df* target)
+{
+	this->target = target;
 }

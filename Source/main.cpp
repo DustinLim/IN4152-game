@@ -50,7 +50,7 @@ unique_ptr<Background> background; //smart pointer needed
 std::vector<Ridge> mountains;
 int numberOfRidges = 2;
 bool toggleBoss = false;
-Boss boss = Boss(Vec3Df(2, -1, 0), 0);//
+Boss boss = Boss(Vec3Df(2, -1, -1), 0, 0.5);
 
 ////////// Draw Functions 
 
@@ -129,7 +129,7 @@ void display( )
 		}
 
 		if (toggleBoss)
-			boss.drawBoss(0.5);
+			boss.drawBoss();
 		break;
 	}
 	default:
@@ -259,10 +259,16 @@ void keyboard(unsigned char key, int x, int y)
 		toggleBoss = !toggleBoss;
 		break;
 	case 'j':
-		boss.setDestination(Vec3Df(-2, -1, 0), 1);
+		if (boss.position[0] <= 0)
+			boss.setDestination(Vec3Df(-2, -1, -0.5), 1);
+		else
+			boss.setDestination(Vec3Df(0, -1, -1), 1);
 		break;
 	case 'k':
-		boss.setDestination(Vec3Df(2, -1, 0), 1);
+		if (boss.position[0] >= 0)
+			boss.setDestination(Vec3Df(2, -1, 0), 1);
+		else
+			boss.setDestination(Vec3Df(0, -1, 0.5), 1);
 		break;
     }
 }
@@ -393,6 +399,7 @@ int main(int argc, char** argv)
          
 	character.color = Vec3Df(1, 0, 0);
 	character.position = Vec3Df(-2, 0, 0);
+	boss.setTarget(&character.position);
 
 	// cablage des callback
     glutReshapeFunc(reshape);
