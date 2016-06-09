@@ -1,4 +1,6 @@
 #include "background.h"
+#include <GL/glext.h>
+#include "SOIL.h"
 
 Background::Background()
 {

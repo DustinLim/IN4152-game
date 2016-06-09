@@ -34,12 +34,11 @@ unsigned int H_fen = 600;  // screen height
 float LightPos[4] = {1,1,0.4,1};
 
 
-////////// Declare your own global variables here:
 
 // NOTE: In C++, declaring "Object instance;" will instantly call the Object constructor!
 // To do these forward declarations, use smart pointers (unique_ptr) instead.
 
-Entity character = Entity();
+Character character = Character();
 std::vector<Entity> enemies = {};
 std::vector<Projectile> projectiles = {};
 int glutElapsedTime = 0; //in ms
@@ -111,8 +110,14 @@ void display( )
 		glLightfv(GL_LIGHT0, GL_POSITION, LightPos);
 		drawLight();
 		drawCoordSystem();
-		
-		character.draw();
+
+		// Note that drawing order has consequences for 'transparancy'
+		background->draw();
+		for (int i = 0; i < numberOfRidges; i++)
+		{
+			mountains[i].draw();
+		}
+
 		for (auto &enemy : enemies) {
 			enemy.draw();
 		}
@@ -120,11 +125,8 @@ void display( )
 			projectile.draw();
 		}
 		
-		background->draw();
-		for (int i = 0; i < numberOfRidges; i++)
-		{
-			mountains[i].draw();
-		}
+		character.draw();
+		
 		break;
 	}
 	default:
@@ -348,6 +350,8 @@ void init()
 	mountains.resize(numberOfRidges);
 	mountains[0] = Ridge(1, 50, 10, -3, 0.01, -3, "./Textures/sand.ppm");
 	mountains[1] = Ridge(2, 50, 10, -3, 0.026, -4, "./Textures/sand.ppm");
+
+	character.initTexture();
 }
 
 /**
