@@ -26,7 +26,7 @@
 //Use the enum values to define different rendering modes 
 //The mode is used by the function display and the mode is 
 //chosen during execution with the keys 1-9
-enum DisplayModeType {GAME=6};
+enum DisplayModeType {GAME=1, MESH=2};
 DisplayModeType DisplayMode = GAME;
 enum MouseModeType {MOUSE_MODE_SHOOTING=0, MOUSE_MODE_CAMERA=1};
 MouseModeType MouseMode = MOUSE_MODE_SHOOTING;
@@ -132,16 +132,19 @@ void display( )
 		{
 			mountains[i].draw();
 		}
-
-		glEnable(GL_LIGHTING);
-		glPushMatrix();
-		glRotatef(-90.0f, 0.0f, 0.0f, 1.0f);
-		glRotatef(-90.0f, 0.0f, 1.0f, 0.0f);
-		meshes[meshIndex].drawSmooth();
-		glPopMatrix();
-		glDisable(GL_LIGHTING);
 		break;
 	}
+    case MESH:
+    {
+        glEnable(GL_LIGHTING);
+        glPushMatrix();
+        glRotatef(-90.0f, 0.0f, 0.0f, 1.0f);
+        glRotatef(-90.0f, 0.0f, 1.0f, 0.0f);
+        meshes[meshIndex].drawSmooth();
+        glPopMatrix();
+        glDisable(GL_LIGHTING);
+        break;
+    }
 	default:
 		break;
 	}

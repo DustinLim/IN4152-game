@@ -33,7 +33,8 @@ public:
 };
 
 /************************************************************
- * Basic Mesh Class
+ * Basic Mesh Class. 
+ * Can load and represent meshes from .obj files.
  ************************************************************/
 class Mesh {
 public:

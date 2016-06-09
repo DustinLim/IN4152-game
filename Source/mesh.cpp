@@ -1,6 +1,11 @@
 #pragma once
-#include "mesh.h"
+#if defined(_WIN32)
 #include <GL/glut.h>
+#elif defined (__APPLE__)
+#include <GLUT/glut.h>
+#endif
+
+#include "mesh.h"
 #include <stdio.h>
 #include <string.h>
 #include <math.h>

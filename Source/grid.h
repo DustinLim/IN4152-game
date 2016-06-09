@@ -1,3 +1,11 @@
+//
+//  grid.h
+//  in4152-game
+//
+//  This class implements the mesh simplification algorithm,
+//  using a grid system.
+//
+
 #ifndef GRID_H
 #define GRID_H
 

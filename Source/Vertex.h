@@ -5,7 +5,7 @@
 #include "Vec3D.h"
 
 /************************************************************
- * Vertex of the mesh (containing normal n and vertetx v)
+ * Mesh vertex class. This consists of a normal n and vertex v.
  ************************************************************/
 class Vertex {
 public:
