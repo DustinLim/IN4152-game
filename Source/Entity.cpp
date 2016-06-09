@@ -84,8 +84,7 @@ void Projectile::animate(int deltaTime)
 
 Character::Character()
 {
-	theta = 0.0f;
-	up = 1;
+	armAngle = 0.0f;
 }
 
 void Character::draw()
@@ -136,7 +135,7 @@ void Character::draw()
 
 	glPushMatrix();
 	glTranslatef(-0.25f, 0.3f, 0.0f);
-	glRotatef(theta, 0.0f, 0.0f, 1.0f);			// should be changed towards the angle of shooting.
+	glRotatef(armAngle, 0.0f, 0.0f, 1.0f);			// should be changed towards the angle of shooting.
 	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 	glNormal3f(0.0f, 0.0f, 1.0f);
 	glBegin(GL_QUADS);
@@ -154,18 +153,12 @@ void Character::draw()
 
 void Character::animate(int deltaTime)
 {
-	// For animation purposes
-	if (up == 1)
-	{
-		theta += 1;
-		up = (theta < 90) ? 1 : 0;
-	}
-	else
-	{
-		theta -= 1;
-		up = (theta < -90) ? 1 : 0;
-	}
 	Entity::animate(deltaTime);
+}
+
+void Character::updateArmAngle(Vec3Df direction)
+{
+	armAngle = atan2f(direction[1], direction[0]) * 180 / M_PI;
 }
 
 void Character::initTexture()

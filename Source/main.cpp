@@ -151,13 +151,13 @@ void animate( )
 	int deltaTime = currentTime - glutElapsedTime;
 	glutElapsedTime = currentTime;
 
-	character.animate(deltaTime);
 	for (auto &enemy : enemies) {
 		enemy.animate(deltaTime);
 	}
 	for (auto &projectile : projectiles) {
 		projectile.animate(deltaTime);
 	}
+	character.animate(deltaTime);
 }
 
 // Method parameter is required to be registered by glutTimerFunc()
@@ -309,6 +309,9 @@ void mouse(int button, int state, int x, int y)
 
         // We now know the correct direction
         Vec3Df shootingDirection = intersection - character.position;
+
+		character.updateArmAngle(shootingDirection);
+
         spawnProjectile(shootingDirection);
     }
     else if (MouseMode == MOUSE_MODE_CAMERA)

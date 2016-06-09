@@ -47,12 +47,12 @@ public:
 	Character();
 
 	void initTexture();
+	void updateArmAngle(Vec3Df direction);
 
 	// Overriding
 	void draw();
 	void animate(int deltaTime);
 
 private:
-	float theta;				// could be used to calculate angle for arm
-	unsigned int up;			// temporarely used for arm animation.
+	float armAngle;				// could be used to calculate angle for arm
 };
