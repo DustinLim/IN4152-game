@@ -7,12 +7,12 @@ Background::Background()
 	heightMin = -5;			// <- could we set abóve the plateau, so that it reduces drawing stuff :)
 	heightMax = 5;
 	widthMin = -6;
-	widthMax = 4;
+	widthMax = 8;
 	depth = -5;
-	quadWidth = 3;
-	quadHeight = 3;
+	quadWidth = 8;
+	quadHeight = 8;
 	position = 0;
-	speed = 0.01;
+	speed = 0.001;
 
 	initTexture();
 }
@@ -21,7 +21,7 @@ Background::~Background() {}
 
 void Background::move()
 {
-	position = (position >= 1) ? 0 : position + 0.005;
+	position = (position >= 1) ? 0 : position + speed;
 }
 
 void Background::draw()
@@ -69,13 +69,9 @@ void Background::draw()
 void Background::initTexture()
 {
 	Texture.resize(1);
-	Texture[0] = 0;
-
-	PPMImage stars("./Textures/img_stars.ppm");
-	glGenTextures(1, &Texture[0]);
-
-	glBindTexture(GL_TEXTURE_2D, Texture[0]);
-	gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGB, stars.sizeX, stars.sizeY,
-		GL_RGB, GL_UNSIGNED_BYTE, stars.data);
-	glBindTexture(GL_TEXTURE_2D, 0);
+	Texture[0] = SOIL_load_OGL_texture(
+		"./Textures/space-background.png",
+		SOIL_LOAD_AUTO,
+		SOIL_CREATE_NEW_ID,
+		SOIL_FLAG_POWER_OF_TWO | SOIL_FLAG_MIPMAPS | SOIL_FLAG_DDS_LOAD_DIRECT);
 }

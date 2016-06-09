@@ -348,8 +348,8 @@ void init()
 
 	background.reset(new Background());
 	mountains.resize(numberOfRidges);
-	mountains[0] = Ridge(1, 50, 10, -3, 0.01, -3, "./Textures/sand.ppm");
-	mountains[1] = Ridge(2, 50, 10, -3, 0.026, -4, "./Textures/sand.ppm");
+	mountains[0] = Ridge(1, 50, 10, -3, 0.02, -3, "./Textures/sand.ppm");
+	mountains[1] = Ridge(2, 50, 10, -3, 0.01, -4, "./Textures/sand.ppm");
 
 	character.initTexture();
 }
