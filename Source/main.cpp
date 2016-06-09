@@ -138,8 +138,12 @@ void display( )
     {
         glEnable(GL_LIGHTING);
         glPushMatrix();
-        glRotatef(-90.0f, 0.0f, 0.0f, 1.0f);
-        glRotatef(-90.0f, 0.0f, 1.0f, 0.0f);
+		//David:
+        //glRotatef(-90.0f, 0.0f, 0.0f, 1.0f);
+        //glRotatef(-90.0f, 0.0f, 1.0f, 0.0f);
+		//hoofd
+		glRotatef(90.0f, 0.0f, 0.0f, 1.0f);
+		glRotatef(-90.0f, 1.0f, 0.0f, 0.0f);
         meshes[meshIndex].drawSmooth();
         glPopMatrix();
         glDisable(GL_LIGHTING);
@@ -373,7 +377,7 @@ void init()
 	//TODO change mesh to correct object.
 	printf("Loading Mesh\n");
 	Mesh mesh = Mesh();
-	mesh.loadMesh("./Models/David.obj");
+	mesh.loadMesh("./Models/hoofd.obj");
 	meshes.push_back(mesh);
 	printf("Creating Grid, 16\n");
 	meshes.push_back(Grid::getReduxMesh(mesh, 16));

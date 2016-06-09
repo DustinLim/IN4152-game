@@ -103,5 +103,8 @@
     <Object Include="Models\David.obj">
       <Filter>Resource Files</Filter>
     </Object>
+    <Object Include="Models\hoofd.obj">
+      <Filter>Resource Files</Filter>
+    </Object>
   </ItemGroup>
 </Project>
