@@ -18,6 +18,7 @@
 #include "Entity.h"
 #include "landscape.h"
 #include "background.h"
+#include "boss.h"
 
 
 //Use the enum values to define different rendering modes 
@@ -48,7 +49,8 @@ bool keyPressed[256]; //keyboard buffer
 unique_ptr<Background> background; //smart pointer needed
 std::vector<Ridge> mountains;
 int numberOfRidges = 2;
-
+bool toggleBoss = false;
+Boss boss = Boss(Vec3Df(2, -1, 0), 0);//
 
 ////////// Draw Functions 
 
@@ -125,6 +127,9 @@ void display( )
 		{
 			mountains[i].draw();
 		}
+
+		if (toggleBoss)
+			boss.drawBoss(0.5);
 		break;
 	}
 	default:
@@ -156,6 +161,9 @@ void animate( )
 	for (auto &projectile : projectiles) {
 		projectile.animate(deltaTime);
 	}
+
+	if (toggleBoss)
+		boss.animate(deltaTime);
 }
 
 // Method parameter is required to be registered by glutTimerFunc()
@@ -246,7 +254,16 @@ void keyboard(unsigned char key, int x, int y)
 		break;
 	case 'y':
 		LightPos[2] -= 0.1;
-		break;		
+		break;	
+	case 'b':
+		toggleBoss = !toggleBoss;
+		break;
+	case 'j':
+		boss.setDestination(Vec3Df(-2, -1, 0), 1);
+		break;
+	case 'k':
+		boss.setDestination(Vec3Df(2, -1, 0), 1);
+		break;
     }
 }
 
