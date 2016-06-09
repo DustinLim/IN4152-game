@@ -166,13 +166,13 @@ void Character::initTexture()
 	Texture.resize(2);
 
 	Texture[0] = SOIL_load_OGL_texture(
-		"C:/CGResources/astronaut-arm.png",
+		"./Textures/astronaut-arm.png",
 		SOIL_LOAD_AUTO,
 		SOIL_CREATE_NEW_ID,
 		SOIL_FLAG_POWER_OF_TWO | SOIL_FLAG_MIPMAPS | SOIL_FLAG_DDS_LOAD_DIRECT);
 
 	Texture[1] = SOIL_load_OGL_texture(
-		"C:/CGResources/astronaut-body.png",
+		"./Textures/astronaut-body.png",
 		SOIL_LOAD_AUTO,
 		SOIL_CREATE_NEW_ID,
 		SOIL_FLAG_POWER_OF_TWO | SOIL_FLAG_MIPMAPS | SOIL_FLAG_DDS_LOAD_DIRECT);

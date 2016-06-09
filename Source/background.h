@@ -2,6 +2,7 @@
 #define NOMINMAX
 #include <windows.h>
 #include <GL/glut.h>
+#include <GL/glext.h>
 #elif defined (__APPLE__)
 #include <GLUT/glut.h>
 #endif

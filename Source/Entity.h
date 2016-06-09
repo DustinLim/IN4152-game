@@ -1,9 +1,15 @@
 #pragma once
+
+#if defined(_WIN32)
+#include <GL/glut.h>
+#include <GL/glext.h>
+#elif defined (__APPLE__)
+#include <GLUT/glut.h>
+#endif
+
 #include "Vec3D.h"
 #include "argumentParser.h"
 
-#include <GL/glut.h>
-#include <GL/glext.h>
 #include "SOIL.h"
 
 class Entity
