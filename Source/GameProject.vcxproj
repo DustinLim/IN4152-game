@@ -54,11 +54,13 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>lib\windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>SOIL.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>lib\windows;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -88,6 +90,7 @@
     <ClInclude Include="Entity.h" />
     <ClInclude Include="grid.h" />
     <ClInclude Include="landscape.h" />
+    <ClInclude Include="lib\windows\SOIL.h" />
     <ClInclude Include="loadppm.h" />
     <ClInclude Include="matrix.h" />
     <ClInclude Include="mesh.h" />
@@ -125,6 +128,9 @@
     <Image Include="Textures\astronaut-arm.png" />
     <Image Include="Textures\astronaut-body.png" />
     <Image Include="Textures\astronaut-complete.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="lib\windows\SOIL.lib" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
