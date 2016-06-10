@@ -50,7 +50,7 @@ unique_ptr<Background> background; //smart pointer needed
 std::vector<Ridge> mountains;
 int numberOfRidges = 2;
 bool toggleBoss = false;
-Boss boss = Boss(Vec3Df(2, -1, -1), 0, 0.5);
+Boss boss;
 
 ////////// Draw Functions 
 
@@ -169,14 +169,25 @@ void animate( )
 // Method parameter is required to be registered by glutTimerFunc()
 void spawnEnemy(int unusedValue)
 {
-	Entity enemy = Entity();
-	enemy.position = Vec3Df(3, (rand()%3-1), 0);
-	enemy.movementDirection = Vec3Df(-1, 0, 0);
-	enemy.color = Vec3Df(0, 0, 1);
-	enemies.push_back(enemy);
+	if (!toggleBoss)
+	{
+		Entity enemy = Entity();
+		enemy.position = Vec3Df(3, (rand() % 3 - 1), 0);
+		enemy.movementDirection = Vec3Df(-1, 0, 0);
+		enemy.color = Vec3Df(0, 0, 1);
+		enemies.push_back(enemy);
 
-	// Repeat this
-	glutTimerFunc(1000, spawnEnemy, 0);
+		// Repeat this
+		glutTimerFunc(1000, spawnEnemy, 0);
+	}
+}
+
+void spawnBoss(int unusedValue)
+{
+	boss = Boss(Vec3Df(6, -1, -2), 0, 0.5);
+	boss.setTarget(&character.position);
+	boss.setDestination(Vec3Df(0, -1, -2), 1);
+	toggleBoss = true;
 }
 
 Projectile spawnProjectile(Vec3Df direction)
@@ -369,8 +380,8 @@ void init()
 
 	background.reset(new Background());
 	mountains.resize(numberOfRidges);
-	mountains[0] = Ridge(1, 50, 10, -3, 0.01, -3, "./Textures/sand.ppm");
-	mountains[1] = Ridge(2, 50, 10, -3, 0.026, -4, "./Textures/sand.ppm");
+	mountains[1] = Ridge(1, 50, 10, -3, 0.01, -3, "./Textures/sand.ppm");
+	mountains[0] = Ridge(2, 50, 10, -3, 0.026, -4, "./Textures/sand.ppm");
 }
 
 /**
@@ -399,7 +410,6 @@ int main(int argc, char** argv)
          
 	character.color = Vec3Df(1, 0, 0);
 	character.position = Vec3Df(-2, 0, 0);
-	boss.setTarget(&character.position);
 
 	// cablage des callback
     glutReshapeFunc(reshape);
@@ -410,7 +420,8 @@ int main(int argc, char** argv)
 	glutMouseFunc(mouse);
     glutMotionFunc(tbMotionFunc);  // traqueboule utilise la souris
     glutIdleFunc(animate);
-	glutTimerFunc(1000, spawnEnemy, 0);
+	glutTimerFunc(3000, spawnEnemy, 0);
+	glutTimerFunc(6000, spawnBoss, 0);
 
     // lancement de la boucle principale
     glutMainLoop();

@@ -56,6 +56,7 @@ private:
 	void init();
 	void drawBody();
 	void drawHead();
+	void NullFunc(int value) {};
 
 public:
 	//float speed = 0.1;
