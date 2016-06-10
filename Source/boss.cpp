@@ -106,6 +106,8 @@ void Leg::drawLeg()
 
 
 
+
+
 Boss::Boss(Vec3Df pos, float speed, float scale)
 {
 	position = pos;
@@ -125,6 +127,7 @@ Boss::Boss(Vec3Df pos, float speed, float scale)
 	walking_speed = base_speed;
 
 	init();
+	nextMove(move);
 }
 
 void Boss::animate(float delta)
@@ -142,6 +145,7 @@ void Boss::animate(float delta)
 		{
 			position = destination;
 			setWalkingSpeed(base_speed);
+			nextMove(move);
 		}
 	}
 	//Increment the walking cycle
@@ -172,6 +176,15 @@ void Boss::animate(float delta)
 			legs[i].moveToe(toe);
 		}
 	}
+	//Update the linger cycle
+	if (linger_time > 0)
+		linger_time -= delta;
+	if (linger_time < 0)
+	{
+		linger_time = 0;
+		nextMove(move);
+	}
+
 }
 
 void Boss::drawBody()
@@ -262,6 +275,20 @@ void Boss::init()
 		Vec3Df toe = Vec3Df(2 * toe_distance*sin(2 * i*M_PI / slices), 0, 2 * toe_distance*cos(2 * i*M_PI / slices));
 		legs[i] = Leg(leg_size, hip, toe);
 	}
+
+	//Create the list of moves for the boss to execute during the bossfight
+	//Move to the middle of the background
+	move_list.push_back(std::bind(&Boss::setDestination, std::placeholders::_1, Vec3Df(0, -1, -2), 1));
+	move_list.push_back(std::bind(&Boss::linger, std::placeholders::_1, 1000));
+	//Quickly move to the side of the screen
+	move_list.push_back(std::bind(&Boss::setDestination, std::placeholders::_1, Vec3Df(2, -1, 0), 2));
+
+	move_list.push_back(std::bind(&Boss::linger, std::placeholders::_1, 6000));
+	move_list.push_back(std::bind(&Boss::setDestination, std::placeholders::_1, Vec3Df(-2, -1, 0), 2));
+	move_list.push_back(std::bind(&Boss::linger, std::placeholders::_1, 4000));
+	move_list.push_back(std::bind(&Boss::setDestination, std::placeholders::_1, Vec3Df(2, -1, 0), 1));
+	//glutTimerFunc(1000, this->nextMove, 2);
+	//glutTimerFunc(enemy_respawn_timer, spawnEnemy, 0);
 }
 
 void Boss::moveBody(Vec3Df delta)
@@ -294,4 +321,24 @@ void Boss::setWalkingSpeed(float speed)
 void Boss::setTarget(const Vec3Df* target)
 {
 	this->target = target;
+}
+
+void Boss::nextMove(int n)
+{
+	if (n < move_list.size())
+	{
+		move_list[n](this);
+		move++;
+	}
+	else 
+	{
+		move_list[n-4](this);
+		move -= 3;
+	}
+		
+}
+
+void Boss::linger(int ms)
+{
+	linger_time = ms;
 }

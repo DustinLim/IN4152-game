@@ -84,21 +84,26 @@
     <ClInclude Include="boss.h" />
     <ClInclude Include="calcUtilities.h" />
     <ClInclude Include="Entity.h" />
+    <ClInclude Include="grid.h" />
     <ClInclude Include="landscape.h" />
     <ClInclude Include="loadppm.h" />
     <ClInclude Include="matrix.h" />
+    <ClInclude Include="mesh.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="trackball.h" />
     <ClInclude Include="Vec3D.h" />
+    <ClInclude Include="Vertex.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="background.cpp" />
     <ClCompile Include="boss.cpp" />
     <ClCompile Include="calcUtilities.cpp" />
     <ClCompile Include="Entity.cpp" />
+    <ClCompile Include="grid.cpp" />
     <ClCompile Include="landscape.cpp" />
     <ClCompile Include="loadppm.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="mesh.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="img_stars.ppm" />
@@ -109,6 +114,9 @@
   </ItemGroup>
   <ItemGroup>
     <Object Include="Models\David.obj">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </Object>
+    <Object Include="Models\hoofd.obj">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </Object>
   </ItemGroup>

@@ -19,12 +19,15 @@
 #include "landscape.h"
 #include "background.h"
 #include "boss.h"
+#include "mesh.h"
+#include "grid.h"
+#include "Vertex.h"
 
 
 //Use the enum values to define different rendering modes 
 //The mode is used by the function display and the mode is 
 //chosen during execution with the keys 1-9
-enum DisplayModeType {GAME=6};
+enum DisplayModeType {GAME=1, MESH=2};
 DisplayModeType DisplayMode = GAME;
 enum MouseModeType {MOUSE_MODE_SHOOTING=0, MOUSE_MODE_CAMERA=1};
 MouseModeType MouseMode = MOUSE_MODE_SHOOTING;
@@ -32,7 +35,7 @@ MouseModeType MouseMode = MOUSE_MODE_SHOOTING;
 unsigned int W_fen = 800;  // screen width
 unsigned int H_fen = 600;  // screen height
 
-float LightPos[4] = {1,1,0.4,1};
+float LightPos[4] = {1,1,0.4f,1};
 
 
 ////////// Declare your own global variables here:
@@ -43,6 +46,7 @@ float LightPos[4] = {1,1,0.4,1};
 Entity character = Entity();
 std::vector<Entity> enemies = {};
 std::vector<Projectile> projectiles = {};
+std::vector<Mesh >meshes = {};
 int glutElapsedTime = 0; //in ms
 bool keyPressed[256]; //keyboard buffer
 
@@ -51,6 +55,15 @@ std::vector<Ridge> mountains;
 int numberOfRidges = 2;
 bool toggleBoss = false;
 Boss boss;
+
+//Timing values
+int enemy_spawn_timer = 2000;
+int boss_spawn_timer = 10000;
+int enemy_respawn_timer = 1500;
+
+//TODO remove this again
+int meshIndex = 0;
+
 
 ////////// Draw Functions 
 
@@ -132,6 +145,21 @@ void display( )
 			boss.drawBoss();
 		break;
 	}
+    case MESH:
+    {
+        glEnable(GL_LIGHTING);
+        glPushMatrix();
+		//David:
+        //glRotatef(-90.0f, 0.0f, 0.0f, 1.0f);
+        //glRotatef(-90.0f, 0.0f, 1.0f, 0.0f);
+		//hoofd
+		glRotatef(90.0f, 0.0f, 0.0f, 1.0f);
+		glRotatef(-90.0f, 1.0f, 0.0f, 0.0f);
+        meshes[meshIndex].drawSmooth();
+        glPopMatrix();
+        glDisable(GL_LIGHTING);
+        break;
+    }
 	default:
 		break;
 	}
@@ -178,15 +206,14 @@ void spawnEnemy(int unusedValue)
 		enemies.push_back(enemy);
 
 		// Repeat this
-		glutTimerFunc(1000, spawnEnemy, 0);
+		glutTimerFunc(enemy_respawn_timer, spawnEnemy, 0);
 	}
 }
 
 void spawnBoss(int unusedValue)
 {
-	boss = Boss(Vec3Df(6, -1, -2), 0, 0.5);
+	boss = Boss(Vec3Df(6, -1, -2), -1, 0.5);
 	boss.setTarget(&character.position);
-	boss.setDestination(Vec3Df(0, -1, -2), 1);
 	toggleBoss = true;
 }
 
@@ -249,25 +276,25 @@ void keyboard(unsigned char key, int x, int y)
 		break;
 	// MOVING THE LIGHT IN THE X,Y,Z DIRECTION -> We should do something with shadows in a later stadium.
 	case 'f':
-		LightPos[0] -= 0.1;
+		LightPos[0] -= 0.1f;
 		break;
 	case 'h':
-		LightPos[0] += 0.1;
+		LightPos[0] += 0.1f;
 		break;
 	case 't':
-		LightPos[1] += 0.1;
+		LightPos[1] += 0.1f;
 		break;
 	case 'g':
-		LightPos[1] -= 0.1;
+		LightPos[1] -= 0.1f;
 		break;
 	case 'r':
-		LightPos[2] += 0.1;
+		LightPos[2] += 0.1f;
 		break;
 	case 'y':
-		LightPos[2] -= 0.1;
+		LightPos[2] -= 0.1f;
 		break;	
 	case 'b':
-		toggleBoss = !toggleBoss;
+		spawnBoss(0);
 		break;
 	case 'j':
 		if (boss.position[0] <= 0)
@@ -280,6 +307,9 @@ void keyboard(unsigned char key, int x, int y)
 			boss.setDestination(Vec3Df(2, -1, 0), 1);
 		else
 			boss.setDestination(Vec3Df(0, -1, 0.5), 1);
+		break;
+	case '+':
+		meshIndex = ++meshIndex % meshes.size();
 		break;
     }
 }
@@ -353,7 +383,6 @@ void mouse(int button, int state, int x, int y)
 
 void displayInternal(void);
 void reshape(int w, int h);
-bool loadMesh(const char * filename);
 void init()
 {
     glDisable( GL_LIGHTING );
@@ -380,8 +409,21 @@ void init()
 
 	background.reset(new Background());
 	mountains.resize(numberOfRidges);
-	mountains[1] = Ridge(1, 50, 10, -3, 0.01, -3, "./Textures/sand.ppm");
-	mountains[0] = Ridge(2, 50, 10, -3, 0.026, -4, "./Textures/sand.ppm");
+	mountains[0] = Ridge(1, 50, 10, -3, 0.005f, -4, "./Textures/sand.ppm");
+	mountains[1] = Ridge(2, 50, 10, -3, 0.0075f, -3, "./Textures/sand.ppm");
+
+
+	//TODO change mesh to correct object.
+	printf("Loading Mesh\n");
+	Mesh mesh = Mesh();
+	mesh.loadMesh("./Models/hoofd.obj");
+	meshes.push_back(mesh);
+	printf("Creating Grid, 16\n");
+	meshes.push_back(Grid::getReduxMesh(mesh, 16));
+	printf("Creating Grid, 8\n");
+	meshes.push_back(Grid::getReduxMesh(mesh, 8));
+	printf("Creating Grid, 4\n");
+	meshes.push_back(Grid::getReduxMesh(mesh, 4));
 }
 
 /**
@@ -420,8 +462,8 @@ int main(int argc, char** argv)
 	glutMouseFunc(mouse);
     glutMotionFunc(tbMotionFunc);  // traqueboule utilise la souris
     glutIdleFunc(animate);
-	glutTimerFunc(3000, spawnEnemy, 0);
-	glutTimerFunc(6000, spawnBoss, 0);
+	glutTimerFunc(enemy_spawn_timer, spawnEnemy, 0);
+	glutTimerFunc(boss_spawn_timer, spawnBoss, 0);
 
     // lancement de la boucle principale
     glutMainLoop();

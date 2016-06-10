@@ -2,6 +2,8 @@
 #include "Vec3D.h"
 #define _USE_MATH_DEFINES
 #include <math.h>
+#include <vector>
+#include <functional>
 
 class Leg
 {
@@ -31,6 +33,7 @@ private:
 	float body_height;
 	float body_radius;
 	Vec3Df center = Vec3Df();
+	int move = 0;
 
 	const Vec3Df* target;
 	float scale;
@@ -41,6 +44,7 @@ private:
 	float base_speed;
 	float walking_speed;
 	float cycle = 0;
+	float linger_time = 0;
 	bool odd_cycle = 0;
 	Vec3Df movement_vec;
 	Vec3Df destination;
@@ -51,12 +55,13 @@ private:
 	float toe_distance;
 	float step_size;
 	float cycle_duration;
-
+	std::vector<std::function<void (Boss *)>> move_list;
+	
 	
 	void init();
 	void drawBody();
 	void drawHead();
-	void NullFunc(int value) {};
+	void linger(int ms);
 
 public:
 	//float speed = 0.1;
@@ -71,4 +76,5 @@ public:
 	void setDestination(Vec3Df dest, float speed);
 	void setWalkingSpeed(float speed);
 	void setTarget(const Vec3Df* target);
+	void nextMove(int n);
 };
