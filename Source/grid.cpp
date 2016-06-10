@@ -1,12 +1,6 @@
 #include "grid.h"
 
-#ifdef WIN32
-#define NOMINMAX
-#include <windows.h>
-#include <GL/glut.h>
-#elif defined (__APPLE__)
-#include <GLUT/glut.h>
-#endif
+#include "commonOpenGL.h"
 
 int Grid::isContainedAt(const Vec3Df & pos){
     //returns index that contains the position

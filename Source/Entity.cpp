@@ -1,10 +1,6 @@
 #include "Entity.h"
 
-#if defined(_WIN32)
-#include <GL/glut.h>
-#elif defined (__APPLE__)
-#include <GLUT/glut.h>
-#endif
+#include "commonOpenGL.h"
 
 #define _USE_MATH_DEFINES
 #include <math.h>

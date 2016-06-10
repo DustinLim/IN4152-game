@@ -1,10 +1,4 @@
-#if defined(_WIN32)
-#define NOMINMAX
-#include <windows.h>
-#include <GL/glut.h>
-#elif defined (__APPLE__)
-#include <GLUT/glut.h>
-#endif
+#include "commonOpenGL.h"
 
 #include <stdlib.h>
 #include <math.h>
@@ -407,6 +401,13 @@ int main(int argc, char** argv)
     glutInitWindowPosition(20, 80);
     glutInitWindowSize(W_fen,H_fen);
     glutCreateWindow(argv[0]);
+
+	// Windows only exposes OpenGL 1.1 functions.
+	// To call more modern functions, we need to load GLEW.
+	#if defined(_WIN32)
+		GLenum err = glewInit();
+		(GLEW_OK != err) ? printf("GLEW init failed!\n") : printf("GLEW init complete\n");
+	#endif
 
     init( );
 	

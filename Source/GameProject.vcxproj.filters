@@ -63,6 +63,12 @@
     <ClInclude Include="lib\windows\SOIL.h">
       <Filter>Libraries</Filter>
     </ClInclude>
+    <ClInclude Include="commonOpenGL.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\windows\glew.h">
+      <Filter>Libraries</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -126,6 +132,9 @@
   </ItemGroup>
   <ItemGroup>
     <Library Include="lib\windows\SOIL.lib">
+      <Filter>Libraries</Filter>
+    </Library>
+    <Library Include="lib\windows\glew32s.lib">
       <Filter>Libraries</Filter>
     </Library>
   </ItemGroup>

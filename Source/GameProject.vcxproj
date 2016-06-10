@@ -59,7 +59,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>SOIL.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SOIL.lib;glew32s.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>lib\windows;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -87,9 +87,11 @@
     <ClInclude Include="argumentParser.h" />
     <ClInclude Include="background.h" />
     <ClInclude Include="calcUtilities.h" />
+    <ClInclude Include="commonOpenGL.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="grid.h" />
     <ClInclude Include="landscape.h" />
+    <ClInclude Include="lib\windows\glew.h" />
     <ClInclude Include="lib\windows\SOIL.h" />
     <ClInclude Include="loadppm.h" />
     <ClInclude Include="matrix.h" />
@@ -130,6 +132,7 @@
     <Image Include="Textures\astronaut-complete.png" />
   </ItemGroup>
   <ItemGroup>
+    <Library Include="lib\windows\glew32s.lib" />
     <Library Include="lib\windows\SOIL.lib" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
