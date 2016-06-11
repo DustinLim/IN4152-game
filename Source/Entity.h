@@ -33,6 +33,9 @@ class Projectile: public Entity
 public:
     Projectile(Vec3Df spawnPoint, Vec3Df direction);
     
+    // Two textures *must* be included here
+    static std::vector<GLuint> textureSet;
+    
     // Overriding
     void draw();
     void animate(int deltaTime);
@@ -40,6 +43,8 @@ public:
 private:
     Vec3Df spawnPoint;
     float propelledDistance = 0;
+    GLuint texture;
+    int timeAccumulator = 0;
 };
 
 class Character : public Entity
