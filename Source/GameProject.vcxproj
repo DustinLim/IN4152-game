@@ -81,6 +81,7 @@
   <ItemGroup>
     <ClInclude Include="argumentParser.h" />
     <ClInclude Include="background.h" />
+    <ClInclude Include="boss.h" />
     <ClInclude Include="calcUtilities.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="grid.h" />
@@ -95,6 +96,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="background.cpp" />
+    <ClCompile Include="boss.cpp" />
     <ClCompile Include="calcUtilities.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="grid.cpp" />
