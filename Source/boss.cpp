@@ -1,5 +1,10 @@
 #include "boss.h"
+
+#if defined(_WIN32)
 #include <GL/glut.h>
+#elif defined (__APPLE__)
+#include <GLUT/glut.h>
+#endif
 
 
 template <typename T> int sgn(T val) {
@@ -211,8 +216,6 @@ void Boss::drawBody()
 			gluCylinder(gluNewQuadric(), 0, 0.25, 0, slices, 1);
 		glPopMatrix();
 	glPopMatrix();
-	
-	
 }
 
 void Boss::drawHead()
@@ -288,14 +291,12 @@ void Boss::init()
 	move_list.push_back(std::bind(&Boss::linger, std::placeholders::_1, 4000));
 	move_list.push_back(std::bind(&Boss::setDestination, std::placeholders::_1, Vec3Df(2, -1, 0), 1));
 	//glutTimerFunc(1000, this->nextMove, 2);
-	//glutTimerFunc(enemy_respawn_timer, spawnEnemy, 0);
 }
 
 void Boss::moveBody(Vec3Df delta)
 {
 	center += delta; 
 	init(); 
-
 }
 
 void Boss::setDestination(Vec3Df dest, float speed)
@@ -335,7 +336,6 @@ void Boss::nextMove(int n)
 		move_list[n-4](this);
 		move -= 3;
 	}
-		
 }
 
 void Boss::linger(int ms)

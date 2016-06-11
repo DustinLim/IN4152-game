@@ -29,6 +29,7 @@
 //chosen during execution with the keys 1-9
 enum DisplayModeType {GAME=1, MESH=2};
 DisplayModeType DisplayMode = GAME;
+
 enum MouseModeType {MOUSE_MODE_SHOOTING=0, MOUSE_MODE_CAMERA=1};
 MouseModeType MouseMode = MOUSE_MODE_SHOOTING;
 
@@ -56,10 +57,10 @@ int numberOfRidges = 2;
 bool toggleBoss = false;
 Boss boss;
 
-//Timing values
-int enemy_spawn_timer = 2000;
-int boss_spawn_timer = 10000;
-int enemy_respawn_timer = 1500;
+// Game timing constants (in ms)
+const int firstEnemySpawnDelay = 3000;
+const int enemyRespawnDelay = 1500;
+const int bossSpawnDelay = 10000;
 
 //TODO remove this again
 int meshIndex = 0;
@@ -206,7 +207,7 @@ void spawnEnemy(int unusedValue)
 		enemies.push_back(enemy);
 
 		// Repeat this
-		glutTimerFunc(enemy_respawn_timer, spawnEnemy, 0);
+		glutTimerFunc(enemyRespawnDelay, spawnEnemy, 0);
 	}
 }
 
@@ -462,8 +463,8 @@ int main(int argc, char** argv)
 	glutMouseFunc(mouse);
     glutMotionFunc(tbMotionFunc);  // traqueboule utilise la souris
     glutIdleFunc(animate);
-	glutTimerFunc(enemy_spawn_timer, spawnEnemy, 0);
-	glutTimerFunc(boss_spawn_timer, spawnBoss, 0);
+	glutTimerFunc(firstEnemySpawnDelay, spawnEnemy, 0);
+	glutTimerFunc(bossSpawnDelay, spawnBoss, 0);
 
     // lancement de la boucle principale
     glutMainLoop();
