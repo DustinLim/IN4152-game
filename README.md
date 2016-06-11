@@ -1,5 +1,9 @@
 # IN4152-game
-This is our 2D-shooter game, inspired by the classic *Forgotten Worlds*.
+This is our 2D-shooter game, inspired by the classic [Forgotten Worlds](https://en.wikipedia.org/wiki/Forgotten_Worlds). Watch a video with in-game footage [here](https://youtu.be/Uc0JYLO6m78).
+
+## Prerequisites
+* Visual Studio 2013
+* FreeGLUT installed (an installation zip with instructions is included in the root folder)
 
 ## Keyboard/mouse controls
 

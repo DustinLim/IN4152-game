@@ -10,6 +10,7 @@
 		54B452771D04BB270071EA7B /* grid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 54B452721D04BB270071EA7B /* grid.cpp */; };
 		54B452781D04BB270071EA7B /* mesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 54B452741D04BB270071EA7B /* mesh.cpp */; };
 		54B4527D1D08675F0071EA7B /* David.obj in CopyFiles */ = {isa = PBXBuildFile; fileRef = 54EA86D61D00C2FD0018AC85 /* David.obj */; };
+		54E41F281D099D070014A4BA /* boss.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 54E41F261D099D070014A4BA /* boss.cpp */; };
 		54E41F2E1D09FC770014A4BA /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 54E41F2D1D09FC770014A4BA /* CoreFoundation.framework */; };
 		54E41F321D09FD5F0014A4BA /* astronaut-arm.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 54E41F2F1D09FD3E0014A4BA /* astronaut-arm.png */; };
 		54E41F331D09FD5F0014A4BA /* astronaut-body.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 54E41F301D09FD3E0014A4BA /* astronaut-body.png */; };
@@ -67,6 +68,8 @@
 		54B452741D04BB270071EA7B /* mesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mesh.cpp; sourceTree = SOURCE_ROOT; };
 		54B452751D04BB270071EA7B /* mesh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mesh.h; sourceTree = SOURCE_ROOT; };
 		54B452761D04BB270071EA7B /* Vertex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Vertex.h; sourceTree = SOURCE_ROOT; };
+		54E41F261D099D070014A4BA /* boss.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = boss.cpp; sourceTree = SOURCE_ROOT; };
+		54E41F271D099D070014A4BA /* boss.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = boss.h; sourceTree = SOURCE_ROOT; };
 		54E41F2D1D09FC770014A4BA /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 		54E41F2F1D09FD3E0014A4BA /* astronaut-arm.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "astronaut-arm.png"; sourceTree = "<group>"; };
 		54E41F301D09FD3E0014A4BA /* astronaut-body.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "astronaut-body.png"; sourceTree = "<group>"; };
@@ -81,9 +84,6 @@
 		54EA86C91D00C2FD0018AC85 /* calcUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = calcUtilities.h; sourceTree = SOURCE_ROOT; };
 		54EA86CA1D00C2FD0018AC85 /* Entity.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Entity.cpp; sourceTree = SOURCE_ROOT; };
 		54EA86CB1D00C2FD0018AC85 /* Entity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Entity.h; sourceTree = SOURCE_ROOT; };
-		54EA86CC1D00C2FD0018AC85 /* GameProject.sln */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = GameProject.sln; sourceTree = SOURCE_ROOT; };
-		54EA86CD1D00C2FD0018AC85 /* GameProject.vcxproj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = GameProject.vcxproj; sourceTree = SOURCE_ROOT; };
-		54EA86CE1D00C2FD0018AC85 /* GameProject.vcxproj.filters */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = GameProject.vcxproj.filters; sourceTree = SOURCE_ROOT; };
 		54EA86CF1D00C2FD0018AC85 /* landscape.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = landscape.cpp; sourceTree = SOURCE_ROOT; };
 		54EA86D01D00C2FD0018AC85 /* landscape.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = landscape.h; sourceTree = SOURCE_ROOT; };
 		54EA86D11D00C2FD0018AC85 /* loadppm.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = loadppm.cpp; sourceTree = SOURCE_ROOT; };
@@ -145,13 +145,12 @@
 				54EA86C51D00C2FD0018AC85 /* argumentParser.h */,
 				54EA86C61D00C2FD0018AC85 /* background.cpp */,
 				54EA86C71D00C2FD0018AC85 /* background.h */,
+				54E41F261D099D070014A4BA /* boss.cpp */,
+				54E41F271D099D070014A4BA /* boss.h */,
 				54EA86C81D00C2FD0018AC85 /* calcUtilities.cpp */,
 				54EA86C91D00C2FD0018AC85 /* calcUtilities.h */,
 				54EA86CA1D00C2FD0018AC85 /* Entity.cpp */,
 				54EA86CB1D00C2FD0018AC85 /* Entity.h */,
-				54EA86CC1D00C2FD0018AC85 /* GameProject.sln */,
-				54EA86CD1D00C2FD0018AC85 /* GameProject.vcxproj */,
-				54EA86CE1D00C2FD0018AC85 /* GameProject.vcxproj.filters */,
 				54B452721D04BB270071EA7B /* grid.cpp */,
 				54B452731D04BB270071EA7B /* grid.h */,
 				54EA86CF1D00C2FD0018AC85 /* landscape.cpp */,
@@ -268,6 +267,7 @@
 				54EA86E31D00C2FD0018AC85 /* Entity.cpp in Sources */,
 				54B452771D04BB270071EA7B /* grid.cpp in Sources */,
 				54EA86E41D00C2FD0018AC85 /* landscape.cpp in Sources */,
+				54E41F281D099D070014A4BA /* boss.cpp in Sources */,
 				54EA86E71D00C35C0018AC85 /* main.cpp in Sources */,
 				54EA86E21D00C2FD0018AC85 /* calcUtilities.cpp in Sources */,
 				54EA86E11D00C2FD0018AC85 /* background.cpp in Sources */,

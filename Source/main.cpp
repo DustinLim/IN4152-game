@@ -12,6 +12,7 @@
 #include "Entity.h"
 #include "landscape.h"
 #include "background.h"
+#include "boss.h"
 #include "mesh.h"
 #include "grid.h"
 #include "Vertex.h"
@@ -22,6 +23,7 @@
 //chosen during execution with the keys 1-9
 enum DisplayModeType {GAME=1, MESH=2};
 DisplayModeType DisplayMode = GAME;
+
 enum MouseModeType {MOUSE_MODE_SHOOTING=0, MOUSE_MODE_CAMERA=1};
 MouseModeType MouseMode = MOUSE_MODE_SHOOTING;
 
@@ -45,6 +47,13 @@ bool keyPressed[256]; //keyboard buffer
 unique_ptr<Background> background; //smart pointer needed
 std::vector<Ridge> mountains;
 int numberOfRidges = 2;
+bool toggleBoss = false;
+Boss boss;
+
+// Game timing constants (in ms)
+const int firstEnemySpawnDelay = 3000;
+const int enemyRespawnDelay = 1500;
+const int bossSpawnDelay = 10000;
 
 //TODO remove this again
 int meshIndex = 0;
@@ -126,7 +135,10 @@ void display( )
 			projectile.draw();
 		}
 		
-		character.draw();
+		if (toggleBoss)
+			boss.drawBoss();
+
+        character.draw();
 		
 		break;
 	}
@@ -174,19 +186,32 @@ void animate( )
 		projectile.animate(deltaTime);
 	}
 	character.animate(deltaTime);
+
+	if (toggleBoss)
+		boss.animate(deltaTime);
 }
 
 // Method parameter is required to be registered by glutTimerFunc()
 void spawnEnemy(int unusedValue)
 {
-	Entity enemy = Entity();
-	enemy.position = Vec3Df(3, (rand()%3-1), 0);
-	enemy.movementDirection = Vec3Df(-1, 0, 0);
-	enemy.color = Vec3Df(0, 0, 1);
-	enemies.push_back(enemy);
+	if (!toggleBoss)
+	{
+		Entity enemy = Entity();
+		enemy.position = Vec3Df(3, (rand() % 3 - 1), 0);
+		enemy.movementDirection = Vec3Df(-1, 0, 0);
+		enemy.color = Vec3Df(0, 0, 1);
+		enemies.push_back(enemy);
 
-	// Repeat this
-	glutTimerFunc(1000, spawnEnemy, 0);
+		// Repeat this
+		glutTimerFunc(enemyRespawnDelay, spawnEnemy, 0);
+	}
+}
+
+void spawnBoss(int unusedValue)
+{
+	boss = Boss(Vec3Df(6, -1, -2), -1, 0.5);
+	boss.setTarget(&character.position);
+	toggleBoss = true;
 }
 
 Projectile spawnProjectile(Vec3Df direction)
@@ -265,6 +290,21 @@ void keyboard(unsigned char key, int x, int y)
 	case 'y':
 		LightPos[2] -= 0.1f;
 		break;	
+	case 'b':
+		spawnBoss(0);
+		break;
+	case 'j':
+		if (boss.position[0] <= 0)
+			boss.setDestination(Vec3Df(-2, -1, -0.5), 1);
+		else
+			boss.setDestination(Vec3Df(0, -1, -1), 1);
+		break;
+	case 'k':
+		if (boss.position[0] >= 0)
+			boss.setDestination(Vec3Df(2, -1, 0), 1);
+		else
+			boss.setDestination(Vec3Df(0, -1, 0.5), 1);
+		break;
 	case '+':
 		meshIndex = ++meshIndex % meshes.size();
 		break;
@@ -369,8 +409,8 @@ void init()
 
 	background.reset(new Background());
 	mountains.resize(numberOfRidges);
-	mountains[0] = Ridge(1, 50, 10, -3, 0.01f, -3, "./Textures/sand.ppm");
-	mountains[1] = Ridge(2, 50, 10, -3, 0.026f, -4, "./Textures/sand.ppm");
+	mountains[0] = Ridge(1, 50, 10, -3, 0.005f, -4, "./Textures/sand.ppm");
+	mountains[1] = Ridge(2, 50, 10, -3, 0.0075f, -3, "./Textures/sand.ppm");
 
 	//TODO change mesh to correct object.
 	printf("Loading Mesh\n");
@@ -430,7 +470,8 @@ int main(int argc, char** argv)
 	glutMouseFunc(mouse);
     glutMotionFunc(tbMotionFunc);  // traqueboule utilise la souris
     glutIdleFunc(animate);
-	glutTimerFunc(1000, spawnEnemy, 0);
+	glutTimerFunc(firstEnemySpawnDelay, spawnEnemy, 0);
+	glutTimerFunc(bossSpawnDelay, spawnBoss, 0);
 
     // lancement de la boucle principale
     glutMainLoop();
