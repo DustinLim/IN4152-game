@@ -37,6 +37,7 @@ float LightPos[4] = {1,1,0.4,1};
 ////////// Declare your own global variables here:
 void calculateWorldSpaceViewportBounds();
 void collisionDetection();
+Vec3Df mouseToCharacterWorldPlane(int x, int y);
 
 // NOTE: In C++, declaring "Object instance;" will instantly call the Object constructor!
 // To do these forward declarations, use smart pointers (unique_ptr) instead.
@@ -201,12 +202,11 @@ void animate( )
 	}
 
 	character.animate(deltaTime);
-	character.position[0] = std::fmax(character.position[0], topLeft[0] + character.width / 2.0f);
-	character.position[0] = std::fmin(character.position[0], bottomRight[0] - character.height / 2.0f);
+	character.position[0] = std::fmax(character.position[0], topLeft[0] + (character.width / 2.0f) * character.scale);
+	character.position[0] = std::fmin(character.position[0], bottomRight[0] - (character.width / 2.0f) * character.scale);
 
-	character.position[1] = std::fmin(character.position[1], topLeft[1] - character.width / 2.0f);
-	character.position[1] = std::fmax(character.position[1], bottomRight[1] + character.height / 2.0f);
-
+	character.position[1] = std::fmin(character.position[1], topLeft[1] - (character.height / 2.0f) * character.scale);
+	character.position[1] = std::fmax(character.position[1], bottomRight[1] + (character.height / 2.0f) * character.scale);
 
 	if (toggleBoss)
 		boss.animate(deltaTime);
@@ -259,10 +259,7 @@ void collisionDetection() {
 	for (std::vector<Entity>::iterator enemy = enemies.begin(); enemy != enemies.end();) {
 		if (isHit(character, (*enemy))) {
 			enemy = enemies.erase(enemy);
-			Vec3Df col = character.color;
-			col[0] = fminf(1, col[0] + 0.1f);
-			col[1] = fmaxf(0, col[1] - 0.1f);
-			character.color = col;
+			// Do some logic here
 		}
 		else {
 			++enemy;
@@ -431,6 +428,12 @@ void calculateMouseRay(int x, int y, Vec3Df *nearPoint, Vec3Df *farPoint)
     *farPoint = Vec3Df(farX, farY, farZ);
 }
 
+Vec3Df mouseToCharacterWorldPlane(int x, int y) {
+	float xD = topLeft[0] + (((float)x) / W_fen) * (bottomRight[0] - topLeft[0]);
+	float yD = topLeft[1] + (((float)y) / H_fen) * (bottomRight[1] - topLeft[1]);
+	return Vec3Df(xD, yD, character.position[2]);
+}
+
 void mouse(int button, int state, int x, int y)
 {
     if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN &&
@@ -438,20 +441,26 @@ void mouse(int button, int state, int x, int y)
     {
         // Shooting in the correct direction is harder than it looks..
         // We first determine the mouse ray that goes through the near and far clipping planes.
-        Vec3Df nearPoint, farPoint;
-        calculateMouseRay(x, y, &nearPoint, &farPoint);
-        Vec3Df ray = nearPoint - farPoint;
+        //Vec3Df nearPoint, farPoint;
+        //calculateMouseRay(x, y, &nearPoint, &farPoint);
+        //Vec3Df ray = nearPoint - farPoint;
 
         // Calculate the vertex where the mouse ray intersects the character plane
-        float fraction = (character.position[2] - farPoint[2]) / ray[2];
-        Vec3Df intersection = farPoint + (ray * fraction);
+        //float fraction = (character.position[2] - farPoint[2]) / ray[2];
+        //Vec3Df intersection = farPoint + (ray * fraction);
 
         // We now know the correct direction
-        Vec3Df shootingDirection = intersection - character.position;
+       // Vec3Df shootingDirection = intersection - character.position;
 
-		character.updateArmAngle(shootingDirection);
+		//character.updateArmAngle(shootingDirection);
 
-        spawnProjectile(shootingDirection);
+        //spawnProjectile(shootingDirection);
+
+		
+		Vec3Df shootingDirection2 = mouseToCharacterWorldPlane(x, y) - character.position;
+		spawnProjectile(shootingDirection2);
+		character.updateArmAngle(shootingDirection2);
+
     }
     else if (MouseMode == MOUSE_MODE_CAMERA)
     {
@@ -459,6 +468,30 @@ void mouse(int button, int state, int x, int y)
         tbMouseFunc(button, state, x, y);
 		calculateWorldSpaceViewportBounds();
     }
+}
+
+void mouseMotion(int x, int y) {
+	if (MouseMode == MOUSE_MODE_SHOOTING)
+	{
+		character.updateArmAngle(mouseToCharacterWorldPlane(x, y) - character.position);
+	}
+	else if (MouseMode == MOUSE_MODE_CAMERA)
+	{
+		// Pass this event to trackball.h
+		tbMotionFunc(x, y);
+		calculateWorldSpaceViewportBounds();
+	}
+}
+
+void mousePassiveMotion(int x, int y) {
+	if (MouseMode == MOUSE_MODE_SHOOTING)
+	{
+		character.updateArmAngle(mouseToCharacterWorldPlane(x, y) - character.position);
+	}
+	else if (MouseMode == MOUSE_MODE_CAMERA)
+	{
+
+	}
 }
 
 void calculateWorldSpaceViewportBounds() {
@@ -561,7 +594,8 @@ int main(int argc, char** argv)
 	glutKeyboardUpFunc(keyboardUp);
     glutDisplayFunc(displayInternal); 
 	glutMouseFunc(mouse);
-    glutMotionFunc(tbMotionFunc);  // traqueboule utilise la souris
+	glutMotionFunc(mouseMotion);  // traqueboule utilise la souris
+	glutPassiveMotionFunc(mousePassiveMotion);
     glutIdleFunc(animate);
 	glutTimerFunc(firstEnemySpawnDelay, spawnEnemy, 0);
 	glutTimerFunc(bossSpawnDelay, spawnBoss, 0);

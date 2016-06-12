@@ -37,8 +37,8 @@ void Entity::animate(int deltaTime)
 }
 
 std::vector<Vec3Df> Entity::getBoundingBox() {
-	Vec3Df topLeft = Vec3Df(position[0] - width / 2.0f, position[1] - height / 2.0f, position[2]);
-	Vec3Df bottomRight = Vec3Df(position[0] + width / 2.0f, position[1] + height / 2.0f, position[2]);
+	Vec3Df topLeft = Vec3Df(position[0] - (width / 2.0f) * scale, position[1] - (height / 2.0f) * scale, position[2]);
+	Vec3Df bottomRight = Vec3Df(position[0] + (width / 2.0f) * scale, position[1] + (height / 2.0f) * scale, position[2]);
 
 	//float angle = atan2f(movementDirection[1], movementDirection[0]);
 	//float y = sin(angle) * (width / 2.0f);
@@ -94,6 +94,9 @@ void Projectile::animate(int deltaTime)
 Character::Character()
 {
 	armAngle = 0.0f;
+	width = 0.8f;
+	height = 2.0f;
+	scale = 0.4f;
 }
 
 void Character::draw()
@@ -112,7 +115,7 @@ void Character::draw()
 
 	glPushMatrix();
 	glTranslatef(position[0], position[1], position[2]);
-	glScalef(0.4f, 0.4f, 0.4f);
+	glScalef(scale, scale, scale);
 	
 	glPushMatrix();
 	
@@ -123,19 +126,22 @@ void Character::draw()
 	glBegin(GL_QUADS);
 		glNormal3f(-ref_mag, -ref_mag, 1.0f);
 		glTexCoord2f(0.0f, tex_v_max);
-		glVertex3f(-0.4f, -1.0f, -0.1f);
+		//glVertex3f(-0.4f, -1.0f, -0.1f);
+		glVertex3f(-width / 2.0f, -height / 2.0f, -0.1f);
 
 		glNormal3f(ref_mag, -ref_mag, 1.0f);
 		glTexCoord2f(tex_u_max, tex_v_max);
-		glVertex3f(0.4f, -1.0f, -0.1f);
+		//glVertex3f(0.4f, -1.0f, -0.1f);
+		glVertex3f(width / 2.0f, -height / 2.0f, -0.1f);
 
 		glNormal3f(ref_mag, ref_mag, 1.0f);
 		glTexCoord2f(tex_u_max, 0.0f);
-		glVertex3f(0.4f, 1.0f, -0.1f);
+		//glVertex3f(0.4f, 1.0f, -0.1f);
+		glVertex3f(width / 2.0f, height / 2.0f, -0.1f);
 
 		glNormal3f(-ref_mag, ref_mag, 1.0f);
 		glTexCoord2f(0.0f, 0.0f);
-		glVertex3f(-0.4f, 1.0f, -0.1f);
+		glVertex3f(-width / 2.0f, height / 2.0f, -0.1f);
 	glEnd();
 	glPopMatrix();
 

@@ -12,6 +12,7 @@ public:
 	~Entity(); //class destructor
 
 	Vec3Df position = Vec3Df(0, 0, 0);
+	float scale = 1.0f;
 	std::vector<GLuint> Texture;
     
     // Movement
