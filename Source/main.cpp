@@ -1,10 +1,4 @@
-#if defined(_WIN32)
-#define NOMINMAX
-#include <windows.h>
-#include <GL/glut.h>
-#elif defined (__APPLE__)
-#include <GLUT/glut.h>
-#endif
+#include "commonOpenGL.h"
 
 #include <stdlib.h>
 #include <math.h>
@@ -18,36 +12,56 @@
 #include "Entity.h"
 #include "landscape.h"
 #include "background.h"
+#include "boss.h"
+#include "mesh.h"
+#include "grid.h"
+#include "Vertex.h"
 
 
 //Use the enum values to define different rendering modes 
 //The mode is used by the function display and the mode is 
 //chosen during execution with the keys 1-9
-enum DisplayModeType {GAME=6};
+enum DisplayModeType {GAME=1, MESH=2};
 DisplayModeType DisplayMode = GAME;
+
 enum MouseModeType {MOUSE_MODE_SHOOTING=0, MOUSE_MODE_CAMERA=1};
 MouseModeType MouseMode = MOUSE_MODE_SHOOTING;
 
 unsigned int W_fen = 800;  // screen width
 unsigned int H_fen = 600;  // screen height
 
+Vec3Df topLeft, bottomRight;
+
 float LightPos[4] = {1,1,0.4,1};
 
-
 ////////// Declare your own global variables here:
+void calculateWorldSpaceViewportBounds();
+void collisionDetection();
+Vec3Df mouseToCharacterWorldPlane(int x, int y);
 
 // NOTE: In C++, declaring "Object instance;" will instantly call the Object constructor!
 // To do these forward declarations, use smart pointers (unique_ptr) instead.
 
-Entity character = Entity();
+Character character = Character();
 std::vector<Entity> enemies = {};
 std::vector<Projectile> projectiles = {};
+std::vector<Mesh >meshes = {};
 int glutElapsedTime = 0; //in ms
 bool keyPressed[256]; //keyboard buffer
 
 unique_ptr<Background> background; //smart pointer needed
 std::vector<Ridge> mountains;
 int numberOfRidges = 2;
+bool toggleBoss = false;
+Boss boss;
+
+// Game timing constants (in ms)
+const int firstEnemySpawnDelay = 3000;
+const int enemyRespawnDelay = 1500;
+const int bossSpawnDelay = 10000;
+
+//TODO remove this again
+int meshIndex = 0;
 
 
 ////////// Draw Functions 
@@ -111,8 +125,14 @@ void display( )
 		glLightfv(GL_LIGHT0, GL_POSITION, LightPos);
 		drawLight();
 		drawCoordSystem();
-		
-		character.draw();
+
+		// Note that drawing order has consequences for 'transparancy'
+		background->draw();
+		for (int i = 0; i < numberOfRidges; i++)
+		{
+			mountains[i].draw();
+		}
+
 		for (auto &enemy : enemies) {
 			enemy.draw();
 		}
@@ -120,18 +140,43 @@ void display( )
 			projectile.draw();
 		}
 		
-		background->draw();
-		for (int i = 0; i < numberOfRidges; i++)
-		{
-			mountains[i].draw();
-		}
+		if (toggleBoss)
+			boss.drawBoss();
+
+        character.draw();
+		
 		break;
 	}
+    case MESH:
+    {
+        glEnable(GL_LIGHTING);
+        glPushMatrix();
+		//David:
+        //glRotatef(-90.0f, 0.0f, 0.0f, 1.0f);
+        //glRotatef(-90.0f, 0.0f, 1.0f, 0.0f);
+		//hoofd
+		glRotatef(90.0f, 0.0f, 0.0f, 1.0f);
+		glRotatef(-90.0f, 1.0f, 0.0f, 0.0f);
+        meshes[meshIndex].drawSmooth();
+        glPopMatrix();
+        glDisable(GL_LIGHTING);
+        break;
+    }
 	default:
 		break;
 	}
 }
 
+bool isHit(Entity ent1, Entity ent2) {
+	std::vector<Vec3Df> bb1 = ent1.getBoundingBox();
+	std::vector<Vec3Df> bb2 = ent2.getBoundingBox();
+
+	bool xAxis = (bb1[0][0] > bb2[1][0] || bb1[1][0] < bb2[0][0]);
+	bool yAxis = (bb1[0][1] > bb2[1][1] || bb1[1][1] < bb2[0][1]);
+	bool anyHit = xAxis || yAxis;
+
+	return !anyHit;
+}
 
 /**
  * Animation function, only put animation code here!
@@ -149,33 +194,108 @@ void animate( )
 	int deltaTime = currentTime - glutElapsedTime;
 	glutElapsedTime = currentTime;
 
-	character.animate(deltaTime);
 	for (auto &enemy : enemies) {
 		enemy.animate(deltaTime);
 	}
 	for (auto &projectile : projectiles) {
 		projectile.animate(deltaTime);
 	}
+
+	character.animate(deltaTime);
+	character.position[0] = std::fmax(character.position[0], topLeft[0] + (character.width / 2.0f) * character.scale);
+	character.position[0] = std::fmin(character.position[0], bottomRight[0] - (character.width / 2.0f) * character.scale);
+
+	character.position[1] = std::fmin(character.position[1], topLeft[1] - (character.height / 2.0f) * character.scale);
+	character.position[1] = std::fmax(character.position[1], bottomRight[1] + (character.height / 2.0f) * character.scale);
+
+	if (toggleBoss)
+		boss.animate(deltaTime);
+
+	collisionDetection();
+}
+
+void collisionDetection() {
+	//Check if any bullets hit
+	for (std::vector<Projectile>::iterator projectile = projectiles.begin(); projectile != projectiles.end();) {
+		bool broken = false;
+		for (std::vector<Entity>::iterator enemy = enemies.begin(); enemy != enemies.end();) {
+			if (isHit((*projectile), (*enemy))) {
+				enemy = enemies.erase(enemy);
+				projectile = projectiles.erase(projectile);
+				broken = true;
+				break;
+			}
+			else {
+				++enemy;
+			}
+		}
+		if (!broken) {
+			projectile++;
+		}
+	}
+
+	//Check if anything went outside the viewport
+	for (std::vector<Entity>::iterator enemy = enemies.begin(); enemy != enemies.end();) {
+		if ((*enemy).getBoundingBox()[1][0] < topLeft[0]) {
+			enemy = enemies.erase(enemy);
+		}
+		else {
+			++enemy;
+		}
+	}
+	Entity viewport = Entity();
+	viewport.height = H_fen;
+	viewport.width = W_fen;
+	for (std::vector<Projectile>::iterator projectile = projectiles.begin(); projectile != projectiles.end();) {
+		if (!isHit((*projectile), viewport)) {
+			projectile = projectiles.erase(projectile);
+		}
+		else {
+			++projectile;
+		}
+	}
+
+	//Check if the player didn't hit an enemy
+	for (std::vector<Entity>::iterator enemy = enemies.begin(); enemy != enemies.end();) {
+		if (isHit(character, (*enemy))) {
+			enemy = enemies.erase(enemy);
+			// Do some logic here
+		}
+		else {
+			++enemy;
+		}
+	}
 }
 
 // Method parameter is required to be registered by glutTimerFunc()
 void spawnEnemy(int unusedValue)
 {
-	Entity enemy = Entity();
-	enemy.position = Vec3Df(3, (rand()%3-1), 0);
-	enemy.movementDirection = Vec3Df(-1, 0, 0);
-	enemy.color = Vec3Df(0, 0, 1);
-	enemies.push_back(enemy);
+	if (!toggleBoss)
+	{
+		Entity enemy = Entity();
+		enemy.position = Vec3Df(3, (rand() % 3 - 1), 0);
+		enemy.movementDirection = Vec3Df(-1, 0, 0);
+		enemy.color = Vec3Df(0, 0, 1);
+		enemies.push_back(enemy);
 
-	// Repeat this
-	glutTimerFunc(1000, spawnEnemy, 0);
+		// Repeat this
+		glutTimerFunc(enemyRespawnDelay, spawnEnemy, 0);
+	}
+}
+
+void spawnBoss(int unusedValue)
+{
+	boss = Boss(Vec3Df(6, -1, -2), -1, 0.5);
+	boss.setTarget(&character.position);
+	toggleBoss = true;
 }
 
 Projectile spawnProjectile(Vec3Df direction)
 {
     Projectile projectile = Projectile(character.position, direction);
 	projectile.movementSpeed = 3.0;
-	projectile.size = 0.125;
+	projectile.width = 0.125;
+	projectile.height = 0.125;
 
 	projectiles.push_back(projectile);
 	return projectile;
@@ -230,23 +350,41 @@ void keyboard(unsigned char key, int x, int y)
 		break;
 	// MOVING THE LIGHT IN THE X,Y,Z DIRECTION -> We should do something with shadows in a later stadium.
 	case 'f':
-		LightPos[0] -= 0.1;
+		LightPos[0] -= 0.1f;
 		break;
 	case 'h':
-		LightPos[0] += 0.1;
+		LightPos[0] += 0.1f;
 		break;
 	case 't':
-		LightPos[1] += 0.1;
+		LightPos[1] += 0.1f;
 		break;
 	case 'g':
-		LightPos[1] -= 0.1;
+		LightPos[1] -= 0.1f;
 		break;
 	case 'r':
-		LightPos[2] += 0.1;
+		LightPos[2] += 0.1f;
 		break;
 	case 'y':
-		LightPos[2] -= 0.1;
-		break;		
+		LightPos[2] -= 0.1f;
+		break;	
+	case 'b':
+		spawnBoss(0);
+		break;
+	case 'j':
+		if (boss.position[0] <= 0)
+			boss.setDestination(Vec3Df(-2, -1, -0.5), 1);
+		else
+			boss.setDestination(Vec3Df(0, -1, -1), 1);
+		break;
+	case 'k':
+		if (boss.position[0] >= 0)
+			boss.setDestination(Vec3Df(2, -1, 0), 1);
+		else
+			boss.setDestination(Vec3Df(0, -1, 0.5), 1);
+		break;
+	case '+':
+		meshIndex = ++meshIndex % meshes.size();
+		break;
     }
 }
 
@@ -290,6 +428,12 @@ void calculateMouseRay(int x, int y, Vec3Df *nearPoint, Vec3Df *farPoint)
     *farPoint = Vec3Df(farX, farY, farZ);
 }
 
+Vec3Df mouseToCharacterWorldPlane(int x, int y) {
+	float xD = topLeft[0] + (((float)x) / W_fen) * (bottomRight[0] - topLeft[0]);
+	float yD = topLeft[1] + (((float)y) / H_fen) * (bottomRight[1] - topLeft[1]);
+	return Vec3Df(xD, yD, character.position[2]);
+}
+
 void mouse(int button, int state, int x, int y)
 {
     if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN &&
@@ -297,29 +441,75 @@ void mouse(int button, int state, int x, int y)
     {
         // Shooting in the correct direction is harder than it looks..
         // We first determine the mouse ray that goes through the near and far clipping planes.
-        Vec3Df nearPoint, farPoint;
-        calculateMouseRay(x, y, &nearPoint, &farPoint);
-        Vec3Df ray = nearPoint - farPoint;
+        //Vec3Df nearPoint, farPoint;
+        //calculateMouseRay(x, y, &nearPoint, &farPoint);
+        //Vec3Df ray = nearPoint - farPoint;
 
         // Calculate the vertex where the mouse ray intersects the character plane
-        float fraction = (character.position[2] - farPoint[2]) / ray[2];
-        Vec3Df intersection = farPoint + (ray * fraction);
+        //float fraction = (character.position[2] - farPoint[2]) / ray[2];
+        //Vec3Df intersection = farPoint + (ray * fraction);
 
         // We now know the correct direction
-        Vec3Df shootingDirection = intersection - character.position;
-        spawnProjectile(shootingDirection);
+       // Vec3Df shootingDirection = intersection - character.position;
+
+		//character.updateArmAngle(shootingDirection);
+
+        //spawnProjectile(shootingDirection);
+
+		
+		Vec3Df shootingDirection2 = mouseToCharacterWorldPlane(x, y) - character.position;
+		spawnProjectile(shootingDirection2);
+		character.updateArmAngle(shootingDirection2);
+
     }
     else if (MouseMode == MOUSE_MODE_CAMERA)
     {
         // Pass this event to trackball.h
         tbMouseFunc(button, state, x, y);
+		calculateWorldSpaceViewportBounds();
     }
+}
+
+void mouseMotion(int x, int y) {
+	if (MouseMode == MOUSE_MODE_SHOOTING)
+	{
+		character.updateArmAngle(mouseToCharacterWorldPlane(x, y) - character.position);
+	}
+	else if (MouseMode == MOUSE_MODE_CAMERA)
+	{
+		// Pass this event to trackball.h
+		tbMotionFunc(x, y);
+		calculateWorldSpaceViewportBounds();
+	}
+}
+
+void mousePassiveMotion(int x, int y) {
+	if (MouseMode == MOUSE_MODE_SHOOTING)
+	{
+		character.updateArmAngle(mouseToCharacterWorldPlane(x, y) - character.position);
+	}
+	else if (MouseMode == MOUSE_MODE_CAMERA)
+	{
+
+	}
+}
+
+void calculateWorldSpaceViewportBounds() {
+	Vec3Df nearPoint, farPoint;
+	calculateMouseRay(0, 0, &nearPoint, &farPoint);
+	Vec3Df ray = nearPoint - farPoint;
+	float fraction = (character.position[2] - farPoint[2]) / ray[2];
+	topLeft = farPoint +(ray * fraction);
+
+	calculateMouseRay(W_fen, H_fen, &nearPoint, &farPoint);
+	ray = nearPoint - farPoint;
+	fraction = (character.position[2] - farPoint[2]) / ray[2];
+	bottomRight = farPoint +(ray * fraction);
 }
 
 
 void displayInternal(void);
 void reshape(int w, int h);
-bool loadMesh(const char * filename);
 void init()
 {
     glDisable( GL_LIGHTING );
@@ -346,8 +536,22 @@ void init()
 
 	background.reset(new Background());
 	mountains.resize(numberOfRidges);
-	mountains[0] = Ridge(1, 50, 10, -3, 0.01, -3, "./Textures/sand.ppm");
-	mountains[1] = Ridge(2, 50, 10, -3, 0.026, -4, "./Textures/sand.ppm");
+	mountains[0] = Ridge(1, 50, 10, -3, 0.005f, -4, "./Textures/sand.ppm");
+	mountains[1] = Ridge(2, 50, 10, -3, 0.0075f, -3, "./Textures/sand.ppm");
+
+	//TODO change mesh to correct object.
+	printf("Loading Mesh\n");
+	Mesh mesh = Mesh();
+	mesh.loadMesh("./Models/hoofd.obj");
+	meshes.push_back(mesh);
+	printf("Creating Grid, 16\n");
+	meshes.push_back(Grid::getReduxMesh(mesh, 16));
+	printf("Creating Grid, 8\n");
+	meshes.push_back(Grid::getReduxMesh(mesh, 8));
+	printf("Creating Grid, 4\n");
+	meshes.push_back(Grid::getReduxMesh(mesh, 4));
+
+	character.initTexture();
 }
 
 /**
@@ -365,6 +569,13 @@ int main(int argc, char** argv)
     glutInitWindowSize(W_fen,H_fen);
     glutCreateWindow(argv[0]);
 
+	// Windows only exposes OpenGL 1.1 functions.
+	// To call more modern functions, we need to load GLEW.
+	#if defined(_WIN32)
+		GLenum err = glewInit();
+		(GLEW_OK != err) ? printf("GLEW init failed!\n") : printf("GLEW init complete\n");
+	#endif
+
     init( );
 	
     // Initialize viewpoint
@@ -373,9 +584,8 @@ int main(int argc, char** argv)
     glTranslatef(0,0,-4);
     tbInitTransform();     
     tbHelp();
-         
-	character.color = Vec3Df(1, 0, 0);
-	character.position = Vec3Df(-2, 0, 0);
+
+	calculateWorldSpaceViewportBounds();
 
 	// cablage des callback
     glutReshapeFunc(reshape);
@@ -384,9 +594,11 @@ int main(int argc, char** argv)
 	glutKeyboardUpFunc(keyboardUp);
     glutDisplayFunc(displayInternal); 
 	glutMouseFunc(mouse);
-    glutMotionFunc(tbMotionFunc);  // traqueboule utilise la souris
+	glutMotionFunc(mouseMotion);  // traqueboule utilise la souris
+	glutPassiveMotionFunc(mousePassiveMotion);
     glutIdleFunc(animate);
-	glutTimerFunc(1000, spawnEnemy, 0);
+	glutTimerFunc(firstEnemySpawnDelay, spawnEnemy, 0);
+	glutTimerFunc(bossSpawnDelay, spawnBoss, 0);
 
     // lancement de la boucle principale
     glutMainLoop();
@@ -418,11 +630,16 @@ void displayInternal(void)
 // pour changement de taille ou desiconification
 void reshape(int w, int h)
 {
+	W_fen = w;
+	H_fen = h;
+
     glViewport(0, 0, (GLsizei) w, (GLsizei) h);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     //glOrtho (-1.1, 1.1, -1.1,1.1, -1000.0, 1000.0);
     gluPerspective (50, (float)w/h, 1, 10);
     glMatrixMode(GL_MODELVIEW);
+
+	calculateWorldSpaceViewportBounds();
 }
 
