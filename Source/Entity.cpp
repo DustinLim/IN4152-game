@@ -20,11 +20,12 @@ void Entity::draw()
 	glColor3f(color[0], color[1], color[2]);
 	glNormal3f(0, 0, 1);
 	glBegin(GL_QUADS);
-	float offset = size/2.0f;
-	glVertex3f(-offset, -offset, 0);
-	glVertex3f(offset, -offset, 0);
-	glVertex3f(offset, offset, 0);
-	glVertex3f(-offset, offset, 0);
+	float offsetW = width / 2.0f;
+	float offsetH = height / 2.0f;
+	glVertex3f(-offsetW, -offsetH, 0);
+	glVertex3f(offsetW, -offsetH, 0);
+	glVertex3f(offsetW, offsetH, 0);
+	glVertex3f(-offsetW, offsetH, 0);
 	glEnd();
 	glPopMatrix();
 }
@@ -33,6 +34,17 @@ void Entity::animate(int deltaTime)
 {
 	movementDirection.normalize();
 	position += movementDirection * movementSpeed * ((float)deltaTime/1000);
+}
+
+std::vector<Vec3Df> Entity::getBoundingBox() {
+	Vec3Df topLeft = Vec3Df(position[0] - (width / 2.0f) * scale, position[1] - (height / 2.0f) * scale, position[2]);
+	Vec3Df bottomRight = Vec3Df(position[0] + (width / 2.0f) * scale, position[1] + (height / 2.0f) * scale, position[2]);
+
+	//float angle = atan2f(movementDirection[1], movementDirection[0]);
+	//float y = sin(angle) * (width / 2.0f);
+	//float x = sin(angle) * (width / 2.0f);
+	std::vector<Vec3Df> list = { topLeft, bottomRight };
+	return list;
 }
 
 Projectile::Projectile(Vec3Df spawnPoint, Vec3Df direction)
@@ -58,11 +70,12 @@ void Projectile::draw()
     glTranslatef(propelledDistance, 0, 0);
     
     glBegin(GL_QUADS);
-    float offset = size/2.0f;
-    glVertex3f(-offset, -offset, 0);
-    glVertex3f(offset, -offset, 0);
-    glVertex3f(offset, offset, 0);
-    glVertex3f(-offset, offset, 0);
+    float offsetW = width/2.0f;
+	float offsetH = height/ 2.0f;
+    glVertex3f(-offsetW, -offsetH, 0);
+    glVertex3f(offsetW, -offsetH, 0);
+    glVertex3f(offsetW, offsetH, 0);
+    glVertex3f(-offsetW, offsetH, 0);
     glEnd();
     
     glPopMatrix();
@@ -81,6 +94,9 @@ void Projectile::animate(int deltaTime)
 Character::Character()
 {
 	armAngle = 0.0f;
+	width = 0.8f;
+	height = 2.0f;
+	scale = 0.4f;
 }
 
 void Character::draw()
@@ -99,7 +115,7 @@ void Character::draw()
 
 	glPushMatrix();
 	glTranslatef(position[0], position[1], position[2]);
-	glScalef(0.4f, 0.4f, 0.4f);
+	glScalef(scale, scale, scale);
 	
 	glPushMatrix();
 	
@@ -110,19 +126,22 @@ void Character::draw()
 	glBegin(GL_QUADS);
 		glNormal3f(-ref_mag, -ref_mag, 1.0f);
 		glTexCoord2f(0.0f, tex_v_max);
-		glVertex3f(-0.4f, -1.0f, -0.1f);
+		//glVertex3f(-0.4f, -1.0f, -0.1f);
+		glVertex3f(-width / 2.0f, -height / 2.0f, -0.1f);
 
 		glNormal3f(ref_mag, -ref_mag, 1.0f);
 		glTexCoord2f(tex_u_max, tex_v_max);
-		glVertex3f(0.4f, -1.0f, -0.1f);
+		//glVertex3f(0.4f, -1.0f, -0.1f);
+		glVertex3f(width / 2.0f, -height / 2.0f, -0.1f);
 
 		glNormal3f(ref_mag, ref_mag, 1.0f);
 		glTexCoord2f(tex_u_max, 0.0f);
-		glVertex3f(0.4f, 1.0f, -0.1f);
+		//glVertex3f(0.4f, 1.0f, -0.1f);
+		glVertex3f(width / 2.0f, height / 2.0f, -0.1f);
 
 		glNormal3f(-ref_mag, ref_mag, 1.0f);
 		glTexCoord2f(0.0f, 0.0f);
-		glVertex3f(-0.4f, 1.0f, -0.1f);
+		glVertex3f(-width / 2.0f, height / 2.0f, -0.1f);
 	glEnd();
 	glPopMatrix();
 
