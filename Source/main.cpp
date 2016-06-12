@@ -1,10 +1,4 @@
-#if defined(_WIN32)
-#define NOMINMAX
-#include <windows.h>
-#include <GL/glut.h>
-#elif defined (__APPLE__)
-#include <GLUT/glut.h>
-#endif
+#include "commonOpenGL.h"
 
 #include <stdlib.h>
 #include <math.h>
@@ -39,12 +33,11 @@ unsigned int H_fen = 600;  // screen height
 float LightPos[4] = {1,1,0.4f,1};
 
 
-////////// Declare your own global variables here:
 
 // NOTE: In C++, declaring "Object instance;" will instantly call the Object constructor!
 // To do these forward declarations, use smart pointers (unique_ptr) instead.
 
-Entity character = Entity();
+Character character = Character();
 std::vector<Entity> enemies = {};
 std::vector<Projectile> projectiles = {};
 std::vector<Mesh >meshes = {};
@@ -127,8 +120,14 @@ void display( )
 		glLightfv(GL_LIGHT0, GL_POSITION, LightPos);
 		drawLight();
 		drawCoordSystem();
-		
-		character.draw();
+
+		// Note that drawing order has consequences for 'transparancy'
+		background->draw();
+		for (int i = 0; i < numberOfRidges; i++)
+		{
+			mountains[i].draw();
+		}
+
 		for (auto &enemy : enemies) {
 			enemy.draw();
 		}
@@ -136,14 +135,11 @@ void display( )
 			projectile.draw();
 		}
 		
-		background->draw();
-		for (int i = 0; i < numberOfRidges; i++)
-		{
-			mountains[i].draw();
-		}
-
 		if (toggleBoss)
 			boss.drawBoss();
+
+        character.draw();
+		
 		break;
 	}
     case MESH:
@@ -183,13 +179,13 @@ void animate( )
 	int deltaTime = currentTime - glutElapsedTime;
 	glutElapsedTime = currentTime;
 
-	character.animate(deltaTime);
 	for (auto &enemy : enemies) {
 		enemy.animate(deltaTime);
 	}
 	for (auto &projectile : projectiles) {
 		projectile.animate(deltaTime);
 	}
+	character.animate(deltaTime);
 
 	if (toggleBoss)
 		boss.animate(deltaTime);
@@ -372,6 +368,9 @@ void mouse(int button, int state, int x, int y)
 
         // We now know the correct direction
         Vec3Df shootingDirection = intersection - character.position;
+
+		character.updateArmAngle(shootingDirection);
+
         spawnProjectile(shootingDirection);
     }
     else if (MouseMode == MOUSE_MODE_CAMERA)
@@ -413,7 +412,6 @@ void init()
 	mountains[0] = Ridge(1, 50, 10, -3, 0.005f, -4, "./Textures/sand.ppm");
 	mountains[1] = Ridge(2, 50, 10, -3, 0.0075f, -3, "./Textures/sand.ppm");
 
-
 	//TODO change mesh to correct object.
 	printf("Loading Mesh\n");
 	Mesh mesh = Mesh();
@@ -425,6 +423,8 @@ void init()
 	meshes.push_back(Grid::getReduxMesh(mesh, 8));
 	printf("Creating Grid, 4\n");
 	meshes.push_back(Grid::getReduxMesh(mesh, 4));
+
+	character.initTexture();
 }
 
 /**
@@ -441,6 +441,13 @@ int main(int argc, char** argv)
     glutInitWindowPosition(20, 80);
     glutInitWindowSize(W_fen,H_fen);
     glutCreateWindow(argv[0]);
+
+	// Windows only exposes OpenGL 1.1 functions.
+	// To call more modern functions, we need to load GLEW.
+	#if defined(_WIN32)
+		GLenum err = glewInit();
+		(GLEW_OK != err) ? printf("GLEW init failed!\n") : printf("GLEW init complete\n");
+	#endif
 
     init( );
 	

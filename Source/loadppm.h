@@ -6,13 +6,7 @@
 #include <iostream>
 #include <fstream>
 #include <math.h>
-#if defined(_WIN32)
-#define NOMINMAX
-#include <windows.h>
-#include <GL/gl.h>
-#elif defined (__APPLE__)
-#include <GLUT/glut.h>
-#endif
+#include "commonOpenGL.h"
 
 using namespace std;
 

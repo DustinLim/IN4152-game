@@ -1,5 +1,11 @@
 #pragma once
+
+#include "commonOpenGL.h"
+
 #include "Vec3D.h"
+#include "argumentParser.h"
+
+#include "SOIL.h"
 
 class Entity
 {
@@ -8,6 +14,7 @@ public:
 	~Entity(); //class destructor
 
 	Vec3Df position = Vec3Df(0, 0, 0);
+	std::vector<GLuint> Texture;
     
     // Movement
 	Vec3Df movementDirection = Vec3Df(0, 0, 0);
@@ -33,4 +40,20 @@ public:
 private:
     Vec3Df spawnPoint;
     float propelledDistance = 0;
+};
+
+class Character : public Entity
+{
+public:
+	Character();
+
+	void initTexture();
+	void updateArmAngle(Vec3Df direction);
+
+	// Overriding
+	void draw();
+	void animate(int deltaTime);
+
+private:
+	float armAngle;				// could be used to calculate angle for arm
 };
