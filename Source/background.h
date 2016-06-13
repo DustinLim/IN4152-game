@@ -1,20 +1,29 @@
 #include "commonOpenGL.h"
 
 #include "argumentParser.h"
-#include "loadppm.h"
 
 
-class Background
+class Surface
+{
+public:
+	Surface();
+	~Surface();
+
+	GLuint texture;
+
+	// Background Speed and 'startlocation'
+	float position;
+	float speed;
+
+	void move(void);
+
+};
+
+
+class Background : public Surface
 {
 public:
 	Background();
-	~Background();
-
-	void move(void);
-	void draw(void);
-	void initTexture(void);
-
-	std::vector<GLuint> Texture;
 
 	// BOUNDARY VALUES - should follow from the screen size.
 	int heightMin;
@@ -29,8 +38,15 @@ public:
 	int quadWidth;
 	int quadHeight;
 
-	// Background Speed and 'startlocation'
-	float position;
-	float speed;
+	void draw(void);
+	void initTexture(void);
+};
 
+class Groundfloor : public Surface
+{
+public:
+	Groundfloor();
+
+	void draw(void);
+	void initTexture(void);
 };
