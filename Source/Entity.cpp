@@ -95,8 +95,8 @@ Character::Character()
 {
 	armAngle = 0.0f;
 	turnAround = 0;
-	width = 0.8f;
-	height = 2.0f;
+	width = 0.8f;			// <- Not that if this changes, the arm + gun is not correct anymore, due to hard-coding
+	height = 2.0f;			// <- Not that if this changes, the arm + gun is not correct anymore, due to hard-coding
 	scale = 0.4f;
 }
 
@@ -152,13 +152,14 @@ void Character::draw()
 	glRotatef(armAngle, 0.0f, 0.0f, 1.0f);
 	
 	glPushMatrix();		// save configuration for the gun!
+	
 	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 	glNormal3f(0.0f, 0.0f, 1.0f);
 	glBegin(GL_QUADS);
-		glTexCoord2f(0.0f, 1.0f-turnAround);		glVertex3f(-0.05f, -0.1f, 0.01f);
-		glTexCoord2f(1.0f, 1.0f-turnAround);		glVertex3f(0.85f, -0.1f, 0.01f);
-		glTexCoord2f(1.0f, 0.0f+turnAround);		glVertex3f(0.85f, 0.15f, 0.01f);
-		glTexCoord2f(0.0f, 0.0f+turnAround);		glVertex3f(-0.05f, 0.15f, 0.01f);
+		glTexCoord2f(0.0f, 1.0f - turnAround);		glVertex3f(-0.05f, -0.1f, 0.01f);
+		glTexCoord2f(1.0f, 1.0f - turnAround);		glVertex3f(0.85f, -0.1f, 0.01f);
+		glTexCoord2f(1.0f, 0.0f + turnAround);		glVertex3f(0.85f, 0.15f, 0.01f);
+		glTexCoord2f(0.0f, 0.0f + turnAround);		glVertex3f(-0.05f, 0.15f, 0.01f);
 	glEnd();
 	glPopMatrix();
 
