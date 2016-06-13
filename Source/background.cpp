@@ -87,15 +87,27 @@ Groundfloor::Groundfloor()
 
 void Groundfloor::draw()
 {
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, texture);
+
+	glPushAttrib(GL_ALL_ATTRIB_BITS);
 	glColor3f(1, 1, 1);
 	glNormal3f(0, 1, 0);
 
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+
 	glBegin(GL_QUADS);
-		glVertex3f(-3.0f, -1.0f, 5.0f);
-		glVertex3f(3.0f, -1.0f, 5.0f);
-		glVertex3f(3.0f, -1.0f, -3.0f);
-		glVertex3f(-3.0f,-1.0f, -3.0f);
+		glTexCoord2f(0 + position, 1);			glVertex3f(-3.0f, -1.0f, 5.0f);
+		glTexCoord2f(1 + position, 1);			glVertex3f(3.0f, -1.0f, 5.0f);
+		glTexCoord2f(1 + position, 0);			glVertex3f(3.0f, -1.0f, -3.0f);
+		glTexCoord2f(0 + position, 0);			glVertex3f(-3.0f, -1.0f, -3.0f);
 	glEnd();
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glDisable(GL_TEXTURE_2D);
 }
 
 void Groundfloor::initTexture()
