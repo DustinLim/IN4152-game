@@ -50,6 +50,7 @@ int glutElapsedTime = 0; //in ms
 bool keyPressed[256]; //keyboard buffer
 
 unique_ptr<Background> background; //smart pointer needed
+unique_ptr<Groundfloor> groundfloor;
 std::vector<Ridge> mountains;
 int numberOfRidges = 2;
 bool toggleBoss = false;
@@ -132,6 +133,7 @@ void display( )
 		{
 			mountains[i].draw();
 		}
+		groundfloor->draw();
 
 		for (auto &enemy : enemies) {
 			enemy.draw();
@@ -189,6 +191,7 @@ void animate( )
 		mountains[i].move();
 	}
 	background->move();
+	groundfloor->move();
 
 	int currentTime = glutGet(GLUT_ELAPSED_TIME);
 	int deltaTime = currentTime - glutElapsedTime;
@@ -535,6 +538,7 @@ void init()
 	//loadMesh("David.obj");
 
 	background.reset(new Background());
+	groundfloor.reset(new Groundfloor());
 	mountains.resize(numberOfRidges);
 	mountains[0] = Ridge(1, 50, 10, -3, 0.005f, -4, "./Textures/sand.ppm");
 	mountains[1] = Ridge(2, 50, 10, -3, 0.0075f, -3, "./Textures/sand.ppm");
