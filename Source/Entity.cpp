@@ -126,56 +126,53 @@ void Character::draw()
 	glNormal3f(0, 0, 1);
 
 	glBegin(GL_QUADS);
-		//glNormal3f(-ref_mag, -ref_mag, 1.0f);
 		glTexCoord2f(0.0f + turnAround, 1.0f); 		glVertex3f(-width / 2.0f, -height / 2.0f, -0.1f);
-		//glNormal3f(ref_mag, -ref_mag, 1.0f);
 		glTexCoord2f(1.0f - turnAround, 1.0f);		glVertex3f(width / 2.0f, -height / 2.0f, -0.1f);
-		//glNormal3f(ref_mag, ref_mag, 1.0f);
 		glTexCoord2f(1.0f - turnAround, 0.0f);		glVertex3f(width / 2.0f, height / 2.0f, -0.1f);
-		//glNormal3f(-ref_mag, ref_mag, 1.0f);
 		glTexCoord2f(0.0f + turnAround, 0.0f);		glVertex3f(-width / 2.0f, height / 2.0f, -0.1f);
 	glEnd();
 	glPopMatrix();
 
 	// Start of the astronaut's arm
+	// To achieve a rotation point as if it is the upper shoulder, we decouple the forward and backward pose.
 	glBindTexture(GL_TEXTURE_2D, Texture[0]);
 
 	glPushMatrix();
 	// put the arm 'turning-point' on the correct start position; position scales with the size of the character!
 	glTranslatef((-0.625f + (1.25f * turnAround)) * (width / 2.0f), 0.4f * (height / 2.0f), 0.0f);				
-	if (turnAround)
-		glRotatef(armAngle, 0.0f, 0.0f, 1.0f);
-	else
-		glRotatef(180 + armAngle, 0.0f, 0.0f, 1.0f);
-	
+	glRotatef(armAngle, 0.0f, 0.0f, 1.0f);
 	glPushMatrix();		// save this as the start configuration for the gun!
 	
+	if (turnAround == 0)
+		glRotatef(180, 0.0f, 0.0f, 1.0f);
+		
 	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 	glNormal3f(0.0f, 0.0f, 1.0f);
-	if (turnAround == 1)
+	glBegin(GL_QUADS);
+
+	// Difference in drawing lies in whether we draw a rectangle upwards or downwards.
+	if (turnAround == 0)
 	{
-		glBegin(GL_QUADS);
-			glTexCoord2f(0.0f, 1.0f - turnAround);		glVertex3f(-0.05f, -0.1f, 0.01f);
-			glTexCoord2f(1.0f, 1.0f - turnAround);		glVertex3f(-0.05f + armLength, -0.1f, 0.01f);
-			glTexCoord2f(1.0f, 0.0f + turnAround);		glVertex3f(-0.05f + armLength, -0.1f + armWidth, 0.01f);
-			glTexCoord2f(0.0f, 0.0f + turnAround);		glVertex3f(-0.05f, -0.1f + armWidth, 0.01f);
-		glEnd();
+		glTexCoord2f(1.0f, 0.0f);		glVertex3f(+0.05f - armLength, -0.1f, 0.01f);
+		glTexCoord2f(0.0f, 0.0f);		glVertex3f(+0.05f, -0.1f, 0.01f);
+		glTexCoord2f(0.0f, 1.0f);		glVertex3f(+0.05f, -0.1f + armWidth, 0.01f);
+		glTexCoord2f(1.0f, 1.0f);		glVertex3f(+0.05f - armLength, -0.1f + armWidth, 0.01f);
 	}
 	else
 	{
-		glBegin(GL_QUADS);
-		glTexCoord2f(1.0f, 0.0f - turnAround);		glVertex3f(+0.05f - armLength, -0.1f, 0.01f);
-		glTexCoord2f(0.0f, 0.0f - turnAround);		glVertex3f(+0.05f, -0.1f, 0.01f);
-		glTexCoord2f(0.0f, 1.0f + turnAround);		glVertex3f(+0.05f, -0.1f + armWidth, 0.01f);
-		glTexCoord2f(1.0f, 1.0f + turnAround);		glVertex3f(+0.05f - armLength, -0.1f + armWidth, 0.01f);
-		glEnd();
+		glTexCoord2f(0.0f, 0.0f);		glVertex3f(-0.05f, -0.1f, 0.01f);
+		glTexCoord2f(1.0f, 0.0f);		glVertex3f(-0.05f + armLength, -0.1f, 0.01f);
+		glTexCoord2f(1.0f, 1.0f);		glVertex3f(-0.05f + armLength, -0.1f + armWidth, 0.01f);
+		glTexCoord2f(0.0f, 1.0f);		glVertex3f(-0.05f, -0.1f + armWidth, 0.01f);
 	}
+	glEnd();
 	glPopMatrix();
 
 	// Start of the astronaut's gun.
 	glBindTexture(GL_TEXTURE_2D, Texture[2]);
 
 	// put the gun on the correct start position at the arm; scales with the size of the arm.
+	glRotatef(armAngle, 0.0f, 0.0f, 1.0f);
 	glTranslatef(-0.05f + (0.555f * armLength), 0.12f - (0.59f * turnAround), 0.0f);
 	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 	glNormal3f(0.0f, 0.0f, 1.0f);
