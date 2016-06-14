@@ -41,7 +41,8 @@ public:
     // Overriding
     void draw();
     void animate(int deltaTime);
-    
+	std::vector<Vec3Df> getBoundingBox();
+
 private:
     Vec3Df spawnPoint;
     float propelledDistance = 0;
