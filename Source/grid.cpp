@@ -172,7 +172,10 @@ Mesh Grid::getReduxMesh(Mesh mesh, int resolution) {
 	Mesh simplified = Mesh(simplifiedVertices, simplifiedTriangles);
 
 	//recalculate the normals.
+	simplified.centerAndScaleToUnit();
 	simplified.computeVertexNormals();
+	simplified.computeBoundingCube();
+
 
 	return simplified;
 }

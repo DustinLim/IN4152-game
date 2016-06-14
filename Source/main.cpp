@@ -56,7 +56,7 @@ unique_ptr<Groundfloor> groundfloor;
 std::vector<Ridge> mountains;
 int numberOfRidges = 2;
 bool toggleBoss = false;
-Boss boss;
+Boss boss = Boss(Vec3Df(6, -1, -2), -1, 0.5);;
 
 // Game timing constants (in ms)
 const int firstEnemySpawnDelay = 3000;
@@ -185,8 +185,6 @@ void display( )
 		for (auto &enemy : enemies) {
 			enemy.draw();
 		}
-
-        character.draw();
         
         glDisable(GL_DEPTH_TEST);
         for (auto &projectile : projectiles) {
@@ -195,7 +193,9 @@ void display( )
         glEnable(GL_DEPTH_TEST);
 		
 		if (toggleBoss)
-			boss.drawBoss();
+			boss.draw();
+
+        character.draw();
 		
 		break;
 	}
@@ -219,13 +219,14 @@ void display( )
 	}
 }
 
-bool isHit(Entity ent1, Entity ent2) {
-	std::vector<Vec3Df> bb1 = ent1.getBoundingBox();
-	std::vector<Vec3Df> bb2 = ent2.getBoundingBox();
+bool isHit(std::vector<Vec3Df> bb1, std::vector<Vec3Df> bb2) {
+	//std::vector<Vec3Df> bb1 = ent1.getBoundingBox();
+	//std::vector<Vec3Df> bb2 = ent2.getBoundingBox();
 
 	bool xAxis = (bb1[0][0] > bb2[1][0] || bb1[1][0] < bb2[0][0]);
 	bool yAxis = (bb1[0][1] > bb2[1][1] || bb1[1][1] < bb2[0][1]);
-	bool anyHit = xAxis || yAxis;
+	bool zAxis = (bb1[0][2] > bb2[1][2] || bb1[1][2] < bb2[0][2]);
+	bool anyHit = xAxis || yAxis || zAxis;
 
 	return !anyHit;
 }
@@ -277,7 +278,7 @@ void collisionDetection() {
 	for (std::vector<Projectile>::iterator projectile = projectiles.begin(); projectile != projectiles.end();) {
 		bool broken = false;
 		for (std::vector<Entity>::iterator enemy = enemies.begin(); enemy != enemies.end();) {
-			if (isHit((*projectile), (*enemy))) {
+			if (isHit((*projectile).getBoundingBox(), (*enemy).getBoundingBox())) {
 				enemy = enemies.erase(enemy);
 				projectile = projectiles.erase(projectile);
 				broken = true;
@@ -286,6 +287,11 @@ void collisionDetection() {
 			else {
 				++enemy;
 			}
+		}
+		if (!broken && isHit((*projectile).getBoundingBox(), boss.getBoundingBox())) {
+			boss.hit();
+			projectile = projectiles.erase(projectile);
+			broken = true;
 		}
 		if (!broken) {
 			projectile++;
@@ -305,7 +311,7 @@ void collisionDetection() {
 	viewport.height = H_fen;
 	viewport.width = W_fen;
 	for (std::vector<Projectile>::iterator projectile = projectiles.begin(); projectile != projectiles.end();) {
-		if (!isHit((*projectile), viewport)) {
+		if (!isHit((*projectile).getBoundingBox(), viewport.getBoundingBox())) {
 			projectile = projectiles.erase(projectile);
 		}
 		else {
@@ -315,7 +321,7 @@ void collisionDetection() {
 
 	//Check if the player didn't hit an enemy
 	for (std::vector<Entity>::iterator enemy = enemies.begin(); enemy != enemies.end();) {
-		if (isHit(character, (*enemy))) {
+		if (isHit(character.getBoundingBox(), (*enemy).getBoundingBox())) {
 			enemy = enemies.erase(enemy);
 			// Do some logic here
 		}
@@ -343,7 +349,7 @@ void spawnEnemy(int unusedValue)
 
 void spawnBoss(int unusedValue)
 {
-	boss = Boss(Vec3Df(6, -1, -2), -1, 0.5);
+	//boss = Boss(Vec3Df(6, -1, -2), -1, 0.5);
 	boss.setTarget(&character.position);
 	toggleBoss = true;
 }
@@ -617,7 +623,7 @@ void init()
 	mountains[1] = Ridge(2, 50, 10, -3, 0.0075f, -3, "./Textures/sand.ppm");
 
 	//TODO change mesh to correct object.
-	printf("Loading Mesh\n");
+	/*printf("Loading Mesh\n");
 	Mesh mesh = Mesh();
 	mesh.loadMesh("./Models/hoofd.obj");
 	meshes.push_back(mesh);
@@ -626,7 +632,7 @@ void init()
 	printf("Creating Grid, 8\n");
 	meshes.push_back(Grid::getReduxMesh(mesh, 8));
 	printf("Creating Grid, 4\n");
-	meshes.push_back(Grid::getReduxMesh(mesh, 4));
+	meshes.push_back(Grid::getReduxMesh(mesh, 4));*/
 
 	character.initTexture();
     initTextures();
