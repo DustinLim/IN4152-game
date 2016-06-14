@@ -27,6 +27,8 @@ DisplayModeType DisplayMode = GAME;
 enum MouseModeType {MOUSE_MODE_SHOOTING=0, MOUSE_MODE_CAMERA=1};
 MouseModeType MouseMode = MOUSE_MODE_SHOOTING;
 
+enum LightModel {DIFFUSE_LIGHTING=1};
+
 unsigned int W_fen = 800;  // screen width
 unsigned int H_fen = 600;  // screen height
 
@@ -65,7 +67,52 @@ const int bossSpawnDelay = 10000;
 int meshIndex = 0;
 
 
-////////// Draw Functions 
+////////// Lighting Functions
+
+/// Computes lighting for a single vertex with given calculation model.
+Vec3Df computeLighting(Vec3Df &vertexPos, Vec3Df &normal, LightModel lightModel)
+{
+    const Vec3Df lightColor = Vec3Df(1,1,1);
+    
+    switch (lightModel) {
+        case DIFFUSE_LIGHTING:
+        {
+            // We cheat here: assuming a distant sun, this is an reasonable approximation
+            Vec3Df l = (Vec3Df(LightPos[0],LightPos[1],LightPos[2]) - Vec3Df(0,0,0));
+            l.normalize();
+            return Vec3Df::dotProduct(l, normal) * lightColor;
+        }
+        default:
+            return Vec3Df(0, 0, 0);
+    }
+}
+
+/// Computes lighting for the entire scene
+void computeLighting()
+{
+    for (auto &ridge : mountains)
+    {
+        for (int i=0; i < ridge.meshVertices.size(); i = i+3)
+        {
+            // Compute for our (single) light
+            Vec3Df vertexpos = Vec3Df(ridge.meshVertices[i],
+                                      ridge.meshVertices[i+1],
+                                      ridge.meshVertices[i+2]);
+            Vec3Df normal = Vec3Df(ridge.meshNormals[i],
+                                   ridge.meshNormals[i+1],
+                                   ridge.meshNormals[i+2]);
+            Vec3Df lighting = computeLighting(vertexpos, normal, DIFFUSE_LIGHTING);
+            
+            // Pass computed values to Ridge
+            ridge.meshColors[i] = lighting[0];
+            ridge.meshColors[i+1] = lighting[1];
+            ridge.meshColors[i+2] = lighting[2];
+        }
+    }
+}
+
+
+////////// Draw Functions
 
 //function to draw coordinate axes with a certain length (1 as a default)
 void drawCoordSystem(float length=1)
@@ -215,6 +262,7 @@ void animate( )
 		boss.animate(deltaTime);
 
 	collisionDetection();
+    computeLighting();
 }
 
 void collisionDetection() {
