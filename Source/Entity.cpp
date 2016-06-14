@@ -124,6 +124,17 @@ void Projectile::animate(int deltaTime)
     position = spawnPoint + movementDirection * propelledDistance;
 }
 
+std::vector<Vec3Df> Projectile::getBoundingBox() {
+	int temp = scale;
+	scale = scale * 0.1f;
+	Vec3Df topLeft = Vec3Df(position[0] - (width / 2.0f) * scale, position[1] - (height / 2.0f) * scale, position[2]);
+	Vec3Df bottomRight = Vec3Df(position[0] + (width / 2.0f) * scale, position[1] + (height / 2.0f) * scale, position[2]);
+	scale = temp;
+
+	std::vector<Vec3Df> list = { topLeft, bottomRight };
+	return list;
+}
+
 Character::Character()
 {
 	armAngle = 0.0f;
