@@ -34,7 +34,7 @@ unsigned int H_fen = 600;  // screen height
 
 Vec3Df topLeft, bottomRight;
 
-float LightPos[4] = {1,1,0.4,1};
+float LightPos[4] = {0, 1.6, 0, 1};
 
 ////////// Declare your own global variables here:
 void calculateWorldSpaceViewportBounds();
@@ -233,6 +233,8 @@ bool isHit(Entity ent1, Entity ent2) {
  */
 void animate( )
 {
+    LightPos[0] += 0.002;
+    
 	for (int i = 0; i < numberOfRidges; i++)
 	{
 		mountains[i].move();
@@ -262,6 +264,8 @@ void animate( )
 		boss.animate(deltaTime);
 
 	collisionDetection();
+
+    // After everything has moved, lighting should be recalculated
     computeLighting();
 }
 
@@ -637,8 +641,6 @@ int main(int argc, char** argv)
     tbInitTransform();     
     tbHelp();
 
-	calculateWorldSpaceViewportBounds();
-
 	// cablage des callback
     glutReshapeFunc(reshape);
 	glutIgnoreKeyRepeat(1); 
@@ -693,5 +695,6 @@ void reshape(int w, int h)
     glMatrixMode(GL_MODELVIEW);
 
 	calculateWorldSpaceViewportBounds();
+    LightPos[0] = topLeft[0]; //init light position
 }
 
