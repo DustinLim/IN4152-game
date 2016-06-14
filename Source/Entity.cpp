@@ -62,9 +62,6 @@ void Projectile::draw()
     // 2. Rotate projectile to face its heading
     float angle = atan2f(movementDirection[1], movementDirection[0]) * 180 / M_PI;
     glRotated(angle, 0, 0, 1.0);
-
-	glTranslatef(0.6f, 0.2f, 0.0f);			// Waarom doet dit niet 'constant' wat ik wil?
-
     // 3. Translate 'forward' as the projectile travels
     glTranslatef(propelledDistance, 0, 0);
     
