@@ -59,4 +59,9 @@ public:
 private:
 	float armAngle;				// could be used to calculate angle for arm
 	float turnAround;			// simulates boolean
+
+	float armLength;
+	float armWidth;
+	float gunLength;
+	float gunHeight;
 };
