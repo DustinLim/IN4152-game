@@ -20,11 +20,12 @@ void Entity::draw()
 	glColor3f(color[0], color[1], color[2]);
 	glNormal3f(0, 0, 1);
 	glBegin(GL_QUADS);
-	float offset = size/2.0f;
-	glVertex3f(-offset, -offset, 0);
-	glVertex3f(offset, -offset, 0);
-	glVertex3f(offset, offset, 0);
-	glVertex3f(-offset, offset, 0);
+	float offsetW = width / 2.0f;
+	float offsetH = height / 2.0f;
+	glVertex3f(-offsetW, -offsetH, 0);
+	glVertex3f(offsetW, -offsetH, 0);
+	glVertex3f(offsetW, offsetH, 0);
+	glVertex3f(-offsetW, offsetH, 0);
 	glEnd();
 	glPopMatrix();
 }
@@ -33,6 +34,17 @@ void Entity::animate(int deltaTime)
 {
 	movementDirection.normalize();
 	position += movementDirection * movementSpeed * ((float)deltaTime/1000);
+}
+
+std::vector<Vec3Df> Entity::getBoundingBox() {
+	Vec3Df topLeft = Vec3Df(position[0] - (width / 2.0f) * scale, position[1] - (height / 2.0f) * scale, position[2]);
+	Vec3Df bottomRight = Vec3Df(position[0] + (width / 2.0f) * scale, position[1] + (height / 2.0f) * scale, position[2]);
+
+	//float angle = atan2f(movementDirection[1], movementDirection[0]);
+	//float y = sin(angle) * (width / 2.0f);
+	//float x = sin(angle) * (width / 2.0f);
+	std::vector<Vec3Df> list = { topLeft, bottomRight };
+	return list;
 }
 
 std::vector<GLuint> Projectile::textureSet;
@@ -66,6 +78,7 @@ void Projectile::draw()
     glTranslatef(propelledDistance, 0, 0);
     
     glBegin(GL_QUADS);
+    /*
         float offset = size/2.0f;
         glTexCoord2f(0,1);
         glVertex3f(-offset, -offset, 0);
@@ -75,6 +88,17 @@ void Projectile::draw()
         glVertex3f(offset, offset, 0);
         glTexCoord2f(0,0);
         glVertex3f(-offset, offset, 0);
+    */
+        float offsetW = width/2.0f;
+        float offsetH = height/ 2.0f;
+        glTexCoord2f(0,1);
+        glVertex3f(-offsetW, -offsetH, 0);
+        glTexCoord2f(1,1);
+        glVertex3f(offsetW, -offsetH, 0);
+        glTexCoord2f(1,0);
+        glVertex3f(offsetW, offsetH, 0);
+        glTexCoord2f(0,0);
+        glVertex3f(-offsetW, offsetH, 0);
     glEnd();
     
     glPopMatrix();
@@ -103,6 +127,10 @@ void Projectile::animate(int deltaTime)
 Character::Character()
 {
 	armAngle = 0.0f;
+	turnAround = 0;
+	width = 0.8f;			// <- Not that if this changes, the arm + gun is not correct anymore, due to hard-coding
+	height = 2.0f;			// <- Not that if this changes, the arm + gun is not correct anymore, due to hard-coding
+	scale = 0.4f;
 }
 
 void Character::draw()
@@ -121,7 +149,7 @@ void Character::draw()
 
 	glPushMatrix();
 	glTranslatef(position[0], position[1], position[2]);
-	glScalef(0.4f, 0.4f, 0.4f);
+	glScalef(scale, scale, scale);
 	
 	glPushMatrix();
 	
@@ -131,20 +159,20 @@ void Character::draw()
 
 	glBegin(GL_QUADS);
 		glNormal3f(-ref_mag, -ref_mag, 1.0f);
-		glTexCoord2f(0.0f, tex_v_max);
-		glVertex3f(-0.4f, -1.0f, -0.1f);
+		glTexCoord2f(0.0f + turnAround, 1.0f);
+		glVertex3f(-width / 2.0f, -height / 2.0f, -0.1f);
 
 		glNormal3f(ref_mag, -ref_mag, 1.0f);
-		glTexCoord2f(tex_u_max, tex_v_max);
-		glVertex3f(0.4f, -1.0f, -0.1f);
+		glTexCoord2f(1.0f - turnAround, 1.0f);
+		glVertex3f(width / 2.0f, -height / 2.0f, -0.1f);
 
 		glNormal3f(ref_mag, ref_mag, 1.0f);
-		glTexCoord2f(tex_u_max, 0.0f);
-		glVertex3f(0.4f, 1.0f, -0.1f);
+		glTexCoord2f(1.0f - turnAround, 0.0f);
+		glVertex3f(width / 2.0f, height / 2.0f, -0.1f);
 
 		glNormal3f(-ref_mag, ref_mag, 1.0f);
-		glTexCoord2f(0.0f, 0.0f);
-		glVertex3f(-0.4f, 1.0f, -0.1f);
+		glTexCoord2f(0.0f + turnAround, 0.0f);
+		glVertex3f(-width / 2.0f, height / 2.0f, -0.1f);
 	glEnd();
 	glPopMatrix();
 
@@ -152,16 +180,35 @@ void Character::draw()
 	glBindTexture(GL_TEXTURE_2D, Texture[0]);
 
 	glPushMatrix();
-	glTranslatef(-0.25f, 0.3f, 0.0f);
-	glRotatef(armAngle, 0.0f, 0.0f, 1.0f);			// should be changed towards the angle of shooting.
+	// put the arm on the correct start position.
+	glTranslatef(-0.25f + (0.5f * turnAround), 0.3f + (0.05f * turnAround), 0.0f);				
+	glRotatef(armAngle, 0.0f, 0.0f, 1.0f);
+	
+	glPushMatrix();		// save configuration for the gun!
+	
 	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 	glNormal3f(0.0f, 0.0f, 1.0f);
 	glBegin(GL_QUADS);
-		glTexCoord2f(0.0f, tex_v_max);		glVertex3f(-0.05f, -0.1f, 0.01f);
-		glTexCoord2f(tex_u_max, tex_v_max);	glVertex3f(1.05f, -0.1f, 0.01f);
-		glTexCoord2f(tex_u_max, 0.0f);		glVertex3f(1.05f, 0.55f, 0.01f);
-		glTexCoord2f(0.0f, 0.0f);			glVertex3f(-0.05f, 0.55f, 0.01f);
+		glTexCoord2f(0.0f, 1.0f - turnAround);		glVertex3f(-0.05f, -0.1f, 0.01f);
+		glTexCoord2f(1.0f, 1.0f - turnAround);		glVertex3f(0.85f, -0.1f, 0.01f);
+		glTexCoord2f(1.0f, 0.0f + turnAround);		glVertex3f(0.85f, 0.15f, 0.01f);
+		glTexCoord2f(0.0f, 0.0f + turnAround);		glVertex3f(-0.05f, 0.15f, 0.01f);
 	glEnd();
+	glPopMatrix();
+
+	glBindTexture(GL_TEXTURE_2D, Texture[2]);
+
+	// put the gun on the correct start position
+	glTranslatef(0.7f, 0.12f - (0.59f * turnAround), 0.0f);
+	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+	glNormal3f(0.0f, 0.0f, 1.0f);
+	glBegin(GL_QUADS);
+	glTexCoord2f(0.0f, 1.0f - turnAround);		glVertex3f(-.25f, 0.0f, 0.01f);
+	glTexCoord2f(1.0f, 1.0f - turnAround);		glVertex3f(0.45f, 0.0f, 0.01f);
+	glTexCoord2f(1.0f, 0.0f + turnAround);		glVertex3f(0.45f, 0.4f, 0.01f);
+	glTexCoord2f(0.0f, 0.0f + turnAround);		glVertex3f(-.25f, 0.4f, 0.01f);
+	glEnd();
+
 	glPopMatrix();
 	glPopMatrix();
 
@@ -177,11 +224,12 @@ void Character::animate(int deltaTime)
 void Character::updateArmAngle(Vec3Df direction)
 {
 	armAngle = atan2f(direction[1], direction[0]) * 180 / M_PI;
+	turnAround = (armAngle > 90 || armAngle < -90) ? 1 : 0;
 }
 
 void Character::initTexture()
 {
-	Texture.resize(2);
+	Texture.resize(3);
 
 	Texture[0] = SOIL_load_OGL_texture(
 		"./Textures/astronaut-arm.png",
@@ -191,6 +239,12 @@ void Character::initTexture()
 
 	Texture[1] = SOIL_load_OGL_texture(
 		"./Textures/astronaut-body.png",
+		SOIL_LOAD_AUTO,
+		SOIL_CREATE_NEW_ID,
+		SOIL_FLAG_POWER_OF_TWO | SOIL_FLAG_MIPMAPS | SOIL_FLAG_DDS_LOAD_DIRECT);
+
+	Texture[2] = SOIL_load_OGL_texture(
+		"./Textures/astronaut-gun.png",
 		SOIL_LOAD_AUTO,
 		SOIL_CREATE_NEW_ID,
 		SOIL_FLAG_POWER_OF_TWO | SOIL_FLAG_MIPMAPS | SOIL_FLAG_DDS_LOAD_DIRECT);

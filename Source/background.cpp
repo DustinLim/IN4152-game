@@ -1,6 +1,9 @@
 #include "background.h"
 #include "SOIL.h"
 
+Surface::Surface(){}
+Surface::~Surface(){}
+
 Background::Background()
 {
 	heightMin = -5;			// <- could we set abóve the plateau, so that it reduces drawing stuff :)
@@ -16,9 +19,7 @@ Background::Background()
 	initTexture();
 }
 
-Background::~Background() {}
-
-void Background::move()
+void Surface::move()
 {
 	position = (position >= 1) ? 0 : position + speed;
 }
@@ -26,7 +27,7 @@ void Background::move()
 void Background::draw()
 {
 	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, Texture[0]);
+	glBindTexture(GL_TEXTURE_2D, texture);
 	
 	glPushAttrib(GL_ALL_ATTRIB_BITS);
 	glColor3f(1, 1, 1);
@@ -67,9 +68,52 @@ void Background::draw()
 
 void Background::initTexture()
 {
-	Texture.resize(1);
-	Texture[0] = SOIL_load_OGL_texture(
+	texture = SOIL_load_OGL_texture(
 		"./Textures/space-background.png",
+		SOIL_LOAD_AUTO,
+		SOIL_CREATE_NEW_ID,
+		SOIL_FLAG_POWER_OF_TWO | SOIL_FLAG_MIPMAPS | SOIL_FLAG_DDS_LOAD_DIRECT);
+}
+
+
+
+Groundfloor::Groundfloor()
+{
+	position = 0;
+	speed = 0.002;
+
+	initTexture();
+}
+
+void Groundfloor::draw()
+{
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, texture);
+
+	glPushAttrib(GL_ALL_ATTRIB_BITS);
+	glColor3f(1, 1, 1);
+	glNormal3f(0, 1, 0);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+
+	glBegin(GL_QUADS);
+		glTexCoord2f(0 + position, 1);			glVertex3f(-3.0f, -1.0f, 5.0f);
+		glTexCoord2f(1 + position, 1);			glVertex3f(3.0f, -1.0f, 5.0f);
+		glTexCoord2f(1 + position, 0);			glVertex3f(3.0f, -1.0f, -3.0f);
+		glTexCoord2f(0 + position, 0);			glVertex3f(-3.0f, -1.0f, -3.0f);
+	glEnd();
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glDisable(GL_TEXTURE_2D);
+}
+
+void Groundfloor::initTexture()
+{
+	texture = SOIL_load_OGL_texture(
+		"./Textures/moon-surface.png",
 		SOIL_LOAD_AUTO,
 		SOIL_CREATE_NEW_ID,
 		SOIL_FLAG_POWER_OF_TWO | SOIL_FLAG_MIPMAPS | SOIL_FLAG_DDS_LOAD_DIRECT);
