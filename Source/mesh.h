@@ -42,11 +42,12 @@ public:
     inline Mesh (const std::vector<Vertex> & v, const std::vector<Triangle> & t) : vertices (v), triangles (t)  {}
     std::vector<Vertex> vertices;
     std::vector<Triangle> triangles;
+	std::vector<Vec3Df> meshColor;
 
     bool loadMesh(const char * filename);
     void computeVertexNormals ();
     void centerAndScaleToUnit ();
-    void draw();
+    void draw(Vec3Df lightPos, Vec3Df lightColor);
     void drawSmooth();
     void computeBoundingCube();
 

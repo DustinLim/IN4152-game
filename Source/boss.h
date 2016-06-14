@@ -88,4 +88,5 @@ public:
 	float getHeadWidth();
 	//Gets bounding box for head
 	std::vector<Vec3Df> getBoundingBox();
+	Mesh getMesh();
 };

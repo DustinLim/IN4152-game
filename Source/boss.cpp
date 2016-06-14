@@ -263,7 +263,6 @@ void Boss::drawHead()
 
 void Boss::draw()
 {
-	glEnable(GL_LIGHTING);
 	glPushMatrix();
 	glTranslatef(position[0], position[1], position[2]);
 		glScalef(scale, scale, scale);
@@ -274,7 +273,6 @@ void Boss::draw()
 		for (int i = 0; i < 6; i++)
 			legs[i].drawLeg();
 	glPopMatrix();
-	glDisable(GL_LIGHTING);
 }
 
 void Boss::init()
@@ -382,4 +380,8 @@ std::vector<Vec3Df> Boss::getBoundingBox() {
 
 	std::vector<Vec3Df> list = { topLeft, bottomRight };
 	return list;
+}
+
+Mesh Boss::getMesh() {
+	return meshes[meshIndex];
 }

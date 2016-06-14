@@ -27,7 +27,7 @@ DisplayModeType DisplayMode = GAME;
 enum MouseModeType {MOUSE_MODE_SHOOTING=0, MOUSE_MODE_CAMERA=1};
 MouseModeType MouseMode = MOUSE_MODE_SHOOTING;
 
-enum LightModel {DIFFUSE_LIGHTING=1};
+enum LightModel {DIFFUSE_LIGHTING=1, PHONG_LIGHTNING=2};
 
 unsigned int W_fen = 800;  // screen width
 unsigned int H_fen = 600;  // screen height
@@ -82,6 +82,10 @@ Vec3Df computeLighting(Vec3Df &vertexPos, Vec3Df &normal, LightModel lightModel)
             l.normalize();
             return Vec3Df::dotProduct(l, normal) * lightColor;
         }
+		case PHONG_LIGHTNING:
+		{
+			return Vec3Df(1, 0, 0);
+		}
         default:
             return Vec3Df(0, 0, 0);
     }
@@ -109,6 +113,19 @@ void computeLighting()
             ridge.meshColors[i+2] = lighting[2];
         }
     }
+	
+	std::vector<Vertex> vertices = boss.getMesh().vertices;
+	std::vector<Vec3Df> meshColors = std::vector<Vec3Df>(vertices.size());
+	for (int i = 0; i < vertices.size(); i++)
+	{
+		// Compute for our (single) light
+		Vertex vertex = vertices[i];
+		Vec3Df lighting = computeLighting(vertex.p, vertex.n, PHONG_LIGHTNING);
+
+		// Pass computed values to Ridge
+		meshColors[i] = lighting;
+	}
+	boss.getMesh().meshColor = meshColors;
 }
 
 
