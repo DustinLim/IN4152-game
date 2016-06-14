@@ -97,11 +97,27 @@ Character::Character()
 	turnAround = 0;
 	width = 0.8f;			
 	height = 2.0f;			
+	scale = 1.0f;
+
+	setShoulderPos();
+	
 	armWidth = 0.25f;
-	armLength = 0.9f;			// Note that if you change the armLength, you need to change the gunLength with the same factor!
-	gunLength = 0.7f;
+	armLength = 0.9f;						// Note that if you change the armLength, you need to change the gunLength with the same factor!
+	gunLength = (0.7f / 0.9f) * armLength;
 	gunHeight = 0.4f;
-	scale = 0.4f;
+}
+
+void Character::setShoulderPos()
+{
+	shoulderPos = Vec3Df((-0.625f + (1.25f * turnAround)) * (width / 2.0f), 0.4f * (height / 2.0f), 0.0f);
+}
+
+// To calculate the correct arm angle and shooting direction, we want to approach the location of the gun
+// Because the gun lies parallel with the arm, we only adapt the y-value -> approximation-wise.
+// We had the arm thickness above the shoulderPos (= 0.1f) and the half of the gunHeight, which gives us the barrel height.
+Vec3Df Character::getAngleRefPos()
+{
+	return Vec3Df(shoulderPos[0], shoulderPos[1] + 0.1f + (gunHeight / 2.0f), shoulderPos[2]);
 }
 
 void Character::draw()
@@ -139,7 +155,7 @@ void Character::draw()
 
 	glPushMatrix();
 	// put the arm 'turning-point' on the correct start position; position scales with the size of the character!
-	glTranslatef((-0.625f + (1.25f * turnAround)) * (width / 2.0f), 0.4f * (height / 2.0f), 0.0f);				
+	glTranslatef(shoulderPos[0], shoulderPos[1], shoulderPos[2]);				
 	glRotatef(armAngle, 0.0f, 0.0f, 1.0f);
 	glPushMatrix();		// save this as the start configuration for the gun!
 	
@@ -172,8 +188,7 @@ void Character::draw()
 	glBindTexture(GL_TEXTURE_2D, Texture[2]);
 
 	// put the gun on the correct start position at the arm; scales with the size of the arm.
-	glRotatef(armAngle, 0.0f, 0.0f, 1.0f);
-	glTranslatef(-0.05f + (0.555f * armLength), 0.12f - (0.59f * turnAround), 0.0f);
+	glTranslatef(-0.05f + (0.555f * armLength), 0.1f - (0.6f * turnAround), 0.0f);
 	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 	glNormal3f(0.0f, 0.0f, 1.0f);
 	glBegin(GL_QUADS);
@@ -197,8 +212,12 @@ void Character::animate(int deltaTime)
 
 void Character::updateArmAngle(Vec3Df direction)
 {
-	armAngle = atan2f(direction[1], direction[0]) * 180 / M_PI;
+	armAngle = atan2f(direction[1], direction[0]) * 180 / M_PI;	
+
+	float oldTurnAround = turnAround;
 	turnAround = (armAngle > 90 || armAngle < -90) ? 1 : 0;
+	if (oldTurnAround != turnAround)
+		setShoulderPos();
 }
 
 void Character::initTexture()

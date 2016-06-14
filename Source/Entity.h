@@ -50,16 +50,22 @@ public:
 	Character();
 
 	void initTexture();
-	void updateArmAngle(Vec3Df direction);
+	void updateArmAngle(Vec3Df mousePos);
+	void setShoulderPos(void);
 
 	// Overriding
-	void draw();
+	void draw(void);
 	void animate(int deltaTime);
 
+	Vec3Df getAngleRefPos();
+
 private:
+	Vec3Df shoulderPos;			// depends on 'turnAround'
 	float armAngle;				// could be used to calculate angle for arm
 	float turnAround;			// simulates boolean
 
+	// Used to scale the arm / gun solely - only consequences for drawing.
+	float drawAngle;
 	float armLength;
 	float armWidth;
 	float gunLength;
