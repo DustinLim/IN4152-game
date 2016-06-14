@@ -19,6 +19,8 @@
 		54E41F391D0A02FE0014A4BA /* libSOIL.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 54E41F371D0A02FE0014A4BA /* libSOIL.a */; };
 		54E41F3D1D0C3D9B0014A4BA /* bullet1.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 54E41F3B1D0C3AF50014A4BA /* bullet1.png */; };
 		54E41F3E1D0C3D9B0014A4BA /* bullet2.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 54E41F3C1D0C3AF50014A4BA /* bullet2.png */; };
+		54E41F411D0ED7050014A4BA /* moon-surface.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 54E41F401D0ED6F80014A4BA /* moon-surface.png */; };
+		54E41F431D0ED7610014A4BA /* astronaut-gun.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 54E41F421D0ED75C0014A4BA /* astronaut-gun.png */; };
 		54EA86E11D00C2FD0018AC85 /* background.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 54EA86C61D00C2FD0018AC85 /* background.cpp */; };
 		54EA86E21D00C2FD0018AC85 /* calcUtilities.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 54EA86C81D00C2FD0018AC85 /* calcUtilities.cpp */; };
 		54EA86E31D00C2FD0018AC85 /* Entity.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 54EA86CA1D00C2FD0018AC85 /* Entity.cpp */; };
@@ -42,6 +44,8 @@
 			files = (
 				54E41F3D1D0C3D9B0014A4BA /* bullet1.png in CopyFiles */,
 				54E41F3E1D0C3D9B0014A4BA /* bullet2.png in CopyFiles */,
+				54E41F431D0ED7610014A4BA /* astronaut-gun.png in CopyFiles */,
+				54E41F411D0ED7050014A4BA /* moon-surface.png in CopyFiles */,
 				54E41F361D0A002B0014A4BA /* space-background.png in CopyFiles */,
 				54E41F321D09FD5F0014A4BA /* astronaut-arm.png in CopyFiles */,
 				54E41F331D09FD5F0014A4BA /* astronaut-body.png in CopyFiles */,
@@ -83,6 +87,8 @@
 		54E41F381D0A02FE0014A4BA /* SOIL.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SOIL.h; path = mac/SOIL.h; sourceTree = "<group>"; };
 		54E41F3B1D0C3AF50014A4BA /* bullet1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = bullet1.png; sourceTree = "<group>"; };
 		54E41F3C1D0C3AF50014A4BA /* bullet2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = bullet2.png; sourceTree = "<group>"; };
+		54E41F401D0ED6F80014A4BA /* moon-surface.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "moon-surface.png"; sourceTree = "<group>"; };
+		54E41F421D0ED75C0014A4BA /* astronaut-gun.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "astronaut-gun.png"; sourceTree = "<group>"; };
 		54EA86C51D00C2FD0018AC85 /* argumentParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = argumentParser.h; sourceTree = SOURCE_ROOT; };
 		54EA86C61D00C2FD0018AC85 /* background.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = background.cpp; sourceTree = SOURCE_ROOT; };
 		54EA86C71D00C2FD0018AC85 /* background.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = background.h; sourceTree = SOURCE_ROOT; };
@@ -211,6 +217,8 @@
 			children = (
 				54E41F3B1D0C3AF50014A4BA /* bullet1.png */,
 				54E41F3C1D0C3AF50014A4BA /* bullet2.png */,
+				54E41F421D0ED75C0014A4BA /* astronaut-gun.png */,
+				54E41F401D0ED6F80014A4BA /* moon-surface.png */,
 				54E41F2F1D09FD3E0014A4BA /* astronaut-arm.png */,
 				54E41F301D09FD3E0014A4BA /* astronaut-body.png */,
 				54E41F311D09FD3E0014A4BA /* astronaut-complete.png */,
