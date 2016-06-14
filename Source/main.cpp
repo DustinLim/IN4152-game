@@ -185,14 +185,17 @@ void display( )
 		for (auto &enemy : enemies) {
 			enemy.draw();
 		}
-		for (auto &projectile : projectiles) {
+
+        character.draw();
+        
+        glDisable(GL_DEPTH_TEST);
+        for (auto &projectile : projectiles) {
 			projectile.draw();
 		}
+        glEnable(GL_DEPTH_TEST);
 		
 		if (toggleBoss)
 			boss.drawBoss();
-
-        character.draw();
 		
 		break;
 	}
@@ -349,8 +352,8 @@ Projectile spawnProjectile(Vec3Df direction)
 {
     Projectile projectile = Projectile(character.position, direction);
 	projectile.movementSpeed = 3.0;
-	projectile.width = 0.125;
-	projectile.height = 0.125;
+	projectile.width = 0.5;
+	projectile.height = 0.5;
 
 	projectiles.push_back(projectile);
 	return projectile;
@@ -565,6 +568,24 @@ void calculateWorldSpaceViewportBounds() {
 
 void displayInternal(void);
 void reshape(int w, int h);
+
+void initTextures()
+{
+    GLuint texture =
+    SOIL_load_OGL_texture("./Textures/bullet1.png",
+                          SOIL_LOAD_AUTO,
+                          SOIL_CREATE_NEW_ID,
+                          SOIL_FLAG_POWER_OF_TWO | SOIL_FLAG_MIPMAPS | SOIL_FLAG_DDS_LOAD_DIRECT);
+    Projectile::textureSet.push_back(texture);
+
+    texture =
+    SOIL_load_OGL_texture("./Textures/bullet2.png",
+                          SOIL_LOAD_AUTO,
+                          SOIL_CREATE_NEW_ID,
+                          SOIL_FLAG_POWER_OF_TWO | SOIL_FLAG_MIPMAPS | SOIL_FLAG_DDS_LOAD_DIRECT);
+    Projectile::textureSet.push_back(texture);
+}
+
 void init()
 {
     glDisable( GL_LIGHTING );
@@ -608,6 +629,7 @@ void init()
 	meshes.push_back(Grid::getReduxMesh(mesh, 4));
 
 	character.initTexture();
+    initTextures();
 }
 
 /**
