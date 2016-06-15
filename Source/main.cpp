@@ -19,8 +19,6 @@
 
 
 //Use the enum values to define different rendering modes 
-//The mode is used by the function display and the mode is 
-//chosen during execution with the keys 1-9
 enum DisplayModeType {GAME=1, MESH=2};
 DisplayModeType DisplayMode = GAME;
 
@@ -67,7 +65,7 @@ const int bossSpawnDelay = 10000;
 int meshIndex = 0;
 
 
-////////// Lighting Functions
+#pragma region "Lightning"
 
 /// Computes lighting for a single vertex with given calculation model.
 Vec3Df computeLighting(Vec3Df &vertexPos, Vec3Df &normal, LightModel lightModel)
@@ -111,14 +109,13 @@ void computeLighting()
     }
 }
 
+#pragma endregion
 
-////////// Draw Functions
+#pragma region "Draw Functions"
 
-//function to draw coordinate axes with a certain length (1 as a default)
+//function to draw coordinate simply colored axes with a certain length (1 as a default)
 void drawCoordSystem(float length=1)
 {
-	//draw simply colored axes
-	
 	//remember GPU state
     GLboolean lightingWasEnabled = glIsEnabled(GL_LIGHTING);
 
@@ -182,6 +179,10 @@ void display( )
 		}
 		groundfloor->draw();
 
+
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 		for (auto &enemy : enemies) {
 			enemy.draw();
 		}
@@ -196,6 +197,8 @@ void display( )
 			boss.draw();
 
         character.draw();
+
+		glPopAttrib();
 		
 		break;
 	}
@@ -218,6 +221,8 @@ void display( )
 		break;
 	}
 }
+
+#pragma endregion
 
 bool isHit(std::vector<Vec3Df> bb1, std::vector<Vec3Df> bb2) {
 	//std::vector<Vec3Df> bb1 = ent1.getBoundingBox();
@@ -337,8 +342,8 @@ void spawnEnemy(int unusedValue)
 	if (!toggleBoss)
 	{
 		Enemy enemy = Enemy();
-		enemy.position = Vec3Df(3, (rand() % 3 - 1), 0);
-		enemy.movementDirection = Vec3Df(-1, 0.2, 0);
+		enemy.position = Vec3Df(3, (rand() % 4 * 0.5 - 0.5), 0);
+		enemy.movementDirection = Vec3Df(-1, 0, 0);
 		enemies.push_back(enemy);
 
 		// Repeat this
@@ -379,6 +384,8 @@ void updateCharacterMovementDirection()
     character.movementDirection = direction;
 }
 
+#pragma region "Input"
+
 //take keyboard input into account
 void keyboard(unsigned char key, int x, int y)
 {
@@ -415,25 +422,6 @@ void keyboard(unsigned char key, int x, int y)
 		//turn lighting off
 		glDisable(GL_LIGHTING);
 		break;
-	// MOVING THE LIGHT IN THE X,Y,Z DIRECTION -> We should do something with shadows in a later stadium.
-	case 'f':
-		LightPos[0] -= 0.1f;
-		break;
-	case 'h':
-		LightPos[0] += 0.1f;
-		break;
-	case 't':
-		LightPos[1] += 0.1f;
-		break;
-	case 'g':
-		LightPos[1] -= 0.1f;
-		break;
-	case 'r':
-		LightPos[2] += 0.1f;
-		break;
-	case 'y':
-		LightPos[2] -= 0.1f;
-		break;	
 	case 'b':
 		spawnBoss(0);
 		break;
@@ -542,6 +530,11 @@ void mousePassiveMotion(int x, int y) {
 	}
 }
 
+#pragma endregion
+
+void displayInternal(void);
+void reshape(int w, int h);
+
 void calculateWorldSpaceViewportBounds() {
 	Vec3Df nearPoint, farPoint;
 	calculateMouseRay(0, 0, &nearPoint, &farPoint);
@@ -556,24 +549,49 @@ void calculateWorldSpaceViewportBounds() {
 }
 
 
-void displayInternal(void);
-void reshape(int w, int h);
-
+// Load and store all textures in the static textureSets. The ID's of correct textures are denoted in the .h files!
 void initTextures()
 {
-    GLuint texture =
-    SOIL_load_OGL_texture("./Textures/bullet1.png",
-                          SOIL_LOAD_AUTO,
-                          SOIL_CREATE_NEW_ID,
-                          SOIL_FLAG_POWER_OF_TWO | SOIL_FLAG_MIPMAPS | SOIL_FLAG_DDS_LOAD_DIRECT);
+	GLuint texture;
+
+	// PROJECTILE
+	texture = SOIL_load_OGL_texture("./Textures/bullet1.png",
+									SOIL_LOAD_AUTO,
+									SOIL_CREATE_NEW_ID,
+									SOIL_FLAG_POWER_OF_TWO | SOIL_FLAG_MIPMAPS | SOIL_FLAG_DDS_LOAD_DIRECT);
     Projectile::textureSet.push_back(texture);
 
-    texture =
-    SOIL_load_OGL_texture("./Textures/bullet2.png",
-                          SOIL_LOAD_AUTO,
-                          SOIL_CREATE_NEW_ID,
-                          SOIL_FLAG_POWER_OF_TWO | SOIL_FLAG_MIPMAPS | SOIL_FLAG_DDS_LOAD_DIRECT);
+	texture = SOIL_load_OGL_texture("./Textures/bullet2.png",
+									SOIL_LOAD_AUTO,
+									SOIL_CREATE_NEW_ID,
+									SOIL_FLAG_POWER_OF_TWO | SOIL_FLAG_MIPMAPS | SOIL_FLAG_DDS_LOAD_DIRECT);
     Projectile::textureSet.push_back(texture);
+
+	// ENEMY
+	texture = SOIL_load_OGL_texture("./Textures/alien_1.png",
+									SOIL_LOAD_AUTO,
+									SOIL_CREATE_NEW_ID,
+									SOIL_FLAG_POWER_OF_TWO | SOIL_FLAG_MIPMAPS | SOIL_FLAG_DDS_LOAD_DIRECT);
+	Enemy::textureSet.push_back(texture);
+
+	// CHARACTER
+	texture = SOIL_load_OGL_texture("./Textures/astronaut-body.png",
+									SOIL_LOAD_AUTO,
+									SOIL_CREATE_NEW_ID,
+									SOIL_FLAG_POWER_OF_TWO | SOIL_FLAG_MIPMAPS | SOIL_FLAG_DDS_LOAD_DIRECT);
+	Character::textureSet.push_back(texture);
+
+	texture = SOIL_load_OGL_texture("./Textures/astronaut-arm.png",
+									SOIL_LOAD_AUTO,
+									SOIL_CREATE_NEW_ID,
+									SOIL_FLAG_POWER_OF_TWO | SOIL_FLAG_MIPMAPS | SOIL_FLAG_DDS_LOAD_DIRECT);
+	Character::textureSet.push_back(texture);
+
+	texture = SOIL_load_OGL_texture("./Textures/astronaut-gun.png",
+									SOIL_LOAD_AUTO,
+									SOIL_CREATE_NEW_ID,
+									SOIL_FLAG_POWER_OF_TWO | SOIL_FLAG_MIPMAPS | SOIL_FLAG_DDS_LOAD_DIRECT);
+	Character::textureSet.push_back(texture);
 }
 
 void init()
@@ -618,7 +636,6 @@ void init()
 	printf("Creating Grid, 4\n");
 	meshes.push_back(Grid::getReduxMesh(mesh, 4));*/
 
-	character.initTexture();
     initTextures();
 }
 
