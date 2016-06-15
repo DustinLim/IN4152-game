@@ -446,27 +446,9 @@ void mouse(int button, int state, int x, int y)
     if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN &&
         MouseMode == MOUSE_MODE_SHOOTING)
     {
-        // Shooting in the correct direction is harder than it looks..
-        // We first determine the mouse ray that goes through the near and far clipping planes.
-        //Vec3Df nearPoint, farPoint;
-        //calculateMouseRay(x, y, &nearPoint, &farPoint);
-        //Vec3Df ray = nearPoint - farPoint;
-
-        // Calculate the vertex where the mouse ray intersects the character plane
-        //float fraction = (character.position[2] - farPoint[2]) / ray[2];
-        //Vec3Df intersection = farPoint + (ray * fraction);
-
-        // We now know the correct direction
-       // Vec3Df shootingDirection = intersection - character.position;
-
-		//character.updateArmAngle(shootingDirection);
-
-        //spawnProjectile(shootingDirection);
-	
-		Vec3Df shootingDirection2 = mouseToCharacterWorldPlane(x, y) - character.getAngleRefPos();
-		spawnProjectile(shootingDirection2);
+		Vec3Df shootingDirection = mouseToCharacterWorldPlane(x, y) - character.getAngleRefPos();
+		spawnProjectile(shootingDirection);
 		character.updateArmAngle(mouseToCharacterWorldPlane(x, y));
-
     }
     else if (MouseMode == MOUSE_MODE_CAMERA)
     {
