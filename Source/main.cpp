@@ -603,8 +603,8 @@ void init()
 	background.reset(new Background());
 	groundfloor.reset(new Groundfloor());
 	mountains.resize(numberOfRidges);
-	mountains[0] = Ridge(1, 50, 10, -3, 0.005f, -4, "./Textures/sand.ppm");
-	mountains[1] = Ridge(2, 50, 10, -3, 0.0075f, -3, "./Textures/sand.ppm");
+	mountains[0] = Ridge(1, 200, 10, -5, 0.0075f, -4, "./Textures/sand.ppm");
+	mountains[1] = Ridge(2, 80, 10, -5, 0.01f, -3, "./Textures/sand.ppm");
 
 	//TODO change mesh to correct object.
 	/*printf("Loading Mesh\n");
@@ -622,9 +622,8 @@ void init()
     initTextures();
 }
 
-/**
- * Programme principal
- */
+#pragma region "Programme Principal"
+
 int main(int argc, char** argv)
 {
     glutInit(&argc, argv);
@@ -710,3 +709,4 @@ void reshape(int w, int h)
     LightPos[0] = topLeft[0]; //init light position
 }
 
+#pragma endregion

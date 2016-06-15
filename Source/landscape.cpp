@@ -50,21 +50,38 @@ Ridge::~Ridge() {}
 
 float Ridge::getHeight(float X, float Z)
 {
+	float Y;
 	if (ridgeNumber == 1)
-		return ((-(Z - scope)*(Z - scope) + scope*scope) / (scope*scope)) * (std::max(0.0, 0.3 *sin(3 * X) + 1));
-	if (ridgeNumber == 2)
-		return ((-(Z - scope)*(Z - scope) + scope*scope) / (scope*scope)) * (std::max(0.0, 0.3 *cos(3 * X) + 1));
+	{
+		Y = ((-(Z - scope)*(Z - scope) + scope*scope) / (scope*scope)) *
+			(std::max(0.0, 0.3 *sin(3 * X) + 0.6 * cos(5.0 / 6.0 * X) + 0.5 * sin(2.0 / 3.0 * X) + 1.8));
+	}
+	else if (ridgeNumber == 2)
+	{
+		Y = ((-(Z - scope)*(Z - scope) + scope*scope) / (scope*scope)) *
+			(std::max(0.0, 0.2 *cos(1.0 / 3.0 * X) + 0.3 * sin(4.0 / 3.0 * X) - 0.1 * sin(2.0 *X) + 0.7));
+	}
 	else
+	{
+		// not really implemented yet, return easy sinus.
 		return ((-(Z - scope)*(Z - scope) + scope*scope) / (scope*scope)) * (std::max(0.0, 0.3 *sin(3 * X) + 1));
+	}
+	
+	// When we are not living on the edge, add some random height.
+	if (X != 0 && X != lengthX & Z != 0 & Z != lengthZ)
+	{
+		Y += (rand() % 10) * 0.05;
+	}
+
+	return Y;
 }
 
 float Ridge::getRidgePeriod()
 {
-	// For now, the period is always the same :)
 	if (ridgeNumber == 1)
-		return (2.0 / 3.0) * M_PI;
-	if (ridgeNumber == 2)
-		return (2.0 / 3.0) * M_PI;
+		return 12.0 * M_PI;				// With help from Wolfram Alpha
+	else if (ridgeNumber == 2)
+		return 6.0 * M_PI;
 	else
 		return (2.0 / 3.0) * M_PI;
 }
@@ -76,13 +93,6 @@ void Ridge::move()
 {
 	position -= speed;
 }
-
-
-void Ridge::computeShadows()
-{
-	// Not implemented yet
-}
-
 
 void Ridge::draw()
 {
