@@ -45,6 +45,7 @@ public:
 private:
 	float angle;
 	unsigned int up;				// determines motion direction (up/down)
+	float speed;					// determines rapidness of motion (random over all enemies)
 };
 
 class Projectile: public Entity

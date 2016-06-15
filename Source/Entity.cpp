@@ -56,6 +56,7 @@ Enemy::Enemy()
 	width = 0.7f;
 	angle = 0.0f;
 	up = 1;
+	speed = rand() % 3;
 	initTexture();
 }
 
@@ -65,7 +66,7 @@ void Enemy::animate(int deltaTime)
 		up = 0;
 	if (angle < -15)
 		up = 1;
-	angle = (up == 1) ? angle + 3 : angle - 3;
+	angle = (up == 1) ? angle + speed : angle - speed;
 
 	Entity::animate(deltaTime);
 }
