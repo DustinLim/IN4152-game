@@ -57,8 +57,8 @@ Enemy::Enemy()
 	angle = 0.0f;
 	up = 1;
 	shake_speed = rand() % 3;
-	elevate_speed = (rand() % 3) * 0.5;
-	elevation = (rand() % 10) * 0.03;
+	elevate_speed = (rand() % 5) * 0.5;
+	elevation = (rand() % 11) * 0.03;
 	initTexture();
 }
 

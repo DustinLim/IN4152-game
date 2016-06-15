@@ -277,7 +277,7 @@ void spawnEnemy(int unusedValue)
 	{
 		Enemy enemy = Enemy();
 		enemy.position = Vec3Df(3, (rand() % 3 - 1), 0);
-		enemy.movementDirection = Vec3Df(-1, 0, 0);
+		enemy.movementDirection = Vec3Df(-1, 0.2, 0);
 		enemies.push_back(enemy);
 
 		// Repeat this
