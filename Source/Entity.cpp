@@ -94,7 +94,10 @@ void Enemy::draw()
 		glTexCoord2f(1.0f, 0.0f);		glVertex3f(offsetW, offsetH, 0);
 		glTexCoord2f(0.0f, 0.0f);		glVertex3f(-offsetW, offsetH, 0);
 	glEnd();
-	glPopMatrix();	
+	glPopMatrix();
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glDisable(GL_TEXTURE_2D);
 }
 
 void Enemy::initTexture()
