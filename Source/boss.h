@@ -4,6 +4,9 @@
 #include <math.h>
 #include <vector>
 #include <functional>
+#include "mesh.h"
+#include "grid.h"
+#include "Entity.h"
 
 class Leg
 {
@@ -24,7 +27,7 @@ public:
 	void drawLeg();
 };
 
-class Boss
+class Boss:  public Entity
 {
 
 private:
@@ -36,7 +39,7 @@ private:
 	int move = 0;
 
 	const Vec3Df* target;
-	float scale;
+	//float scale;
 
 	float leg_size;
 	float toe_distance_factor;
@@ -48,6 +51,9 @@ private:
 	bool odd_cycle = 0;
 	Vec3Df movement_vec;
 	Vec3Df destination;
+
+	std::vector<Mesh >meshes = {};
+	int meshIndex = 0;
 
 	//These variables will by set by init()
 	float body_elevation;
@@ -65,16 +71,21 @@ private:
 
 public:
 	//float speed = 0.1;
-	Vec3Df position;
+	//Vec3Df position;
 
 	Boss(Vec3Df pos = Vec3Df(0, 0, 0), float speed = 1, float scale = 1);
 	void animate(float delta);
 	
-	void drawBoss();
+	void draw();
 	void moveBody(Vec3Df delta);
 
 	void setDestination(Vec3Df dest, float speed);
 	void setWalkingSpeed(float speed);
 	void setTarget(const Vec3Df* target);
-	void nextMove(int n);
+	void nextMove(unsigned int n);
+
+	void hit();
+	float getHeadWidth();
+	//Gets bounding box for head
+	std::vector<Vec3Df> getBoundingBox();
 };

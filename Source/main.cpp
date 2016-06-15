@@ -27,12 +27,14 @@ DisplayModeType DisplayMode = GAME;
 enum MouseModeType {MOUSE_MODE_SHOOTING=0, MOUSE_MODE_CAMERA=1};
 MouseModeType MouseMode = MOUSE_MODE_SHOOTING;
 
+enum LightModel {DIFFUSE_LIGHTING=1};
+
 unsigned int W_fen = 800;  // screen width
 unsigned int H_fen = 600;  // screen height
 
 Vec3Df topLeft, bottomRight;
 
-float LightPos[4] = {1,1,0.4,1};
+float LightPos[4] = {0, 1.6, 0, 1};
 
 ////////// Declare your own global variables here:
 void calculateWorldSpaceViewportBounds();
@@ -54,7 +56,7 @@ unique_ptr<Groundfloor> groundfloor;
 std::vector<Ridge> mountains;
 int numberOfRidges = 2;
 bool toggleBoss = false;
-Boss boss;
+Boss boss = Boss(Vec3Df(6, -1, -2), -1, 0.5);;
 
 // Game timing constants (in ms)
 const int firstEnemySpawnDelay = 3000;
@@ -65,7 +67,52 @@ const int bossSpawnDelay = 10000;
 int meshIndex = 0;
 
 
-////////// Draw Functions 
+////////// Lighting Functions
+
+/// Computes lighting for a single vertex with given calculation model.
+Vec3Df computeLighting(Vec3Df &vertexPos, Vec3Df &normal, LightModel lightModel)
+{
+    const Vec3Df lightColor = Vec3Df(1,1,1);
+    
+    switch (lightModel) {
+        case DIFFUSE_LIGHTING:
+        {
+            // We cheat here: assuming a distant sun, this is an reasonable approximation
+            Vec3Df l = (Vec3Df(LightPos[0],LightPos[1],LightPos[2]) - Vec3Df(0,0,0));
+            l.normalize();
+            return Vec3Df::dotProduct(l, normal) * lightColor;
+        }
+        default:
+            return Vec3Df(0, 0, 0);
+    }
+}
+
+/// Computes lighting for the entire scene
+void computeLighting()
+{
+    for (auto &ridge : mountains)
+    {
+        for (int i=0; i < ridge.meshVertices.size(); i = i+3)
+        {
+            // Compute for our (single) light
+            Vec3Df vertexpos = Vec3Df(ridge.meshVertices[i],
+                                      ridge.meshVertices[i+1],
+                                      ridge.meshVertices[i+2]);
+            Vec3Df normal = Vec3Df(ridge.meshNormals[i],
+                                   ridge.meshNormals[i+1],
+                                   ridge.meshNormals[i+2]);
+            Vec3Df lighting = computeLighting(vertexpos, normal, DIFFUSE_LIGHTING);
+            
+            // Pass computed values to Ridge
+            ridge.meshColors[i] = lighting[0];
+            ridge.meshColors[i+1] = lighting[1];
+            ridge.meshColors[i+2] = lighting[2];
+        }
+    }
+}
+
+
+////////// Draw Functions
 
 //function to draw coordinate axes with a certain length (1 as a default)
 void drawCoordSystem(float length=1)
@@ -138,12 +185,15 @@ void display( )
 		for (auto &enemy : enemies) {
 			enemy.draw();
 		}
-		for (auto &projectile : projectiles) {
+        
+        glDisable(GL_DEPTH_TEST);
+        for (auto &projectile : projectiles) {
 			projectile.draw();
 		}
+        glEnable(GL_DEPTH_TEST);
 		
 		if (toggleBoss)
-			boss.drawBoss();
+			boss.draw();
 
         character.draw();
 		
@@ -169,13 +219,14 @@ void display( )
 	}
 }
 
-bool isHit(Entity ent1, Entity ent2) {
-	std::vector<Vec3Df> bb1 = ent1.getBoundingBox();
-	std::vector<Vec3Df> bb2 = ent2.getBoundingBox();
+bool isHit(std::vector<Vec3Df> bb1, std::vector<Vec3Df> bb2) {
+	//std::vector<Vec3Df> bb1 = ent1.getBoundingBox();
+	//std::vector<Vec3Df> bb2 = ent2.getBoundingBox();
 
 	bool xAxis = (bb1[0][0] > bb2[1][0] || bb1[1][0] < bb2[0][0]);
 	bool yAxis = (bb1[0][1] > bb2[1][1] || bb1[1][1] < bb2[0][1]);
-	bool anyHit = xAxis || yAxis;
+	bool zAxis = (bb1[0][2] > bb2[1][2] || bb1[1][2] < bb2[0][2]);
+	bool anyHit = xAxis || yAxis || zAxis;
 
 	return !anyHit;
 }
@@ -186,6 +237,8 @@ bool isHit(Entity ent1, Entity ent2) {
  */
 void animate( )
 {
+    LightPos[0] += 0.002;
+    
 	for (int i = 0; i < numberOfRidges; i++)
 	{
 		mountains[i].move();
@@ -215,6 +268,9 @@ void animate( )
 		boss.animate(deltaTime);
 
 	collisionDetection();
+
+    // After everything has moved, lighting should be recalculated
+    computeLighting();
 }
 
 void collisionDetection() {
@@ -222,7 +278,7 @@ void collisionDetection() {
 	for (std::vector<Projectile>::iterator projectile = projectiles.begin(); projectile != projectiles.end();) {
 		bool broken = false;
 		for (std::vector<Enemy>::iterator enemy = enemies.begin(); enemy != enemies.end();) {
-			if (isHit((*projectile), (*enemy))) {
+			if (isHit((*projectile).getBoundingBox(), (*enemy).getBoundingBox())) {
 				enemy = enemies.erase(enemy);
 				projectile = projectiles.erase(projectile);
 				broken = true;
@@ -231,6 +287,11 @@ void collisionDetection() {
 			else {
 				++enemy;
 			}
+		}
+		if (!broken && isHit((*projectile).getBoundingBox(), boss.getBoundingBox())) {
+			boss.hit();
+			projectile = projectiles.erase(projectile);
+			broken = true;
 		}
 		if (!broken) {
 			projectile++;
@@ -250,7 +311,7 @@ void collisionDetection() {
 	viewport.height = H_fen;
 	viewport.width = W_fen;
 	for (std::vector<Projectile>::iterator projectile = projectiles.begin(); projectile != projectiles.end();) {
-		if (!isHit((*projectile), viewport)) {
+		if (!isHit((*projectile).getBoundingBox(), viewport.getBoundingBox())) {
 			projectile = projectiles.erase(projectile);
 		}
 		else {
@@ -260,7 +321,7 @@ void collisionDetection() {
 
 	//Check if the player didn't hit an enemy
 	for (std::vector<Enemy>::iterator enemy = enemies.begin(); enemy != enemies.end();) {
-		if (isHit(character, (*enemy))) {
+		if (isHit(character.getBoundingBox(), (*enemy).getBoundingBox())) {
 			enemy = enemies.erase(enemy);
 			// Do some logic here
 		}
@@ -287,7 +348,7 @@ void spawnEnemy(int unusedValue)
 
 void spawnBoss(int unusedValue)
 {
-	boss = Boss(Vec3Df(6, -1, -2), -1, 0.5);
+	//boss = Boss(Vec3Df(6, -1, -2), -1, 0.5);
 	boss.setTarget(&character.position);
 	toggleBoss = true;
 }
@@ -300,8 +361,8 @@ Projectile spawnProjectile(Vec3Df direction)
 
     Projectile projectile = Projectile(spawnPos, direction);
 	projectile.movementSpeed = 3.0;
-	projectile.width = 0.125;
-	projectile.height = 0.125;
+	projectile.width = 0.5;
+	projectile.height = 0.5;
 
 	projectiles.push_back(projectile);
 	return projectile;
@@ -497,6 +558,24 @@ void calculateWorldSpaceViewportBounds() {
 
 void displayInternal(void);
 void reshape(int w, int h);
+
+void initTextures()
+{
+    GLuint texture =
+    SOIL_load_OGL_texture("./Textures/bullet1.png",
+                          SOIL_LOAD_AUTO,
+                          SOIL_CREATE_NEW_ID,
+                          SOIL_FLAG_POWER_OF_TWO | SOIL_FLAG_MIPMAPS | SOIL_FLAG_DDS_LOAD_DIRECT);
+    Projectile::textureSet.push_back(texture);
+
+    texture =
+    SOIL_load_OGL_texture("./Textures/bullet2.png",
+                          SOIL_LOAD_AUTO,
+                          SOIL_CREATE_NEW_ID,
+                          SOIL_FLAG_POWER_OF_TWO | SOIL_FLAG_MIPMAPS | SOIL_FLAG_DDS_LOAD_DIRECT);
+    Projectile::textureSet.push_back(texture);
+}
+
 void init()
 {
     glDisable( GL_LIGHTING );
@@ -528,7 +607,7 @@ void init()
 	mountains[1] = Ridge(2, 50, 10, -3, 0.0075f, -3, "./Textures/sand.ppm");
 
 	//TODO change mesh to correct object.
-	printf("Loading Mesh\n");
+	/*printf("Loading Mesh\n");
 	Mesh mesh = Mesh();
 	mesh.loadMesh("./Models/hoofd.obj");
 	meshes.push_back(mesh);
@@ -537,9 +616,10 @@ void init()
 	printf("Creating Grid, 8\n");
 	meshes.push_back(Grid::getReduxMesh(mesh, 8));
 	printf("Creating Grid, 4\n");
-	meshes.push_back(Grid::getReduxMesh(mesh, 4));
+	meshes.push_back(Grid::getReduxMesh(mesh, 4));*/
 
 	character.initTexture();
+    initTextures();
 }
 
 /**
@@ -572,8 +652,6 @@ int main(int argc, char** argv)
     glTranslatef(0,0,-4);
     tbInitTransform();     
     tbHelp();
-
-	calculateWorldSpaceViewportBounds();
 
 	// cablage des callback
     glutReshapeFunc(reshape);
@@ -629,5 +707,6 @@ void reshape(int w, int h)
     glMatrixMode(GL_MODELVIEW);
 
 	calculateWorldSpaceViewportBounds();
+    LightPos[0] = topLeft[0]; //init light position
 }
 

@@ -51,9 +51,9 @@ Leg::Leg(float height, Vec3Df hip, Vec3Df toe)
 	this->hip = hip;
 	toe_base = toe;
 	this->moveToe(toe);
-	pawHeight = height / 2.0;
-	pawWidth = height / 4.0;
-	pawDepth = height / 4.0;
+	pawHeight = height / 2.0f;
+	pawWidth = height / 4.0f;
+	pawDepth = height / 4.0f;
 }
 
 Vec3Df Leg::getToeBase()
@@ -66,15 +66,15 @@ void Leg::init()
 	//The vector from the toe to the hip
 	Vec3Df delta = toe - hip;
 	//The angle for the direction of the leg
-	angle_y = atan2f(delta[0], delta[2]) * 180 / M_PI;
+	angle_y = atan2f(delta[0], delta[2]) * 180.0f / M_PI;
 	//The distance between the toe and the hip
 	float length_l = Vec3Df::distance(toe, hip);
 	//The angle between delta (line from hip to toe) and the leg, set to 0 if the toe is further away than the length of the leg
 	angle_alpha = 0;
 	if (length_l < 1.5*height)
-		angle_alpha = acos(0.5*length_l / (0.75*height)) * 180 / M_PI;
+		angle_alpha = acos(0.5f*length_l / (0.75f*height)) * 180.0f / M_PI;
 	//The angle between delta and the x,z plane
-	float angle_beta = atan2(delta[1], sqrtf(delta[0] * delta[0] + delta[2] * delta[2])) * 180 / M_PI;
+	float angle_beta = atan2(delta[1], sqrtf(delta[0] * delta[0] + delta[2] * delta[2])) * 180.0f / M_PI;
 	//The angle of upwards rotation for the leg
 	angle_x = -(angle_alpha + angle_beta);
 }
@@ -131,13 +131,24 @@ Boss::Boss(Vec3Df pos, float speed, float scale)
 	base_speed = speed;
 	walking_speed = base_speed;
 
+	printf("Loading Mesh\n");
+	Mesh mesh = Mesh();
+	mesh.loadMesh("./Models/hoofd.obj");
+	meshes.push_back(mesh);
+	printf("Creating Grid, 16\n");
+	meshes.push_back(Grid::getReduxMesh(mesh, 16));
+	printf("Creating Grid, 8\n");
+	meshes.push_back(Grid::getReduxMesh(mesh, 8));
+	printf("Creating Grid, 4\n");
+	meshes.push_back(Grid::getReduxMesh(mesh, 4));
+
 	init();
 	nextMove(move);
 }
 
 void Boss::animate(float delta)
 {
-	cycle += delta/(1000.0*cycle_duration);
+	cycle += delta/(1000.0f*cycle_duration);
 	float hor_speed = 0;
 	//Move the boss
 	if (position != destination)
@@ -168,15 +179,15 @@ void Boss::animate(float delta)
 			Vec3Df toe = legs[i].getToeBase();
 			//Decide if the leg is on the ground or in the air
 			if ((i + odd_cycle) % 2)
-				toe[0] += sign*(-step_size / 2.0 + step_size * cycle);
+				toe[0] += sign*(-step_size / 2.0f + step_size * cycle);
 			else
 			{
-				float delta_x = sign*(step_size / 2.0 - step_size * cycle);
+				float delta_x = sign*(step_size / 2.0f - step_size * cycle);
 				toe[0] += delta_x;
 
-				float arc_angle = 135 * M_PI / 180;
-				float step_circle_radius = ((step_size / 2.0) / sin(arc_angle / 2.0));
-				toe[1] += sqrt(step_circle_radius*step_circle_radius - delta_x*delta_x) - step_circle_radius*sin(M_PI_2 - arc_angle / 2.0);
+				float arc_angle = 135.0f * M_PI / 180.0f;
+				float step_circle_radius = ((step_size / 2.0f) / sin(arc_angle / 2.0f));
+				toe[1] += sqrt(step_circle_radius*step_circle_radius - delta_x*delta_x) - step_circle_radius*sin(M_PI_2 - arc_angle / 2.0f);
 			}
 			legs[i].moveToe(toe);
 		}
@@ -221,35 +232,38 @@ void Boss::drawBody()
 void Boss::drawHead()
 {
 	glPushMatrix();
-		glTranslatef(0, -body_height, 0);
-		float head_radius = 1.5*body_radius;
-		//Draw the eye
-		glTranslatef(center[0], 1.5*body_height + head_radius + center[1], center[2]);
+		glTranslatef(0, body_height + meshes[meshIndex].bbEdgeSize, 0);
+		//float head_radius = 1.5*body_radius;
+		////Draw the eye
+		//glTranslatef(center[0], 1.5*body_height + head_radius + center[1], center[2]);
 		if (target != NULL)
 		{
 			//The vector from the player to the boss head
-			Vec3Df delta = *target - (position + scale*(center + Vec3Df(0, body_height / 2.0 + head_radius, 0)));
+			Vec3Df delta = *target - (position + scale*(center + Vec3Df(0, body_height / 2.0f + meshes[meshIndex].bbEdgeSize, 0)));
 			//The angles to aim at the player
-			float angle_y = -atan2f(delta[2], delta[0]) * 180 / M_PI;
-			float angle_z = atan2(delta[1], sqrtf(delta[0] * delta[0] + delta[2] * delta[2])) * 180 / M_PI;
+			float angle_y = -atan2f(delta[2], delta[0]) * 180.0f / M_PI;
+			float angle_z = atan2(delta[1], sqrtf(delta[0] * delta[0] + delta[2] * delta[2])) * 180.0f / M_PI;
 			glRotatef(angle_y, 0, 1, 0);
 			glRotatef(angle_z, 0, 0, 1);
 		}
-		glColor3f(1, 1, 1);
-		gluSphere(gluNewQuadric(), head_radius, 16, 16);
-		//Draw the iris
-		glTranslatef(0.5*head_radius, 0, 0);
-		glColor3f(0, 0.2, 1);
-		gluSphere(gluNewQuadric(), head_radius*0.6, 16, 16);
-		//Draw the pupil
-		glTranslatef(0.5*head_radius, 0, 0);
-		glColor3f(0, 0, 0);
-		gluSphere(gluNewQuadric(), head_radius*0.2, 16, 16);
+		glRotatef(90.0f, 0.0f, 0.0f, 1.0f);
+		meshes[meshIndex].drawSmooth();
+		//glColor3f(1, 1, 1);
+		//gluSphere(gluNewQuadric(), head_radius, 16, 16);
+		////Draw the iris
+		//glTranslatef(0.5*head_radius, 0, 0);
+		//glColor3f(0, 0.2, 1);
+		//gluSphere(gluNewQuadric(), head_radius*0.6, 16, 16);
+		////Draw the pupil
+		//glTranslatef(0.5*head_radius, 0, 0);
+		//glColor3f(0, 0, 0);
+		//gluSphere(gluNewQuadric(), head_radius*0.2, 16, 16);
 	glPopMatrix();
 }
 
-void Boss::drawBoss()
+void Boss::draw()
 {
+	glEnable(GL_LIGHTING);
 	glPushMatrix();
 	glTranslatef(position[0], position[1], position[2]);
 		glScalef(scale, scale, scale);
@@ -260,7 +274,7 @@ void Boss::drawBoss()
 		for (int i = 0; i < 6; i++)
 			legs[i].drawLeg();
 	glPopMatrix();
-
+	glDisable(GL_LIGHTING);
 }
 
 void Boss::init()
@@ -274,8 +288,8 @@ void Boss::init()
 	//Make the legs
 	for (int i = 0; i < 6; i++)
 	{
-		Vec3Df hip = Vec3Df(center[0] + hip_radius*sin(2 * i*M_PI / slices), center[1], center[2] + hip_radius*cos(2 * i*M_PI / slices));
-		Vec3Df toe = Vec3Df(2 * toe_distance*sin(2 * i*M_PI / slices), 0, 2 * toe_distance*cos(2 * i*M_PI / slices));
+		Vec3Df hip = Vec3Df(center[0] + hip_radius*sin(2.0f * i*M_PI / slices), center[1], center[2] + hip_radius*cos(2.0f * i*M_PI / slices));
+		Vec3Df toe = Vec3Df(2 * toe_distance*sin(2.0f * i*M_PI / slices), 0, 2.0f * toe_distance*cos(2.0f * i*M_PI / slices));
 		legs[i] = Leg(leg_size, hip, toe);
 	}
 
@@ -324,7 +338,7 @@ void Boss::setTarget(const Vec3Df* target)
 	this->target = target;
 }
 
-void Boss::nextMove(int n)
+void Boss::nextMove(unsigned int n)
 {
 	if (n < move_list.size())
 	{
@@ -341,4 +355,31 @@ void Boss::nextMove(int n)
 void Boss::linger(int ms)
 {
 	linger_time = ms;
+}
+
+void Boss::hit() {
+	int total = meshes.size();
+	meshIndex++;
+	if (meshIndex >= total) {
+		//kill boss
+
+		meshIndex = 0;
+	}
+}
+
+float Boss::getHeadWidth() {
+	return meshes[meshIndex].bbEdgeSize;
+}
+
+std::vector<Vec3Df> Boss::getBoundingBox() {
+	float meshSize = getHeadWidth();
+	Vec3Df center = position + Vec3Df(0, (body_height + meshes[meshIndex].bbEdgeSize) * scale, 0);
+
+	float offset = (meshSize / 2.0f) * scale;
+
+	Vec3Df topLeft = Vec3Df(center[0] - offset, center[1] - offset, center[2] - offset);
+	Vec3Df bottomRight = Vec3Df(center[0] + offset, center[1] + offset, center[2] + offset);
+
+	std::vector<Vec3Df> list = { topLeft, bottomRight };
+	return list;
 }

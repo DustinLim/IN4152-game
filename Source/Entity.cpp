@@ -120,19 +120,27 @@ void Enemy::initTexture()
 
 #pragma region "Projectile"
 
+std::vector<GLuint> Projectile::textureSet;
+
 Projectile::Projectile(Vec3Df spawnPoint, Vec3Df direction)
 {
     this->spawnPoint = spawnPoint;
     movementDirection = direction;
+    texture = textureSet[0];
 }
 
 // Overrides base method
 void Projectile::draw()
 {
-    glColor3f(color[0], color[1], color[2]);
+    glColor3f(1,1,1);
     glNormal3f(0, 0, 1);
     
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, texture);
     glPushMatrix();
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     
     // 1. Translate projectile to its spawn point
     glTranslatef(spawnPoint[0], spawnPoint[1], spawnPoint[2]);
@@ -143,25 +151,61 @@ void Projectile::draw()
     glTranslatef(propelledDistance, 0, 0);
     
     glBegin(GL_QUADS);
-    float offsetW = width/2.0f;
-	float offsetH = height/ 2.0f;
-    glVertex3f(-offsetW, -offsetH, 0);
-    glVertex3f(offsetW, -offsetH, 0);
-    glVertex3f(offsetW, offsetH, 0);
-    glVertex3f(-offsetW, offsetH, 0);
+    /*
+        float offset = size/2.0f;
+        glTexCoord2f(0,1);
+        glVertex3f(-offset, -offset, 0);
+        glTexCoord2f(1,1);
+        glVertex3f(offset, -offset, 0);
+        glTexCoord2f(1,0);
+        glVertex3f(offset, offset, 0);
+        glTexCoord2f(0,0);
+        glVertex3f(-offset, offset, 0);
+    */
+        float offsetW = width/2.0f;
+        float offsetH = height/ 2.0f;
+        glTexCoord2f(0,1);
+        glVertex3f(-offsetW, -offsetH, 0);
+        glTexCoord2f(1,1);
+        glVertex3f(offsetW, -offsetH, 0);
+        glTexCoord2f(1,0);
+        glVertex3f(offsetW, offsetH, 0);
+        glTexCoord2f(0,0);
+        glVertex3f(-offsetW, offsetH, 0);
     glEnd();
     
     glPopMatrix();
+    glBindTexture(GL_TEXTURE_2D, 0);
+    glDisable(GL_TEXTURE_2D);
 }
 
 // Overrides base method
 void Projectile::animate(int deltaTime)
 {
+    // Alternate between textures
+    timeAccumulator += deltaTime;
+    if (timeAccumulator >= 200)
+    {
+        texture = (texture == textureSet[0]) ? textureSet[1] : textureSet[0];
+        timeAccumulator = 0;
+    }
+    
     propelledDistance += movementSpeed * ((float)deltaTime/1000);
     
     // In this case, we need to derive the new position separately
     movementDirection.normalize();
     position = spawnPoint + movementDirection * propelledDistance;
+}
+
+std::vector<Vec3Df> Projectile::getBoundingBox() {
+	int temp = scale;
+	scale = scale * 0.1f;
+	Vec3Df topLeft = Vec3Df(position[0] - (width / 2.0f) * scale, position[1] - (height / 2.0f) * scale, position[2]);
+	Vec3Df bottomRight = Vec3Df(position[0] + (width / 2.0f) * scale, position[1] + (height / 2.0f) * scale, position[2]);
+	scale = temp;
+
+	std::vector<Vec3Df> list = { topLeft, bottomRight };
+	return list;
 }
 
 #pragma endregion

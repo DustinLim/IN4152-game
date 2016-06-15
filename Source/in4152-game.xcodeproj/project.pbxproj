@@ -18,6 +18,10 @@
 		54E41F361D0A002B0014A4BA /* space-background.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 54E41F351D0A001F0014A4BA /* space-background.png */; };
 		54E41F391D0A02FE0014A4BA /* libSOIL.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 54E41F371D0A02FE0014A4BA /* libSOIL.a */; };
 		54E41F471D1169590014A4BA /* alien_1.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 54E41F461D11694F0014A4BA /* alien_1.png */; };
+		54E41F3D1D0C3D9B0014A4BA /* bullet1.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 54E41F3B1D0C3AF50014A4BA /* bullet1.png */; };
+		54E41F3E1D0C3D9B0014A4BA /* bullet2.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 54E41F3C1D0C3AF50014A4BA /* bullet2.png */; };
+		54E41F411D0ED7050014A4BA /* moon-surface.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 54E41F401D0ED6F80014A4BA /* moon-surface.png */; };
+		54E41F431D0ED7610014A4BA /* astronaut-gun.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 54E41F421D0ED75C0014A4BA /* astronaut-gun.png */; };
 		54EA86E11D00C2FD0018AC85 /* background.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 54EA86C61D00C2FD0018AC85 /* background.cpp */; };
 		54EA86E21D00C2FD0018AC85 /* calcUtilities.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 54EA86C81D00C2FD0018AC85 /* calcUtilities.cpp */; };
 		54EA86E31D00C2FD0018AC85 /* Entity.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 54EA86CA1D00C2FD0018AC85 /* Entity.cpp */; };
@@ -40,6 +44,10 @@
 			dstSubfolderSpec = 16;
 			files = (
 				54E41F471D1169590014A4BA /* alien_1.png in CopyFiles */,
+				54E41F3D1D0C3D9B0014A4BA /* bullet1.png in CopyFiles */,
+				54E41F3E1D0C3D9B0014A4BA /* bullet2.png in CopyFiles */,
+				54E41F431D0ED7610014A4BA /* astronaut-gun.png in CopyFiles */,
+				54E41F411D0ED7050014A4BA /* moon-surface.png in CopyFiles */,
 				54E41F361D0A002B0014A4BA /* space-background.png in CopyFiles */,
 				54E41F321D09FD5F0014A4BA /* astronaut-arm.png in CopyFiles */,
 				54E41F331D09FD5F0014A4BA /* astronaut-body.png in CopyFiles */,
@@ -80,6 +88,10 @@
 		54E41F371D0A02FE0014A4BA /* libSOIL.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libSOIL.a; path = mac/libSOIL.a; sourceTree = "<group>"; };
 		54E41F381D0A02FE0014A4BA /* SOIL.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SOIL.h; path = mac/SOIL.h; sourceTree = "<group>"; };
 		54E41F461D11694F0014A4BA /* alien_1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = alien_1.png; sourceTree = "<group>"; };
+		54E41F3B1D0C3AF50014A4BA /* bullet1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = bullet1.png; sourceTree = "<group>"; };
+		54E41F3C1D0C3AF50014A4BA /* bullet2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = bullet2.png; sourceTree = "<group>"; };
+		54E41F401D0ED6F80014A4BA /* moon-surface.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "moon-surface.png"; sourceTree = "<group>"; };
+		54E41F421D0ED75C0014A4BA /* astronaut-gun.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "astronaut-gun.png"; sourceTree = "<group>"; };
 		54EA86C51D00C2FD0018AC85 /* argumentParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = argumentParser.h; sourceTree = SOURCE_ROOT; };
 		54EA86C61D00C2FD0018AC85 /* background.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = background.cpp; sourceTree = SOURCE_ROOT; };
 		54EA86C71D00C2FD0018AC85 /* background.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = background.h; sourceTree = SOURCE_ROOT; };
@@ -127,10 +139,8 @@
 			isa = PBXGroup;
 			children = (
 				546202621D00C1BE0084392B /* in4152-game */,
+				54E41F3F1D0C8A210014A4BA /* Frameworks */,
 				546202611D00C1BE0084392B /* Products */,
-				54E41F2D1D09FC770014A4BA /* CoreFoundation.framework */,
-				54EA86EB1D00D37D0018AC85 /* GLUT.framework */,
-				54EA86E81D00D26A0018AC85 /* OpenGL.framework */,
 			);
 			sourceTree = "<group>";
 		};
@@ -186,6 +196,16 @@
 			path = lib;
 			sourceTree = SOURCE_ROOT;
 		};
+		54E41F3F1D0C8A210014A4BA /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				54E41F2D1D09FC770014A4BA /* CoreFoundation.framework */,
+				54EA86EB1D00D37D0018AC85 /* GLUT.framework */,
+				54EA86E81D00D26A0018AC85 /* OpenGL.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		54EA86D41D00C2FD0018AC85 /* Models */ = {
 			isa = PBXGroup;
 			children = (
@@ -199,6 +219,10 @@
 			isa = PBXGroup;
 			children = (
 				54E41F461D11694F0014A4BA /* alien_1.png */,
+				54E41F3B1D0C3AF50014A4BA /* bullet1.png */,
+				54E41F3C1D0C3AF50014A4BA /* bullet2.png */,
+				54E41F421D0ED75C0014A4BA /* astronaut-gun.png */,
+				54E41F401D0ED6F80014A4BA /* moon-surface.png */,
 				54E41F2F1D09FD3E0014A4BA /* astronaut-arm.png */,
 				54E41F301D09FD3E0014A4BA /* astronaut-body.png */,
 				54E41F311D09FD3E0014A4BA /* astronaut-complete.png */,
