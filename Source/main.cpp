@@ -295,7 +295,11 @@ void spawnBoss(int unusedValue)
 
 Projectile spawnProjectile(Vec3Df direction)
 {
-    Projectile projectile = Projectile(character.position, direction);
+	Vec3Df spawnPos = character.getAngleRefPos();
+	direction.normalize();
+	spawnPos += direction * character.getArmRadius();
+
+    Projectile projectile = Projectile(spawnPos, direction);
 	projectile.movementSpeed = 3.0;
 	projectile.width = 0.125;
 	projectile.height = 0.125;
@@ -458,11 +462,10 @@ void mouse(int button, int state, int x, int y)
 		//character.updateArmAngle(shootingDirection);
 
         //spawnProjectile(shootingDirection);
-
-		
-		Vec3Df shootingDirection2 = mouseToCharacterWorldPlane(x, y) - character.position;
+	
+		Vec3Df shootingDirection2 = mouseToCharacterWorldPlane(x, y) - character.getAngleRefPos();
 		spawnProjectile(shootingDirection2);
-		character.updateArmAngle(shootingDirection2);
+		character.updateArmAngle(mouseToCharacterWorldPlane(x, y));
 
     }
     else if (MouseMode == MOUSE_MODE_CAMERA)
@@ -476,7 +479,7 @@ void mouse(int button, int state, int x, int y)
 void mouseMotion(int x, int y) {
 	if (MouseMode == MOUSE_MODE_SHOOTING)
 	{
-		character.updateArmAngle(mouseToCharacterWorldPlane(x, y) - character.position);
+		character.updateArmAngle(mouseToCharacterWorldPlane(x, y));
 	}
 	else if (MouseMode == MOUSE_MODE_CAMERA)
 	{

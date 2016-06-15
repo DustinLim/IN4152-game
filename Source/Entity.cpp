@@ -97,16 +97,24 @@ Character::Character()
 	turnAround = 0;
 	width = 0.8f;			
 	height = 2.0f;			
-	scale = 1.0f;
+	scale = 0.4f;
 
 	setShoulderPos();
 	
+	// DO ONLY CHANGE WHEN YOU WANT TO CHANGE THE PROPORTIONS
 	armWidth = 0.25f;
-	armLength = 0.9f;						// Note that if you change the armLength, you need to change the gunLength with the same factor!
+	armLength = 0.9f;						// arm- and gunLength are related / coupled.
 	gunLength = (0.7f / 0.9f) * armLength;
 	gunHeight = 0.4f;
+
+	gunAngle = atan2f((gunHeight * 0.55f) * scale, getArmRadius()) * 180 / M_PI;
+
+
+
 }
 
+// Because we use the shoulder position at multiple points, it is defined in this method.
+// Note that this position is a relative one!
 void Character::setShoulderPos()
 {
 	shoulderPos = Vec3Df((-0.625f + (1.25f * turnAround)) * (width / 2.0f), 0.4f * (height / 2.0f), 0.0f);
@@ -114,10 +122,34 @@ void Character::setShoulderPos()
 
 // To calculate the correct arm angle and shooting direction, we want to approach the location of the gun
 // Because the gun lies parallel with the arm, we only adapt the y-value -> approximation-wise.
-// We had the arm thickness above the shoulderPos (= 0.1f) and the half of the gunHeight, which gives us the barrel height.
+// We had the arm thickness above the shoulderPos (= 0.1f) and the half of the gunHeight, which gives us the barrel position.
 Vec3Df Character::getAngleRefPos()
 {
-	return Vec3Df(shoulderPos[0], shoulderPos[1] + 0.1f + (gunHeight / 2.0f), shoulderPos[2]);
+	float anglePI = armAngle * M_PI / 180;
+	float refScale = gunHeight * scale * 0.5f;
+
+	Vec3Df refPos = position + shoulderPos * scale;
+	refPos[0] += (turnAround == 0) ? -sin(anglePI) * refScale :  sin(anglePI) * refScale;
+	refPos[1] += (turnAround == 0) ?  cos(anglePI) * refScale : -cos(anglePI) * refScale;
+
+	return refPos;
+}
+
+float Character::getArmRadius()
+{
+	return (armLength + 0.5 * gunLength) * scale;
+}
+
+// Debug purposes; draw a yellow sphere at the location of the reference position.
+void Character::drawAngleRefPos()
+{
+	Vec3Df refPos = getAngleRefPos(); 
+	glColor3f(1, 1, 0);
+	glPushMatrix();
+	glTranslatef(refPos[0], refPos[1], 0.0f);
+	glutSolidSphere(0.1, 6, 6);
+	glPopMatrix();
+	glPopAttrib();
 }
 
 void Character::draw()
@@ -156,11 +188,17 @@ void Character::draw()
 	glPushMatrix();
 	// put the arm 'turning-point' on the correct start position; position scales with the size of the character!
 	glTranslatef(shoulderPos[0], shoulderPos[1], shoulderPos[2]);				
-	glRotatef(armAngle, 0.0f, 0.0f, 1.0f);
+	
+	//float drawAngle = (turnAround == 0) ? armAngle - gunAngle : armAngle + gunAngle;
+	float drawAngle = armAngle;
+	glRotatef(drawAngle, 0.0f, 0.0f, 1.0f);
+
 	glPushMatrix();		// save this as the start configuration for the gun!
 	
 	if (turnAround == 0)
+	{
 		glRotatef(180, 0.0f, 0.0f, 1.0f);
+	}
 		
 	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 	glNormal3f(0.0f, 0.0f, 1.0f);
@@ -188,7 +226,7 @@ void Character::draw()
 	glBindTexture(GL_TEXTURE_2D, Texture[2]);
 
 	// put the gun on the correct start position at the arm; scales with the size of the arm.
-	glTranslatef(-0.05f + (0.555f * armLength), 0.1f - (0.6f * turnAround), 0.0f);
+	glTranslatef(-0.05f + (0.555f * armLength), 0.1f - ((0.2f + gunHeight) * turnAround), 0.0f);
 	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 	glNormal3f(0.0f, 0.0f, 1.0f);
 	glBegin(GL_QUADS);
@@ -203,15 +241,14 @@ void Character::draw()
 
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glDisable(GL_TEXTURE_2D);
+
+	//DEBUG
+	drawAngleRefPos();
 }
 
-void Character::animate(int deltaTime)
+void Character::updateArmAngle(Vec3Df mousePos)
 {
-	Entity::animate(deltaTime);
-}
-
-void Character::updateArmAngle(Vec3Df direction)
-{
+	Vec3Df direction = mousePos - getAngleRefPos();
 	armAngle = atan2f(direction[1], direction[0]) * 180 / M_PI;	
 
 	float oldTurnAround = turnAround;

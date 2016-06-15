@@ -55,14 +55,17 @@ public:
 
 	// Overriding
 	void draw(void);
-	void animate(int deltaTime);
 
-	Vec3Df getAngleRefPos();
+	// Correct arm and bullets
+	Vec3Df getAngleRefPos(void);
+	void drawAngleRefPos(void);
+	float getArmRadius(void);
 
 private:
 	Vec3Df shoulderPos;			// depends on 'turnAround'
 	float armAngle;				// could be used to calculate angle for arm
 	float turnAround;			// simulates boolean
+	float gunAngle;				// used to adapt the armAngle to let the gun aim at the cursor.
 
 	// Used to scale the arm / gun solely - only consequences for drawing.
 	float drawAngle;
