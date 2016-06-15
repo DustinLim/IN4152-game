@@ -44,8 +44,10 @@ public:
 
 private:
 	float angle;
-	unsigned int up;				// determines motion direction (up/down)
-	float speed;					// determines rapidness of motion (random over all enemies)
+	unsigned int up;					// determines motion direction (up/down)
+	float shake_speed;					// determines rapidness of shaking motion (random over all enemies)
+	float elevate_speed;				// determines rapidness of the up-downward movement (random over all enemies)
+	float elevation;					// determines the amplitude of the up-downward movement
 };
 
 class Projectile: public Entity

@@ -56,7 +56,9 @@ Enemy::Enemy()
 	width = 0.7f;
 	angle = 0.0f;
 	up = 1;
-	speed = rand() % 3;
+	shake_speed = rand() % 3;
+	elevate_speed = (rand() % 3) * 0.5;
+	elevation = (rand() % 10) * 0.03;
 	initTexture();
 }
 
@@ -66,9 +68,12 @@ void Enemy::animate(int deltaTime)
 		up = 0;
 	if (angle < -15)
 		up = 1;
-	angle = (up == 1) ? angle + speed : angle - speed;
+	angle = (up == 1) ? angle + shake_speed : angle - shake_speed;
 
-	Entity::animate(deltaTime);
+	movementDirection.normalize();
+	position[1] -= elevation * cos(position[0] * M_PI * elevate_speed);
+	position += movementDirection * movementSpeed * ((float)deltaTime / 1000);
+	position[1] += elevation * cos(position[0] * M_PI * elevate_speed);
 }
 
 void Enemy::draw()
