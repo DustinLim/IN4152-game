@@ -101,6 +101,8 @@ void Groundfloor::draw()
 		glTexCoord2f(0 + position, 0);			glVertex3f(-3.0f, -1.0f, -3.0f);
 	glEnd();
 
+    // FIXME: balancing with this pop breaks enemy drawing..
+    //glPopAttrib();
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glDisable(GL_TEXTURE_2D);
 }
