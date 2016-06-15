@@ -473,7 +473,7 @@ void mouseMotion(int x, int y) {
 void mousePassiveMotion(int x, int y) {
 	if (MouseMode == MOUSE_MODE_SHOOTING)
 	{
-		character.updateArmAngle(mouseToCharacterWorldPlane(x, y) - character.position);
+		character.updateArmAngle(mouseToCharacterWorldPlane(x, y));
 	}
 	else if (MouseMode == MOUSE_MODE_CAMERA)
 	{

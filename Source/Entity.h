@@ -75,6 +75,7 @@ public:
 
 	// Overriding
 	void draw();
+	void animate(int DeltaTime);
 
 	// Correct arm and bullets
 	Vec3Df getAngleRefPos();
