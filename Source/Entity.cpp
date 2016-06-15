@@ -47,6 +47,70 @@ std::vector<Vec3Df> Entity::getBoundingBox() {
 	return list;
 }
 
+
+#pragma region "Enemy"
+
+Enemy::Enemy()
+{
+	// overwrite height and width;
+	width = 0.7f;
+	angle = 0.0f;
+	up = 1;
+	initTexture();
+}
+
+void Enemy::animate(int deltaTime)
+{
+	if (angle > 15)
+		up = 0;
+	if (angle < -15)
+		up = 1;
+	angle = (up == 1) ? angle + 3 : angle - 3;
+
+	Entity::animate(deltaTime);
+}
+
+void Enemy::draw()
+{
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	glEnable(GL_BLEND);
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, Texture[0]);
+
+	glPushMatrix();
+	glTranslatef(position[0], position[1], position[2]);
+	glRotatef(angle, 0.0f, 0.0f, 1.0f);
+	
+	glNormal3f(0, 0, 1);
+	
+	float offsetH = height / 2.0f;
+	float offsetW = width / 2.0f;
+	glBegin(GL_QUADS);
+		glTexCoord2f(0.0f, 1.0f);		glVertex3f(-offsetW, -offsetH, 0);
+		glTexCoord2f(1.0f, 1.0f);		glVertex3f(offsetW, -offsetH, 0);
+		glTexCoord2f(1.0f, 0.0f);		glVertex3f(offsetW, offsetH, 0);
+		glTexCoord2f(0.0f, 0.0f);		glVertex3f(-offsetW, offsetH, 0);
+	glEnd();
+	glPopMatrix();	
+}
+
+void Enemy::initTexture()
+{
+	Texture.resize(1);
+
+	Texture[0] = SOIL_load_OGL_texture(
+		"./Textures/alien_1.png",
+		SOIL_LOAD_AUTO,
+		SOIL_CREATE_NEW_ID,
+		SOIL_FLAG_POWER_OF_TWO | SOIL_FLAG_MIPMAPS | SOIL_FLAG_DDS_LOAD_DIRECT);
+}
+
+#pragma endregion
+
+#pragma region "Projectile"
+
 Projectile::Projectile(Vec3Df spawnPoint, Vec3Df direction)
 {
     this->spawnPoint = spawnPoint;
@@ -91,6 +155,9 @@ void Projectile::animate(int deltaTime)
     position = spawnPoint + movementDirection * propelledDistance;
 }
 
+#pragma endregion
+
+#pragma region "Character"
 Character::Character()
 {
 	armAngle = 0.0f;
@@ -269,3 +336,5 @@ void Character::initTexture()
 		SOIL_CREATE_NEW_ID,
 		SOIL_FLAG_POWER_OF_TWO | SOIL_FLAG_MIPMAPS | SOIL_FLAG_DDS_LOAD_DIRECT);
 }
+
+#pragma endregion

@@ -43,7 +43,7 @@ Vec3Df mouseToCharacterWorldPlane(int x, int y);
 // To do these forward declarations, use smart pointers (unique_ptr) instead.
 
 Character character = Character();
-std::vector<Entity> enemies = {};
+std::vector<Enemy> enemies = {};
 std::vector<Projectile> projectiles = {};
 std::vector<Mesh >meshes = {};
 int glutElapsedTime = 0; //in ms
@@ -221,7 +221,7 @@ void collisionDetection() {
 	//Check if any bullets hit
 	for (std::vector<Projectile>::iterator projectile = projectiles.begin(); projectile != projectiles.end();) {
 		bool broken = false;
-		for (std::vector<Entity>::iterator enemy = enemies.begin(); enemy != enemies.end();) {
+		for (std::vector<Enemy>::iterator enemy = enemies.begin(); enemy != enemies.end();) {
 			if (isHit((*projectile), (*enemy))) {
 				enemy = enemies.erase(enemy);
 				projectile = projectiles.erase(projectile);
@@ -238,7 +238,7 @@ void collisionDetection() {
 	}
 
 	//Check if anything went outside the viewport
-	for (std::vector<Entity>::iterator enemy = enemies.begin(); enemy != enemies.end();) {
+	for (std::vector<Enemy>::iterator enemy = enemies.begin(); enemy != enemies.end();) {
 		if ((*enemy).getBoundingBox()[1][0] < topLeft[0]) {
 			enemy = enemies.erase(enemy);
 		}
@@ -259,7 +259,7 @@ void collisionDetection() {
 	}
 
 	//Check if the player didn't hit an enemy
-	for (std::vector<Entity>::iterator enemy = enemies.begin(); enemy != enemies.end();) {
+	for (std::vector<Enemy>::iterator enemy = enemies.begin(); enemy != enemies.end();) {
 		if (isHit(character, (*enemy))) {
 			enemy = enemies.erase(enemy);
 			// Do some logic here
@@ -275,10 +275,9 @@ void spawnEnemy(int unusedValue)
 {
 	if (!toggleBoss)
 	{
-		Entity enemy = Entity();
+		Enemy enemy = Enemy();
 		enemy.position = Vec3Df(3, (rand() % 3 - 1), 0);
 		enemy.movementDirection = Vec3Df(-1, 0, 0);
-		enemy.color = Vec3Df(0, 0, 1);
 		enemies.push_back(enemy);
 
 		// Repeat this

@@ -30,6 +30,23 @@ public:
 	std::vector<Vec3Df> getBoundingBox();
 };
 
+class Enemy : public Entity
+{
+public:
+	Enemy();
+
+	void initTexture();
+
+	// Overriding
+	void draw();
+	void animate(int deltaTime);	// uses the base.
+
+
+private:
+	float angle;
+	unsigned int up;				// determines motion direction (up/down)
+};
+
 class Projectile: public Entity
 {
 public:
@@ -51,15 +68,15 @@ public:
 
 	void initTexture();
 	void updateArmAngle(Vec3Df mousePos);
-	void setShoulderPos(void);
+	void setShoulderPos();
 
 	// Overriding
-	void draw(void);
+	void draw();
 
 	// Correct arm and bullets
-	Vec3Df getAngleRefPos(void);
-	void drawAngleRefPos(void);
-	float getArmRadius(void);
+	Vec3Df getAngleRefPos();
+	void drawAngleRefPos();
+	float getArmRadius();
 
 private:
 	Vec3Df shoulderPos;			// depends on 'turnAround'
