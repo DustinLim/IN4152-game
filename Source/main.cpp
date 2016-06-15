@@ -592,6 +592,23 @@ void initTextures()
 									SOIL_CREATE_NEW_ID,
 									SOIL_FLAG_POWER_OF_TWO | SOIL_FLAG_MIPMAPS | SOIL_FLAG_DDS_LOAD_DIRECT);
 	Character::textureSet.push_back(texture);
+
+	// MOUNTAINS -- slightly different due to usage of .ppm
+	Ridge::initTexture("./Textures/sand.ppm");
+
+	// BACKGROUND AND GROUNDFLOOR
+	texture = SOIL_load_OGL_texture("./Textures/space-background.png",
+		SOIL_LOAD_AUTO,
+		SOIL_CREATE_NEW_ID,
+		SOIL_FLAG_POWER_OF_TWO | SOIL_FLAG_MIPMAPS | SOIL_FLAG_DDS_LOAD_DIRECT);
+	Background::texture = texture;
+
+	texture = SOIL_load_OGL_texture("./Textures/moon-surface.png",
+		SOIL_LOAD_AUTO,
+		SOIL_CREATE_NEW_ID,
+		SOIL_FLAG_POWER_OF_TWO | SOIL_FLAG_MIPMAPS | SOIL_FLAG_DDS_LOAD_DIRECT);
+	Groundfloor::texture = texture;
+
 }
 
 void init()
@@ -621,8 +638,8 @@ void init()
 	background.reset(new Background());
 	groundfloor.reset(new Groundfloor());
 	mountains.resize(numberOfRidges);
-	mountains[0] = Ridge(1, 50, 10, -3, 0.005f, -4, "./Textures/sand.ppm");
-	mountains[1] = Ridge(2, 50, 10, -3, 0.0075f, -3, "./Textures/sand.ppm");
+	mountains[0] = Ridge(1, 50, 10, -3, 0.005f, -4);
+	mountains[1] = Ridge(2, 50, 10, -3, 0.0075f, -3);
 
 	//TODO change mesh to correct object.
 	/*printf("Loading Mesh\n");
