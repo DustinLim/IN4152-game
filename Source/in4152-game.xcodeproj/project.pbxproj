@@ -17,6 +17,7 @@
 		54E41F341D09FD5F0014A4BA /* astronaut-complete.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 54E41F311D09FD3E0014A4BA /* astronaut-complete.png */; };
 		54E41F361D0A002B0014A4BA /* space-background.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 54E41F351D0A001F0014A4BA /* space-background.png */; };
 		54E41F391D0A02FE0014A4BA /* libSOIL.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 54E41F371D0A02FE0014A4BA /* libSOIL.a */; };
+		54E41F471D1169590014A4BA /* alien_1.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 54E41F461D11694F0014A4BA /* alien_1.png */; };
 		54EA86E11D00C2FD0018AC85 /* background.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 54EA86C61D00C2FD0018AC85 /* background.cpp */; };
 		54EA86E21D00C2FD0018AC85 /* calcUtilities.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 54EA86C81D00C2FD0018AC85 /* calcUtilities.cpp */; };
 		54EA86E31D00C2FD0018AC85 /* Entity.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 54EA86CA1D00C2FD0018AC85 /* Entity.cpp */; };
@@ -38,6 +39,7 @@
 			dstPath = Textures;
 			dstSubfolderSpec = 16;
 			files = (
+				54E41F471D1169590014A4BA /* alien_1.png in CopyFiles */,
 				54E41F361D0A002B0014A4BA /* space-background.png in CopyFiles */,
 				54E41F321D09FD5F0014A4BA /* astronaut-arm.png in CopyFiles */,
 				54E41F331D09FD5F0014A4BA /* astronaut-body.png in CopyFiles */,
@@ -77,6 +79,7 @@
 		54E41F351D0A001F0014A4BA /* space-background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "space-background.png"; sourceTree = "<group>"; };
 		54E41F371D0A02FE0014A4BA /* libSOIL.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libSOIL.a; path = mac/libSOIL.a; sourceTree = "<group>"; };
 		54E41F381D0A02FE0014A4BA /* SOIL.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SOIL.h; path = mac/SOIL.h; sourceTree = "<group>"; };
+		54E41F461D11694F0014A4BA /* alien_1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = alien_1.png; sourceTree = "<group>"; };
 		54EA86C51D00C2FD0018AC85 /* argumentParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = argumentParser.h; sourceTree = SOURCE_ROOT; };
 		54EA86C61D00C2FD0018AC85 /* background.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = background.cpp; sourceTree = SOURCE_ROOT; };
 		54EA86C71D00C2FD0018AC85 /* background.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = background.h; sourceTree = SOURCE_ROOT; };
@@ -195,6 +198,7 @@
 		54EA86DA1D00C2FD0018AC85 /* Textures */ = {
 			isa = PBXGroup;
 			children = (
+				54E41F461D11694F0014A4BA /* alien_1.png */,
 				54E41F2F1D09FD3E0014A4BA /* astronaut-arm.png */,
 				54E41F301D09FD3E0014A4BA /* astronaut-body.png */,
 				54E41F311D09FD3E0014A4BA /* astronaut-complete.png */,

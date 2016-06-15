@@ -219,8 +219,6 @@ void Character::updateArmAngle(Vec3Df mousePos)
 	turnAround = (armAngle > 90 || armAngle < -90) ? 1 : 0;
 	if (oldTurnAround != turnAround)
 		setShoulderPos();
-
-	printf_s("%f\n", armAngle);
 }
 
 void Character::animate(int deltaTime)
