@@ -78,10 +78,6 @@ void Enemy::animate(int deltaTime)
 
 void Enemy::draw()
 {
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	glEnable(GL_BLEND);
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, Texture[0]);
 
@@ -274,10 +270,6 @@ void Character::animate(int deltaTime)
 
 void Character::draw()
 {
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	glEnable(GL_BLEND);
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, Texture[1]);
 

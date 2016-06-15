@@ -578,6 +578,10 @@ void initTextures()
 
 void init()
 {
+    // Enable transparant textures
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    
     glDisable( GL_LIGHTING );
     glEnable( GL_LIGHT0 );
     glEnable(GL_COLOR_MATERIAL);
