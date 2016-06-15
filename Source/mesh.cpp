@@ -95,6 +95,8 @@ void Mesh::drawSmooth(){
     {
         for(int v = 0; v < 3 ; v++){
             glNormal3f(vertices[triangles[i].v[v]].n[0], vertices[triangles[i].v[v]].n[1], vertices[triangles[i].v[v]].n[2]);
+			if (triangles[i].v[v] < meshColor.size())
+				glColor3f(meshColor[triangles[i].v[v]][0], meshColor[triangles[i].v[v]][1], meshColor[triangles[i].v[v]][2]);
             glVertex3f(vertices[triangles[i].v[v]].p[0], vertices[triangles[i].v[v]].p[1] , vertices[triangles[i].v[v]].p[2]);
         }
 
@@ -113,7 +115,8 @@ void Mesh::draw(Vec3Df lightPos, Vec3Df lightColor){
         n.normalize ();
         glNormal3f(n[0], n[1], n[2]);
         for(int v = 0; v < 3 ; v++){
-			glColor3f(meshColor[i * 3 + v][0], meshColor[i * 3 + v][1], meshColor[i * 3 + v][2]);
+			if (triangles[i].v[v] < meshColor.size())
+				glColor3f(meshColor[i * 3 + v][0], meshColor[i * 3 + v][1], meshColor[i * 3 + v][2]);
             glVertex3f(vertices[triangles[i].v[v]].p[0], vertices[triangles[i].v[v]].p[1] , vertices[triangles[i].v[v]].p[2]);
         }
     }
@@ -246,8 +249,8 @@ bool Mesh::loadMesh(const char * filename)
     }
     fclose(in);
 
-	meshColor = std::vector<Vec3Df>(vertices.size());
-	for (int i = 0; i < vertices.size(); i++) {
+	meshColor.resize(vertices.size());
+	for (int i = 0; i < meshColor.size(); i++) {
 		meshColor[i] = Vec3Df(0, 1, 0);
 	}
 

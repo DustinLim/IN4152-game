@@ -243,6 +243,8 @@ void Boss::drawHead()
 			//The angles to aim at the player
 			float angle_y = -atan2f(delta[2], delta[0]) * 180.0f / M_PI;
 			float angle_z = atan2(delta[1], sqrtf(delta[0] * delta[0] + delta[2] * delta[2])) * 180.0f / M_PI;
+			angleHeadY = angle_y;
+			angleHeadZ = angle_z;
 			glRotatef(angle_y, 0, 1, 0);
 			glRotatef(angle_z, 0, 0, 1);
 		}
@@ -363,6 +365,8 @@ void Boss::hit() {
 
 		meshIndex = 0;
 	}
+
+	translation = Vec3Df(0, body_height + meshes[meshIndex].bbEdgeSize, 0);
 }
 
 float Boss::getHeadWidth() {
@@ -382,6 +386,6 @@ std::vector<Vec3Df> Boss::getBoundingBox() {
 	return list;
 }
 
-Mesh Boss::getMesh() {
+Mesh& Boss::getMesh() {
 	return meshes[meshIndex];
 }
