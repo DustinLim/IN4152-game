@@ -237,18 +237,20 @@ bool isHit(std::vector<Vec3Df> bb1, std::vector<Vec3Df> bb2) {
  */
 void animate( )
 {
+	int currentTime = glutGet(GLUT_ELAPSED_TIME);
+	int deltaTime = currentTime - glutElapsedTime;
+	glutElapsedTime = currentTime;
+
+
     LightPos[0] += 0.002;
     
 	for (int i = 0; i < numberOfRidges; i++)
 	{
-		mountains[i].move();
+		mountains[i].move(deltaTime);
 	}
-	background->move();
-	groundfloor->move();
+	background->move(deltaTime);
+	groundfloor->move(deltaTime);
 
-	int currentTime = glutGet(GLUT_ELAPSED_TIME);
-	int deltaTime = currentTime - glutElapsedTime;
-	glutElapsedTime = currentTime;
 
 	for (auto &enemy : enemies) {
 		enemy.animate(deltaTime);
@@ -603,8 +605,8 @@ void init()
 	background.reset(new Background());
 	groundfloor.reset(new Groundfloor());
 	mountains.resize(numberOfRidges);
-	mountains[0] = Ridge(1, 200, 10, -8, 0.0075f, -4, "./Textures/sand.ppm");
-	mountains[1] = Ridge(2, 80, 10, -8, 0.015f, -3, "./Textures/sand.ppm");
+	mountains[0] = Ridge(1, 200, 10, -8, 0.5f, -4, "./Textures/sand.ppm");
+	mountains[1] = Ridge(2, 80, 10, -8, 1.0f, -3, "./Textures/sand.ppm");
 
 	//TODO change mesh to correct object.
 	/*printf("Loading Mesh\n");

@@ -20,7 +20,7 @@ public:
 	Ridge(unsigned int rn, int resX, int resZ, float startPos, float spd, double depth, const char *texLoc);
 	~Ridge();
 
-	void move();
+	void move(float deltaTime);
 	void draw();
 
 	// Different steps inside these method will depend on the ridgenumber.

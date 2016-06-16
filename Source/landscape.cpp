@@ -89,9 +89,9 @@ float Ridge::getRidgePeriod()
 
 
 // Update the parameters needed to let the landscape move <- called in 'main->animate'
-void Ridge::move()
+void Ridge::move(float deltaTime)
 {
-	position -= speed;
+	position -= deltaTime*speed/1000.0f;
 }
 
 void Ridge::draw()

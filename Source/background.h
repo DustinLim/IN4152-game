@@ -15,7 +15,7 @@ public:
 	float position;
 	float speed;
 
-	void move(void);
+	void move(float deltaTime);
 
 };
 

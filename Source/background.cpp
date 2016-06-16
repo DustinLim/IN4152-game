@@ -14,14 +14,14 @@ Background::Background()
 	quadWidth = 8;
 	quadHeight = 6;
 	position = 0;
-	speed = 0.001;
+	speed = 0.1;
 
 	initTexture();
 }
 
-void Surface::move()
+void Surface::move(float deltaTime)
 {
-	position = (position >= 1) ? 0 : position + speed;
+	position = (position >= 1) ? position - 1 + deltaTime*speed / 1000.0f : position + deltaTime*speed / 1000.0f;
 }
 
 void Background::draw()
@@ -80,7 +80,7 @@ void Background::initTexture()
 Groundfloor::Groundfloor()
 {
 	position = 0;
-	speed = 0.015;
+	speed = 1;
 	width = 12.5f;
 	height = -1.0f;
 	depth = 5.0f;
