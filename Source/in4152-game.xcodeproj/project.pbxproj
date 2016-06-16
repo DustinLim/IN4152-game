@@ -23,6 +23,7 @@
 		54E41F431D0ED7610014A4BA /* astronaut-gun.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 54E41F421D0ED75C0014A4BA /* astronaut-gun.png */; };
 		54E41F451D103B460014A4BA /* hoofd.obj in CopyFiles */ = {isa = PBXBuildFile; fileRef = 54E41F441D103B3A0014A4BA /* hoofd.obj */; };
 		54E41F471D1169590014A4BA /* alien_1.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 54E41F461D11694F0014A4BA /* alien_1.png */; };
+		54E41F4C1D1302360014A4BA /* shadow.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 54E41F4B1D13022D0014A4BA /* shadow.png */; };
 		54EA86E11D00C2FD0018AC85 /* background.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 54EA86C61D00C2FD0018AC85 /* background.cpp */; };
 		54EA86E21D00C2FD0018AC85 /* calcUtilities.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 54EA86C81D00C2FD0018AC85 /* calcUtilities.cpp */; };
 		54EA86E31D00C2FD0018AC85 /* Entity.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 54EA86CA1D00C2FD0018AC85 /* Entity.cpp */; };
@@ -44,6 +45,7 @@
 			dstPath = Textures;
 			dstSubfolderSpec = 16;
 			files = (
+				54E41F4C1D1302360014A4BA /* shadow.png in CopyFiles */,
 				54E41F471D1169590014A4BA /* alien_1.png in CopyFiles */,
 				54E41F3D1D0C3D9B0014A4BA /* bullet1.png in CopyFiles */,
 				54E41F3E1D0C3D9B0014A4BA /* bullet2.png in CopyFiles */,
@@ -96,6 +98,7 @@
 		54E41F441D103B3A0014A4BA /* hoofd.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = hoofd.obj; sourceTree = "<group>"; };
 		54E41F461D11694F0014A4BA /* alien_1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = alien_1.png; sourceTree = "<group>"; };
 		54E41F481D12BEBB0014A4BA /* commonOpenGL.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = commonOpenGL.h; sourceTree = SOURCE_ROOT; };
+		54E41F4B1D13022D0014A4BA /* shadow.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = shadow.png; sourceTree = "<group>"; };
 		54EA86C51D00C2FD0018AC85 /* argumentParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = argumentParser.h; sourceTree = SOURCE_ROOT; };
 		54EA86C61D00C2FD0018AC85 /* background.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = background.cpp; sourceTree = SOURCE_ROOT; };
 		54EA86C71D00C2FD0018AC85 /* background.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = background.h; sourceTree = SOURCE_ROOT; };
@@ -223,6 +226,7 @@
 		54EA86DA1D00C2FD0018AC85 /* Textures */ = {
 			isa = PBXGroup;
 			children = (
+				54E41F4B1D13022D0014A4BA /* shadow.png */,
 				54E41F461D11694F0014A4BA /* alien_1.png */,
 				54E41F3B1D0C3AF50014A4BA /* bullet1.png */,
 				54E41F3C1D0C3AF50014A4BA /* bullet2.png */,
