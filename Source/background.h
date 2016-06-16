@@ -49,4 +49,9 @@ public:
 
 	void draw(void);
 	void initTexture(void);
+
+	float width;	// X
+	float depth;	// Z
+	float height;	// Y
+	float startDepth;
 };

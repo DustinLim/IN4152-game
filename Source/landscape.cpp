@@ -157,7 +157,7 @@ void Ridge::createRidge()
 
 			// Storing the absolute vertex coordinates.
 			meshVertices[index] = X;
-			meshVertices[index + 2] = -Z;
+			meshVertices[index + 2] = ((Z == 0 || Z == lengthZ) && (X != 0 && X != lengthX)) ? -Z + (rand() % 10 * 0.05) : -Z;
 			meshVertices[index + 1] = Y;
 						
 			// Setting the meshColors - in this case following the coördinates and the 'B' value ('z' value) always 1;

@@ -80,7 +80,11 @@ void Background::initTexture()
 Groundfloor::Groundfloor()
 {
 	position = 0;
-	speed = 0.002;
+	speed = 0.001;
+	width = 10.0f;
+	height = -1.0f;
+	depth = 5.0f;
+	startDepth = 2.0f;
 
 	initTexture();
 }
@@ -100,10 +104,10 @@ void Groundfloor::draw()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 
 	glBegin(GL_QUADS);
-		glTexCoord2f(0 + position, 1);			glVertex3f(-3.0f, -1.0f, 5.0f);
-		glTexCoord2f(1 + position, 1);			glVertex3f(3.0f, -1.0f, 5.0f);
-		glTexCoord2f(1 + position, 0);			glVertex3f(3.0f, -1.0f, -3.0f);
-		glTexCoord2f(0 + position, 0);			glVertex3f(-3.0f, -1.0f, -3.0f);
+		glTexCoord2f(0 + position, 1);			glVertex3f(-width / 2.0f, height, startDepth);
+		glTexCoord2f(2 + position, 1);			glVertex3f(width / 2.0f, height, startDepth);
+		glTexCoord2f(2 + position, 0);			glVertex3f(width / 2.0f, height, startDepth - depth);
+		glTexCoord2f(0 + position, 0);			glVertex3f(-width / 2.0f, height, startDepth - depth);
 	glEnd();
 
 	glBindTexture(GL_TEXTURE_2D, 0);
