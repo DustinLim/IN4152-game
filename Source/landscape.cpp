@@ -29,8 +29,8 @@ Ridge::Ridge(unsigned int rn, int resX, int resZ, float startPos, float spd, dou
 	position = startPos;				
 	speed = spd;			
 	zDepth = depth;			
-	boundaryLeft = -5;			// For now the same for every ridge
-	boundaryRight = 5;			// For now the same for every ridge
+	boundaryLeft = -6;			// For now the same for every ridge
+	boundaryRight = 6;			// For now the same for every ridge
 
 	// INIT the vectors and Textures;
 	initTexture(texLoc);
@@ -246,6 +246,29 @@ void Ridge::createRidge()
 		meshNormals[(g * 3) + 1] = gpNormal[1];
 		meshNormals[(g * 3) + 2] = gpNormal[2];
 	}
+
+	// EXTRA - For each first and last gridpoint per row, we need to add these results, because the ridge continues.
+	// We only look at the first gridpoint per row and then to the calculations for both the first and last gridpoint (as their result is the same!)
+	for (int g = 0; g < numberOfGridpoints; g += numVertX)
+	{
+		// Calculate the actual normal for the gridpoints.
+		std::vector<float> gpNormal;
+		gpNormal.resize(3);
+		gpNormal[0] = (meshNormals[(g * 3)] + meshNormals[((g + numVertX - 1) * 3)])			/ 2.0f;
+		gpNormal[1] = (meshNormals[(g * 3) + 1] + meshNormals[((g + numVertX - 1) * 3) + 1])	/ 2.0f;
+		gpNormal[2] = (meshNormals[(g * 3) + 2] + meshNormals[((g + numVertX - 1) * 3) + 2])	/ 2.0f;
+		gpNormal = normalize(gpNormal);
+
+		// Double save :)
+		meshNormals[(g * 3)] = gpNormal[0];
+		meshNormals[(g * 3) + 1] = gpNormal[1];
+		meshNormals[(g * 3) + 2] = gpNormal[2];
+		meshNormals[((g + numVertX - 1) * 3)] = gpNormal[0];
+		meshNormals[((g + numVertX - 1) * 3) + 1] = gpNormal[1];
+		meshNormals[((g + numVertX - 1) * 3) + 2] = gpNormal[2];
+	}
+
+
 }
 
 //this function loads the textures in the GPU memory
