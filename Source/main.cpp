@@ -45,7 +45,7 @@ Vec3Df mouseToCharacterWorldPlane(int x, int y);
 // To do these forward declarations, use smart pointers (unique_ptr) instead.
 
 Character character = Character();
-std::vector<Entity> enemies = {};
+std::vector<Enemy> enemies = {};
 std::vector<Projectile> projectiles = {};
 std::vector<Mesh >meshes = {};
 int glutElapsedTime = 0; //in ms
@@ -294,7 +294,7 @@ void collisionDetection() {
 	//Check if any bullets hit
 	for (std::vector<Projectile>::iterator projectile = projectiles.begin(); projectile != projectiles.end();) {
 		bool broken = false;
-		for (std::vector<Entity>::iterator enemy = enemies.begin(); enemy != enemies.end();) {
+		for (std::vector<Enemy>::iterator enemy = enemies.begin(); enemy != enemies.end();) {
 			if (isHit((*projectile).getBoundingBox(), (*enemy).getBoundingBox())) {
 				enemy = enemies.erase(enemy);
 				projectile = projectiles.erase(projectile);
@@ -316,7 +316,7 @@ void collisionDetection() {
 	}
 
 	//Check if anything went outside the viewport
-	for (std::vector<Entity>::iterator enemy = enemies.begin(); enemy != enemies.end();) {
+	for (std::vector<Enemy>::iterator enemy = enemies.begin(); enemy != enemies.end();) {
 		if ((*enemy).getBoundingBox()[1][0] < topLeft[0]) {
 			enemy = enemies.erase(enemy);
 		}
@@ -337,7 +337,7 @@ void collisionDetection() {
 	}
 
 	//Check if the player didn't hit an enemy
-	for (std::vector<Entity>::iterator enemy = enemies.begin(); enemy != enemies.end();) {
+	for (std::vector<Enemy>::iterator enemy = enemies.begin(); enemy != enemies.end();) {
 		if (isHit(character.getBoundingBox(), (*enemy).getBoundingBox())) {
 			enemy = enemies.erase(enemy);
 			// Do some logic here
@@ -353,10 +353,9 @@ void spawnEnemy(int unusedValue)
 {
 	if (!toggleBoss)
 	{
-		Entity enemy = Entity();
+		Enemy enemy = Enemy();
 		enemy.position = Vec3Df(3, (rand() % 3 - 1), 0);
-		enemy.movementDirection = Vec3Df(-1, 0, 0);
-		enemy.color = Vec3Df(0, 0, 1);
+		enemy.movementDirection = Vec3Df(-1, 0.2, 0);
 		enemies.push_back(enemy);
 
 		// Repeat this
@@ -373,7 +372,11 @@ void spawnBoss(int unusedValue)
 
 Projectile spawnProjectile(Vec3Df direction)
 {
-    Projectile projectile = Projectile(character.position, direction);
+	Vec3Df spawnPos = character.getAngleRefPos();
+	direction.normalize();
+	spawnPos += direction * character.getArmRadius();
+
+    Projectile projectile = Projectile(spawnPos, direction);
 	projectile.movementSpeed = 3.0;
 	projectile.width = 0.5;
 	projectile.height = 0.5;
@@ -520,28 +523,9 @@ void mouse(int button, int state, int x, int y)
     if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN &&
         MouseMode == MOUSE_MODE_SHOOTING)
     {
-        // Shooting in the correct direction is harder than it looks..
-        // We first determine the mouse ray that goes through the near and far clipping planes.
-        //Vec3Df nearPoint, farPoint;
-        //calculateMouseRay(x, y, &nearPoint, &farPoint);
-        //Vec3Df ray = nearPoint - farPoint;
-
-        // Calculate the vertex where the mouse ray intersects the character plane
-        //float fraction = (character.position[2] - farPoint[2]) / ray[2];
-        //Vec3Df intersection = farPoint + (ray * fraction);
-
-        // We now know the correct direction
-       // Vec3Df shootingDirection = intersection - character.position;
-
-		//character.updateArmAngle(shootingDirection);
-
-        //spawnProjectile(shootingDirection);
-
-		
-		Vec3Df shootingDirection2 = mouseToCharacterWorldPlane(x, y) - character.position;
-		spawnProjectile(shootingDirection2);
-		character.updateArmAngle(shootingDirection2);
-
+		Vec3Df shootingDirection = mouseToCharacterWorldPlane(x, y) - character.getAngleRefPos();
+		spawnProjectile(shootingDirection);
+		character.updateArmAngle(mouseToCharacterWorldPlane(x, y));
     }
     else if (MouseMode == MOUSE_MODE_CAMERA)
     {
@@ -554,7 +538,7 @@ void mouse(int button, int state, int x, int y)
 void mouseMotion(int x, int y) {
 	if (MouseMode == MOUSE_MODE_SHOOTING)
 	{
-		character.updateArmAngle(mouseToCharacterWorldPlane(x, y) - character.position);
+		character.updateArmAngle(mouseToCharacterWorldPlane(x, y));
 	}
 	else if (MouseMode == MOUSE_MODE_CAMERA)
 	{
@@ -567,7 +551,7 @@ void mouseMotion(int x, int y) {
 void mousePassiveMotion(int x, int y) {
 	if (MouseMode == MOUSE_MODE_SHOOTING)
 	{
-		character.updateArmAngle(mouseToCharacterWorldPlane(x, y) - character.position);
+		character.updateArmAngle(mouseToCharacterWorldPlane(x, y));
 	}
 	else if (MouseMode == MOUSE_MODE_CAMERA)
 	{
@@ -611,6 +595,10 @@ void initTextures()
 
 void init()
 {
+    // Enable transparant textures
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    
     glDisable( GL_LIGHTING );
     glEnable( GL_LIGHT0 );
     glEnable(GL_COLOR_MATERIAL);

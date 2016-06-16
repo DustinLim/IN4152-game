@@ -52,7 +52,7 @@ private:
 	Vec3Df movement_vec;
 	Vec3Df destination;
 
-	std::vector<Mesh >meshes = {};
+	std::vector<Mesh> meshes;
 	int meshIndex = 0;
 
 	//These variables will by set by init()

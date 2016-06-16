@@ -30,6 +30,26 @@ public:
 	std::vector<Vec3Df> getBoundingBox();
 };
 
+class Enemy : public Entity
+{
+public:
+	Enemy();
+
+	void initTexture();
+
+	// Overriding
+	void draw();
+	void animate(int deltaTime);	// uses the base.
+
+
+private:
+	float angle;
+	unsigned int up;					// determines motion direction (up/down)
+	float shake_speed;					// determines rapidness of shaking motion (random over all enemies)
+	float elevate_speed;				// determines rapidness of the up-downward movement (random over all enemies)
+	float elevation;					// determines the amplitude of the up-downward movement
+};
+
 class Projectile: public Entity
 {
 public:
@@ -56,13 +76,28 @@ public:
 	Character();
 
 	void initTexture();
-	void updateArmAngle(Vec3Df direction);
+	void updateArmAngle(Vec3Df mousePos);
+	void setShoulderPos();
 
 	// Overriding
 	void draw();
-	void animate(int deltaTime);
+	void animate(int DeltaTime);
+
+	// Correct arm and bullets
+	Vec3Df getAngleRefPos();
+	void drawAngleRefPos();
+	float getArmRadius();
 
 private:
+	Vec3Df shoulderPos;			// depends on 'turnAround'
 	float armAngle;				// could be used to calculate angle for arm
 	float turnAround;			// simulates boolean
+	float gunAngle;				// used to adapt the armAngle to let the gun aim at the cursor.
+
+	// Used to scale the arm / gun solely - only consequences for drawing.
+	float drawAngle;
+	float armLength;
+	float armWidth;
+	float gunLength;
+	float gunHeight;
 };
