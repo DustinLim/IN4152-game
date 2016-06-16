@@ -104,15 +104,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="test.pro" />
-    <None Include="img_stars.ppm">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Textures\brick.ppm">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Textures\checker.ppm">
-      <Filter>Resource Files</Filter>
-    </None>
     <None Include="Textures\sand.ppm">
       <Filter>Resource Files</Filter>
     </None>
@@ -132,7 +123,22 @@
     <Image Include="Textures\astronaut-body.png">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="Textures\astronaut-complete.png">
+    <Image Include="Textures\alien_1.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Textures\astronaut-gun.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Textures\bullet1.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Textures\bullet2.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Textures\moon-surface.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Textures\space-background.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

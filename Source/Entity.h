@@ -8,12 +8,8 @@
 class Entity
 {
 public:
-	Entity();
-	~Entity(); //class destructor
-
 	Vec3Df position = Vec3Df(0, 0, 0);
 	float scale = 1.0f;
-	std::vector<GLuint> Texture;
     
     // Movement
 	Vec3Df movementDirection = Vec3Df(0, 0, 0);
@@ -24,10 +20,9 @@ public:
 	float height = 0.5f;
 	Vec3Df color = Vec3Df(1, 1, 1);
 
-	void draw();
-	void animate(int deltaTime);
-
-	std::vector<Vec3Df> getBoundingBox();
+	virtual void draw();
+	virtual void animate(int deltaTime);
+	virtual std::vector<Vec3Df> getBoundingBox();
 };
 
 class Enemy : public Entity
@@ -35,12 +30,13 @@ class Enemy : public Entity
 public:
 	Enemy();
 
-	void initTexture();
+	// Contains one texture
+	static std::vector<GLuint> textureSet;
+	static const int ENEMY_TEXTURE_ID = 0;
 
 	// Overriding
 	void draw();
 	void animate(int deltaTime);	// uses the base.
-
 
 private:
 	float angle;
@@ -57,6 +53,8 @@ public:
     
     // Two textures *must* be included here
     static std::vector<GLuint> textureSet;
+	static const int BLUE_TEXTURE_ID = 0;
+	static const int RED_TEXTURE_ID = 1;
     
     // Overriding
     void draw();
@@ -75,13 +73,18 @@ class Character : public Entity
 public:
 	Character();
 
-	void initTexture();
+	// Three textures are needed for the Character.
+	static std::vector<GLuint> textureSet;
+	static const int BODY_TEXTURE_ID = 0;
+	static const int ARM_TEXTURE_ID = 1;
+	static const int GUN_TEXTURE_ID = 2;
+
 	void updateArmAngle(Vec3Df mousePos);
 	void setShoulderPos();
 
 	// Overriding
 	void draw();
-	void animate(int DeltaTime);
+	void animate(int deltaTime);
 
 	// Correct arm and bullets
 	Vec3Df getAngleRefPos();

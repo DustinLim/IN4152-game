@@ -1,12 +1,14 @@
 #include "landscape.h"
 
+std::vector<GLuint> Ridge::textureSet;
+
 // One should not use this constructor!
 Ridge::Ridge()
 {
-	Ridge(0, 50, 10, 0, 0, 0, "./Textures/sand.ppm");
+	Ridge(0, 50, 10, 0, 0, 0);
 }
 
-Ridge::Ridge(unsigned int rn, int resX, int resZ, float startPos, float spd, double depth, const char *texLoc)
+Ridge::Ridge(unsigned int rn, int resX, int resZ, float startPos, float spd, double depth)
 {
 	ridgeNumber = rn;
 
@@ -32,9 +34,7 @@ Ridge::Ridge(unsigned int rn, int resX, int resZ, float startPos, float spd, dou
 	boundaryLeft = -5;			// For now the same for every ridge
 	boundaryRight = 5;			// For now the same for every ridge
 
-	// INIT the vectors and Textures;
-	initTexture(texLoc);
-
+	// INIT
 	meshVertices.resize(3 * numberOfGridpoints);
 	meshNormals.resize(3 * numberOfGridpoints);
 	meshTexCoords.resize(2 * numberOfGridpoints);
@@ -87,7 +87,7 @@ void Ridge::computeShadows()
 void Ridge::draw()
 {
 	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, Textures[0]);
+	glBindTexture(GL_TEXTURE_2D, textureSet[RIDGE_TEXTURE_ID]);
 
 	// start- and endpos are the start and end X-coördinate of a mountain fraction.
 	float endpos = position + lengthX;
@@ -242,17 +242,17 @@ void Ridge::createRidge()
 //the function is called once when the program starts
 void Ridge::initTexture(const char *texLoc)
 {
-	Textures.resize(1);
-	Textures[0] = 0;
+	textureSet.resize(1);
+	textureSet[RIDGE_TEXTURE_ID] = 0;
 
 	PPMImage sand(texLoc);
-	glGenTextures(1, &Textures[0]);
+	glGenTextures(1, &textureSet[RIDGE_TEXTURE_ID]);
 
-	glBindTexture(GL_TEXTURE_2D, Textures[0]);
+	glBindTexture(GL_TEXTURE_2D, textureSet[RIDGE_TEXTURE_ID]);
 	gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGB, sand.sizeX, sand.sizeY,
 		GL_RGB, GL_UNSIGNED_BYTE, sand.data);
-	glBindTexture(GL_TEXTURE_2D, 0);
-	
+	glBindTexture(GL_TEXTURE_2D, RIDGE_TEXTURE_ID);
 }
+
 
 
