@@ -80,12 +80,14 @@ void Background::initTexture()
 Groundfloor::Groundfloor()
 {
 	position = 0;
-	speed = 0.001;
-	width = 10.0f;
+	speed = 0.015;
+	width = 12.5f;
 	height = -1.0f;
 	depth = 5.0f;
 	startDepth = 2.0f;
-
+	textureWidth = 3;
+	textureDepth = textureWidth*depth / (width);
+	speed *= textureWidth / width;
 	initTexture();
 }
 
@@ -102,12 +104,11 @@ void Groundfloor::draw()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-
 	glBegin(GL_QUADS);
-		glTexCoord2f(0 + position, 1);			glVertex3f(-width / 2.0f, height, startDepth);
-		glTexCoord2f(2 + position, 1);			glVertex3f(width / 2.0f, height, startDepth);
-		glTexCoord2f(2 + position, 0);			glVertex3f(width / 2.0f, height, startDepth - depth);
-		glTexCoord2f(0 + position, 0);			glVertex3f(-width / 2.0f, height, startDepth - depth);
+		glTexCoord2f(0 + position, textureDepth);				glVertex3f(-width / 2.0f, height, startDepth);
+		glTexCoord2f(textureWidth + position, textureDepth);	glVertex3f(width / 2.0f, height, startDepth);
+		glTexCoord2f(textureWidth + position, 0);				glVertex3f(width / 2.0f, height, startDepth - depth);
+		glTexCoord2f(0 + position, 0);							glVertex3f(-width / 2.0f, height, startDepth - depth);
 	glEnd();
 
 	glBindTexture(GL_TEXTURE_2D, 0);

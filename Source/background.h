@@ -54,4 +54,6 @@ public:
 	float depth;	// Z
 	float height;	// Y
 	float startDepth;
+	float textureWidth;
+	float textureDepth;
 };
