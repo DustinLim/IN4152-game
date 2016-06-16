@@ -25,7 +25,7 @@ public:
 	static const int RIDGE_TEXTURE_ID = 0;
 	static void initTexture(const char *texLoc);
 
-	void move();
+	void move(float deltaTime);
 	void draw();
 
 	// Different steps inside these method will depend on the ridgenumber.

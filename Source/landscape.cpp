@@ -31,8 +31,8 @@ Ridge::Ridge(unsigned int rn, int resX, int resZ, float startPos, float spd, dou
 	position = startPos;				
 	speed = spd;			
 	zDepth = depth;			
-	boundaryLeft = -5;			// For now the same for every ridge
-	boundaryRight = 5;			// For now the same for every ridge
+	boundaryLeft = -8;			// For now the same for every ridge
+	boundaryRight = 8;			// For now the same for every ridge
 
 	// INIT
 	meshVertices.resize(3 * numberOfGridpoints);
@@ -50,21 +50,38 @@ Ridge::~Ridge() {}
 
 float Ridge::getHeight(float X, float Z)
 {
+	float Y;
 	if (ridgeNumber == 1)
-		return ((-(Z - scope)*(Z - scope) + scope*scope) / (scope*scope)) * (std::max(0.0, 0.3 *sin(3 * X) + 1));
-	if (ridgeNumber == 2)
-		return ((-(Z - scope)*(Z - scope) + scope*scope) / (scope*scope)) * (std::max(0.0, 0.3 *cos(3 * X) + 1));
+	{
+		Y = ((-(Z - scope)*(Z - scope) + scope*scope) / (scope*scope)) *
+			(std::max(0.0, 0.3 *sin(3 * X) + 0.6 * cos(5.0 / 6.0 * X) + 0.5 * sin(2.0 / 3.0 * X) + 1.8));
+	}
+	else if (ridgeNumber == 2)
+	{
+		Y = ((-(Z - scope)*(Z - scope) + scope*scope) / (scope*scope)) *
+			(std::max(0.0, 0.2 *cos(1.0 / 3.0 * X) + 0.3 * sin(4.0 / 3.0 * X) - 0.1 * sin(2.0 *X) + 0.7));
+	}
 	else
+	{
+		// not really implemented yet, return easy sinus.
 		return ((-(Z - scope)*(Z - scope) + scope*scope) / (scope*scope)) * (std::max(0.0, 0.3 *sin(3 * X) + 1));
+	}
+	
+	// When we are not living on the edge, add some random height.
+	if (X != 0 && X != lengthX & Z != 0 & Z != lengthZ)
+	{
+		Y += (rand() % 10) * 0.05;
+	}
+
+	return Y;
 }
 
 float Ridge::getRidgePeriod()
 {
-	// For now, the period is always the same :)
 	if (ridgeNumber == 1)
-		return (2.0 / 3.0) * M_PI;
-	if (ridgeNumber == 2)
-		return (2.0 / 3.0) * M_PI;
+		return 12.0 * M_PI;				// With help from Wolfram Alpha
+	else if (ridgeNumber == 2)
+		return 6.0 * M_PI;
 	else
 		return (2.0 / 3.0) * M_PI;
 }
@@ -72,17 +89,10 @@ float Ridge::getRidgePeriod()
 
 
 // Update the parameters needed to let the landscape move <- called in 'main->animate'
-void Ridge::move()
+void Ridge::move(float deltaTime)
 {
-	position -= speed;
+	position -= deltaTime*speed/1000.0f;
 }
-
-
-void Ridge::computeShadows()
-{
-	// Not implemented yet
-}
-
 
 void Ridge::draw()
 {
@@ -147,7 +157,7 @@ void Ridge::createRidge()
 
 			// Storing the absolute vertex coordinates.
 			meshVertices[index] = X;
-			meshVertices[index + 2] = -Z;
+			meshVertices[index + 2] = ((Z == 0 || Z == lengthZ) && (X != 0 && X != lengthX)) ? -Z + (rand() % 10 * 0.05) : -Z;
 			meshVertices[index + 1] = Y;
 						
 			// Setting the meshColors - in this case following the coördinates and the 'B' value ('z' value) always 1;
@@ -236,6 +246,29 @@ void Ridge::createRidge()
 		meshNormals[(g * 3) + 1] = gpNormal[1];
 		meshNormals[(g * 3) + 2] = gpNormal[2];
 	}
+
+	// EXTRA - For each first and last gridpoint per row, we need to add these results, because the ridge continues.
+	// We only look at the first gridpoint per row and then to the calculations for both the first and last gridpoint (as their result is the same!)
+	for (int g = 0; g < numberOfGridpoints; g += numVertX)
+	{
+		// Calculate the actual normal for the gridpoints.
+		std::vector<float> gpNormal;
+		gpNormal.resize(3);
+		gpNormal[0] = (meshNormals[(g * 3)] + meshNormals[((g + numVertX - 1) * 3)])			/ 2.0f;
+		gpNormal[1] = (meshNormals[(g * 3) + 1] + meshNormals[((g + numVertX - 1) * 3) + 1])	/ 2.0f;
+		gpNormal[2] = (meshNormals[(g * 3) + 2] + meshNormals[((g + numVertX - 1) * 3) + 2])	/ 2.0f;
+		gpNormal = normalize(gpNormal);
+
+		// Double save :)
+		meshNormals[(g * 3)] = gpNormal[0];
+		meshNormals[(g * 3) + 1] = gpNormal[1];
+		meshNormals[(g * 3) + 2] = gpNormal[2];
+		meshNormals[((g + numVertX - 1) * 3)] = gpNormal[0];
+		meshNormals[((g + numVertX - 1) * 3) + 1] = gpNormal[1];
+		meshNormals[((g + numVertX - 1) * 3) + 2] = gpNormal[2];
+	}
+
+
 }
 
 //this function loads the textures in the GPU memory

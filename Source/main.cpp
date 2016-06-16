@@ -232,18 +232,20 @@ bool isHit(std::vector<Vec3Df> bb1, std::vector<Vec3Df> bb2) {
  */
 void animate( )
 {
+	int currentTime = glutGet(GLUT_ELAPSED_TIME);
+	int deltaTime = currentTime - glutElapsedTime;
+	glutElapsedTime = currentTime;
+
+
     LightPos[0] += 0.002;
     
 	for (int i = 0; i < numberOfRidges; i++)
 	{
-		mountains[i].move();
+		mountains[i].move(deltaTime);
 	}
-	background->move();
-	groundfloor->move();
+	background->move(deltaTime);
+	groundfloor->move(deltaTime);
 
-	int currentTime = glutGet(GLUT_ELAPSED_TIME);
-	int deltaTime = currentTime - glutElapsedTime;
-	glutElapsedTime = currentTime;
 
 	for (auto &enemy : enemies) {
 		enemy.animate(deltaTime);
@@ -621,11 +623,14 @@ void init()
 	background.reset(new Background());
 	groundfloor.reset(new Groundfloor());
 	mountains.resize(numberOfRidges);
-	mountains[0] = Ridge(1, 50, 10, -3, 0.005f, -4);
-	mountains[1] = Ridge(2, 50, 10, -3, 0.0075f, -3);
+
+	mountains[0] = Ridge(1, 200, 10, -8, 0.5f, -4);
+	mountains[1] = Ridge(2, 80, 10, -8, 1.0f, -3);
 
     initTextures();
 }
+
+#pragma region "Programme Principal"
 
 int main(int argc, char** argv)
 {
@@ -711,3 +716,4 @@ void reshape(int w, int h)
     LightPos[0] = topLeft[0]; //init light position
 }
 
+#pragma endregion

@@ -13,7 +13,7 @@ public:
 	float position;
 	float speed;
 
-	void move();
+	void move(float deltaTime);
 	virtual void draw() {};
 
 };
@@ -50,4 +50,11 @@ public:
 	static GLuint texture;
 
 	void draw();
+
+	float width;	// X
+	float depth;	// Z
+	float height;	// Y
+	float startDepth;
+	float textureWidth;
+	float textureDepth;
 };
