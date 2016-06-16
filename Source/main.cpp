@@ -165,7 +165,7 @@ void display( )
 	{
 		glLightfv(GL_LIGHT0, GL_POSITION, LightPos);
 		drawLightPosition();
-		drawCoordinateSystem();
+		//drawCoordinateSystem();
 
 		// Note that drawing order has consequences for 'transparancy'
 		background->draw();
@@ -332,12 +332,12 @@ void collisionDetection() {
 void spawnEnemy(int unusedValue)
 {
 	// randomize the delay between enemies, with the base from the constant enemyRespawnDelay
-	float delay = enemyRespawnDelay + ((rand() % 6 * 200) - 1000);
+	float delay = enemyRespawnDelay + ((rand() % 6 * 200) - 700);
 
 	if (!toggleBoss)
 	{
 		Enemy enemy = Enemy();
-		enemy.position = Vec3Df(3, (rand() % 5 * 0.5 - 0.4), 0);
+		enemy.position = Vec3Df(3, (rand() % 11 * 0.2 - 0.4), 0);
 		enemy.movementDirection = Vec3Df(-1, 0, 0);
 		enemies.push_back(enemy);
 
