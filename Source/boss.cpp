@@ -194,7 +194,11 @@ void Boss::animate(float delta)
 	}
 	//Update the linger cycle
 	if (linger_time > 0)
+    {
 		linger_time -= delta;
+        if (linger_time == 0)
+            linger_time = -1; //dirty, but works
+    }
 	if (linger_time < 0)
 	{
 		linger_time = 0;
