@@ -370,7 +370,7 @@ void Character::drawAngleRefPos()
 	glColor3f(1, 1, 0);
 	glPushMatrix();
 	glTranslatef(refPos[0], refPos[1], 0.0f);
-	glutSolidSphere(0.1, 6, 6);
+	glutSolidSphere(0.02, 6, 6);
 	glPopMatrix();
 }
 
