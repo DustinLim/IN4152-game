@@ -33,9 +33,7 @@ class Boss:  public Entity
 private:
 	Leg legs[6];
 	float slices;
-	float body_height;
 	float body_radius;
-	Vec3Df center = Vec3Df();
 	int move = 0;
 
 	const Vec3Df* target;
@@ -53,7 +51,7 @@ private:
 	Vec3Df destination;
 
 	std::vector<Mesh> meshes;
-	int meshIndex = 0;
+	int meshIndex = 1;
 
 	//These variables will by set by init()
 	float body_elevation;
@@ -91,4 +89,6 @@ public:
 	Mesh& getMesh();
 	Vec3Df translation;
 	float angleHeadZ, angleHeadY;
+	Vec3Df center = Vec3Df();
+	float body_height;
 };

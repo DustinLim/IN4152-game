@@ -68,16 +68,16 @@ const int bossSpawnDelay = 10000;
 int meshIndex = 0;
 
 //Phong model properties
-float is = 1.0f;
+float is = 0.0f;
 float id = 1.0f;
-float ia = 1.0f;
+float ia = 0.0f;
 
 float ks = 0.5f;
-float kd = 0.2f;
-float ka = 0.1f;
+float kd = 1.0f;
+float ka = 0.0f;
 int alpha = 1;
 
-
+int indexer = 0;
 ////////// Lighting Functions
 
 /// Computes lighting for a single vertex with given calculation model.
@@ -95,19 +95,33 @@ Vec3Df computeLighting(Vec3Df &vertexPos, Vec3Df &normal, LightModel lightModel)
         }
 		case PHONG_LIGHTNING:
 		{
-			Vec3Df lightDir = Vec3Df(LightPos[0], LightPos[1], LightPos[2]) - vertexPos;
+			//Vec3Df lightDir = Vec3Df(LightPos[0], LightPos[1], LightPos[2]) - vertexPos;
+			Vec3Df lightDir = boss.center - vertexPos;
+			lightDir[1] = lightDir[1] + boss.body_height * 0.5f;
 			lightDir.normalize();
 
-			Vec3Df reflDir = 2 * Vec3Df::dotProduct(lightDir, normal)  *normal - lightDir;
+			if (indexer == 10) {
+				printf("%f, %f, %f\n", lightDir[0], lightDir[1], lightDir[2]);
+			}
+
+			Vec3Df reflDir = 2 * Vec3Df::dotProduct(lightDir, normal) * normal - lightDir;
 			reflDir.normalize();
 
-			Vec3Df viewDir = vertexPos - camPos;
+			Vec3Df viewDir = camPos - vertexPos;
 			viewDir.normalize();
 
 			//Using only 1 light source
-			float intentsity = ka*ia + (kd*Vec3Df::dotProduct(lightDir, normal)*id + ks*std::pow(Vec3Df::dotProduct(reflDir, viewDir), alpha)*is);
+			float ambiant = std::fmax(0, ka*ia);
+			float diffuse = std::fmax(0, kd*Vec3Df::dotProduct(lightDir, normal)*id);
+			float specular = std::fmax(0, ks*std::pow(std::fmax(0, Vec3Df::dotProduct(reflDir, viewDir)), alpha)*is);
 
-			Vec3Df final = intentsity * lightColor;
+			//float intensity = ka*ia + 
+			//	(kd*Vec3Df::dotProduct(lightDir, normal)*id + 
+			//	ks*std::pow(Vec3Df::dotProduct(reflDir, viewDir), alpha)*is);
+
+			float intensity = ambiant + diffuse + specular;
+
+			Vec3Df final = intensity * lightColor;
 
 			return final;
 		}
@@ -141,19 +155,63 @@ void computeLighting()
 	
 	std::vector<Vertex> vertices = boss.getMesh().vertices;
 	std::vector<Vec3Df> meshColors = std::vector<Vec3Df>(vertices.size());
+
+	indexer = 0;
+	auto rotMat = matrixMultiplication(
+		rotateMatrixY(boss.angleHeadY*M_PI / 180),
+				//matrixMultiplication(
+		rotateMatrixX(boss.angleHeadZ*M_PI / 180)
+				//matrixMultiplication(
+		//rotateMatrixY(M_PI + M_2_PI),
+		//rotateMatrixZ(M_2_PI)
+		//)
+		)
+		//)
+		;
+	//printf("%f, %f\n", boss.angleHeadY, boss.angleHeadZ);
 	for (int i = 0; i < vertices.size(); i++)
 	{
 		// Compute for our (single) light
-		Vertex vertex = vertices[i];
+ 		Vertex vertex = vertices[i];
+		indexer++;
+		Vec3Df vec = vertex.p;
+		//vec = calculateMatrix(rotateMatrixZ(M_2_PI), vec);
+		//vec = calculateMatrix(rotateMatrixY(M_PI + M_2_PI), vec);
+		//vec = calculateMatrix(rotateMatrixY(boss.angleHeadY*M_PI / 180), vec);
+		//vec = calculateMatrix(rotateMatrixX(M_PI), vec);
+		//vec = calculateMatrix(rotateMatrixX(boss.angleHeadZ*M_PI / 180), vec);
+		vec = calculateMatrix(rotMat, vec);
 
-		Vec3Df vec = rotateMatrixZ(90, vertex.p);
-		vec = rotateMatrixZ(boss.angleHeadZ, vec);
-		vec = rotateMatrixY(boss.angleHeadY, vec);
-		vec = vec + boss.translation;
+		//vec = calculateMatrix(rotateMatrixX(boss.angleHeadZ*M_PI / 180), vec);
+		//vec = calculateMatrix(rotateMatrixY(boss.angleHeadY*M_PI / 180), vec);
+
 		vec = vec * boss.scale;
-		vec = vec + boss.position;
+		vec = vec + boss.center;
+		//Vec3Df vec = calculateMatrix(rotMat, vertex.p);
+		vec = vec + boss.translation;
+		
 
-		Vec3Df lighting = computeLighting(vec, vertex.n, PHONG_LIGHTNING);
+		Vec3Df nor = vertex.n;
+		//nor = calculateMatrix(rotateMatrixZ(M_2_PI), nor);
+		//nor = calculateMatrix(rotateMatrixY(M_PI + M_2_PI), nor);
+		//nor = calculateMatrix(rotateMatrixY(boss.angleHeadY*M_PI / 180), nor);
+		//nor = calculateMatrix(rotateMatrixX(boss.angleHeadZ*M_PI / 180), nor);
+		nor = calculateMatrix(rotMat, nor);
+
+		//nor = calculateMatrix(rotateMatrixX(boss.angleHeadZ*M_PI / 180), nor);
+		//nor = calculateMatrix(rotateMatrixY(boss.angleHeadY*M_PI / 180), nor);
+
+		nor = nor * boss.scale;
+		nor = nor + boss.center;
+		//Vec3Df vec = calculateMatrix(rotMat, vertex.p);
+		nor = nor + boss.translation;
+		
+
+		if (i == i) {
+			//printf("%f, %f, %f\n", vec[0], vec[1], vec[2]);
+		}
+
+		Vec3Df lighting = computeLighting(vec, nor, PHONG_LIGHTNING);
 
 		meshColors[i] = lighting;
 	}
@@ -256,8 +314,8 @@ void display( )
         //glRotatef(-90.0f, 0.0f, 0.0f, 1.0f);
         //glRotatef(-90.0f, 0.0f, 1.0f, 0.0f);
 		//hoofd
-		glRotatef(90.0f, 0.0f, 0.0f, 1.0f);
-		glRotatef(-90.0f, 1.0f, 0.0f, 0.0f);
+		//glRotatef(90.0f, 0.0f, 0.0f, 1.0f);
+		//glRotatef(-90.0f, 1.0f, 0.0f, 0.0f);
         meshes[meshIndex].drawSmooth();
         glPopMatrix();
         glDisable(GL_LIGHTING);
@@ -662,7 +720,7 @@ void init()
 	mountains[1] = Ridge(2, 50, 10, -3, 0.0075f, -3, "./Textures/sand.ppm");
 
 	//TODO change mesh to correct object.
-	/*printf("Loading Mesh\n");
+	printf("Loading Mesh\n");
 	Mesh mesh = Mesh();
 	mesh.loadMesh("./Models/hoofd.obj");
 	meshes.push_back(mesh);
@@ -671,7 +729,7 @@ void init()
 	printf("Creating Grid, 8\n");
 	meshes.push_back(Grid::getReduxMesh(mesh, 8));
 	printf("Creating Grid, 4\n");
-	meshes.push_back(Grid::getReduxMesh(mesh, 4));*/
+	meshes.push_back(Grid::getReduxMesh(mesh, 4));
 
 	character.initTexture();
     initTextures();

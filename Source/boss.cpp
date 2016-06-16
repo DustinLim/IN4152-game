@@ -228,7 +228,7 @@ void Boss::drawBody()
 			glTranslatef(0, 0, body_height);
 			gluCylinder(gluNewQuadric(), 0.5, 0.25, body_height/2.0, slices, 1);
 			glTranslatef(0, 0, body_height / 2.0);
-			gluCylinder(gluNewQuadric(), 0, 0.25, 0, slices, 1);
+			gluCylinder(gluNewQuadric(), 0.25, 0, 0, slices, 1);
 		glPopMatrix();
 	glPopMatrix();
 }
@@ -247,12 +247,15 @@ void Boss::drawHead()
 			//The angles to aim at the player
 			float angle_y = -atan2f(delta[2], delta[0]) * 180.0f / M_PI;
 			float angle_z = atan2(delta[1], sqrtf(delta[0] * delta[0] + delta[2] * delta[2])) * 180.0f / M_PI;
-			angleHeadY = angle_y;
-			angleHeadZ = angle_z;
-			glRotatef(angle_y, 0, 1, 0);
-			glRotatef(angle_z, 0, 0, 1);
+			angleHeadY = angle_y +90.0f;
+			angleHeadZ = -angle_z;
+			
+			glRotatef(angleHeadY, 0, 1, 0);
+			glRotatef(angleHeadZ, 1, 0, 0);
+
+			
 		}
-		glRotatef(90.0f, 0.0f, 0.0f, 1.0f);
+		//glRotatef(90.0f, 0.0f, 0.0f, 1.0f);
 		meshes[meshIndex].drawSmooth();
 		//glColor3f(1, 1, 1);
 		//gluSphere(gluNewQuadric(), head_radius, 16, 16);
@@ -270,14 +273,23 @@ void Boss::drawHead()
 void Boss::draw()
 {
 	glPushMatrix();
+	
 	glTranslatef(position[0], position[1], position[2]);
 		glScalef(scale, scale, scale);
+		glEnable(GL_LIGHTING);
 		drawBody();
+		glDisable(GL_LIGHTING);
+
 		//Draw the head
 		drawHead();
+
 		//Draw the legs
+		glEnable(GL_LIGHTING);
 		for (int i = 0; i < 6; i++)
 			legs[i].drawLeg();
+
+		glDisable(GL_LIGHTING);
+		
 	glPopMatrix();
 }
 
