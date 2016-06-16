@@ -17,23 +17,24 @@ class Ridge
 {
 public:
 	Ridge();
-	Ridge(unsigned int rn, int resX, int resZ, float startPos, float spd, double depth, const char *texLoc);
+	Ridge(unsigned int rn, int resX, int resZ, float startPos, float spd, double depth);
 	~Ridge();
+
+	// contains one texture for all ridges
+	static std::vector<GLuint> textureSet;
+	static const int RIDGE_TEXTURE_ID = 0;
+	static void initTexture(const char *texLoc);
 
 	void move(float deltaTime);
 	void draw();
 
 	// Different steps inside these method will depend on the ridgenumber.
 	void createRidge();
-	void initTexture(const char *texLoc);
 
 	float getHeight(float X, float Z);	// Returns the 'y', thus here the ridge formulas are defined
 	float getRidgePeriod();				// Here, the different ridge periods are stored!
 
-	void computeShadows(void);		// Not implemented yet
-
-	//an array of texture (indices)
-	std::vector<GLuint> Textures;
+	void computeShadows(void);			// Not implemented yet
 
 	unsigned int ridgeNumber;
 

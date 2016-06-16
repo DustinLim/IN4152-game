@@ -114,10 +114,7 @@
     <ClCompile Include="mesh.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="img_stars.ppm" />
     <None Include="test.pro" />
-    <None Include="Textures\brick.ppm" />
-    <None Include="Textures\checker.ppm" />
     <None Include="Textures\sand.ppm" />
   </ItemGroup>
   <ItemGroup>
@@ -129,9 +126,14 @@
     </Object>
   </ItemGroup>
   <ItemGroup>
+    <Image Include="Textures\alien_1.png" />
     <Image Include="Textures\astronaut-arm.png" />
     <Image Include="Textures\astronaut-body.png" />
-    <Image Include="Textures\astronaut-complete.png" />
+    <Image Include="Textures\astronaut-gun.png" />
+    <Image Include="Textures\bullet1.png" />
+    <Image Include="Textures\bullet2.png" />
+    <Image Include="Textures\moon-surface.png" />
+    <Image Include="Textures\space-background.png" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="lib\windows\glew32s.lib" />

@@ -9,13 +9,12 @@ public:
 	Surface();
 	~Surface();
 
-	GLuint texture;
-
 	// Background Speed and 'startlocation'
 	float position;
 	float speed;
 
 	void move(float deltaTime);
+	virtual void draw() {};
 
 };
 
@@ -24,6 +23,8 @@ class Background : public Surface
 {
 public:
 	Background();
+
+	static GLuint texture;
 
 	// BOUNDARY VALUES - should follow from the screen size.
 	int heightMin;
@@ -38,8 +39,7 @@ public:
 	int quadWidth;
 	int quadHeight;
 
-	void draw(void);
-	void initTexture(void);
+	void draw();
 };
 
 class Groundfloor : public Surface
@@ -47,8 +47,9 @@ class Groundfloor : public Surface
 public:
 	Groundfloor();
 
-	void draw(void);
-	void initTexture(void);
+	static GLuint texture;
+
+	void draw();
 
 	float width;	// X
 	float depth;	// Z

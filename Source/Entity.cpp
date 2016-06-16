@@ -5,13 +5,6 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-Entity::Entity()
-{
-}
-Entity::~Entity()
-{
-}
-
 void Entity::draw()
 {
 	// Simple quad Entity
@@ -50,16 +43,16 @@ std::vector<Vec3Df> Entity::getBoundingBox() {
 
 #pragma region "Enemy"
 
+std::vector<GLuint> Enemy::textureSet;
+
 Enemy::Enemy()
 {
-	// overwrite height and width;
-	width = 0.7f;
+	width = 0.7f;		// height was 0.5f in Entity.h
 	angle = 0.0f;
 	up = 1;
 	shake_speed = rand() % 3;
 	elevate_speed = (rand() % 5) * 0.5;
 	elevation = (rand() % 11) * 0.03;
-	initTexture();
 }
 
 void Enemy::animate(int deltaTime)
@@ -78,12 +71,8 @@ void Enemy::animate(int deltaTime)
 
 void Enemy::draw()
 {
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	glEnable(GL_BLEND);
 	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, Texture[0]);
+	glBindTexture(GL_TEXTURE_2D, textureSet[ENEMY_TEXTURE_ID]);
 
 	glPushMatrix();
 	glTranslatef(position[0], position[1], position[2]);
@@ -103,17 +92,6 @@ void Enemy::draw()
 
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glDisable(GL_TEXTURE_2D);
-}
-
-void Enemy::initTexture()
-{
-	Texture.resize(1);
-
-	Texture[0] = SOIL_load_OGL_texture(
-		"./Textures/alien_1.png",
-		SOIL_LOAD_AUTO,
-		SOIL_CREATE_NEW_ID,
-		SOIL_FLAG_POWER_OF_TWO | SOIL_FLAG_MIPMAPS | SOIL_FLAG_DDS_LOAD_DIRECT);
 }
 
 #pragma endregion
@@ -151,17 +129,6 @@ void Projectile::draw()
     glTranslatef(propelledDistance, 0, 0);
     
     glBegin(GL_QUADS);
-    /*
-        float offset = size/2.0f;
-        glTexCoord2f(0,1);
-        glVertex3f(-offset, -offset, 0);
-        glTexCoord2f(1,1);
-        glVertex3f(offset, -offset, 0);
-        glTexCoord2f(1,0);
-        glVertex3f(offset, offset, 0);
-        glTexCoord2f(0,0);
-        glVertex3f(-offset, offset, 0);
-    */
         float offsetW = width/2.0f;
         float offsetH = height/ 2.0f;
         glTexCoord2f(0,1);
@@ -211,6 +178,9 @@ std::vector<Vec3Df> Projectile::getBoundingBox() {
 #pragma endregion
 
 #pragma region "Character"
+
+std::vector<GLuint> Character::textureSet;
+
 Character::Character()
 {
 	armAngle = 0.0f;
@@ -240,7 +210,7 @@ void Character::setShoulderPos()
 Vec3Df Character::getAngleRefPos()
 {
 	float anglePI = armAngle * M_PI / 180;
-	float refScale = gunHeight * scale * 0.5f;			// with the last value we can tweak the 'height' of the reference point.
+	float refScale = gunHeight * scale * 0.65f;			// with the last value we can tweak the 'height' of the reference point.
 
 	Vec3Df refPos = position + shoulderPos * scale;
 	refPos[0] += (turnAround == 0) ? -sin(anglePI) * refScale :  sin(anglePI) * refScale;
@@ -251,7 +221,7 @@ Vec3Df Character::getAngleRefPos()
 
 float Character::getArmRadius()
 {
-	return scale * (armLength + gunLength * 0.5f);		// with the last value we can tweak the spawn point of a bullit
+	return scale * (armLength + gunLength * 0.6f);		// with the last value we can tweak the spawn point of a bullit
 }
 
 void Character::updateArmAngle(Vec3Df mousePos)
@@ -267,19 +237,13 @@ void Character::updateArmAngle(Vec3Df mousePos)
 
 void Character::animate(int deltaTime)
 {
-	movementDirection.normalize();
-	position += movementDirection * movementSpeed * ((float)deltaTime / 1000);
-	// update the armAngle!
+	Entity::animate(deltaTime);
 }
 
 void Character::draw()
 {
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	glEnable(GL_BLEND);
 	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, Texture[1]);
+	glBindTexture(GL_TEXTURE_2D, textureSet[BODY_TEXTURE_ID]);
 
 	glPushMatrix();
 	glTranslatef(position[0], position[1], position[2]);
@@ -301,7 +265,7 @@ void Character::draw()
 
 	// Start of the astronaut's arm
 	// To achieve a rotation point as if it is the upper shoulder, we decouple the forward and backward pose.
-	glBindTexture(GL_TEXTURE_2D, Texture[0]);
+	glBindTexture(GL_TEXTURE_2D, textureSet[ARM_TEXTURE_ID]);
 
 	glPushMatrix();
 	// put the arm 'turning-point' on the correct start position; position scales with the size of the character!
@@ -338,7 +302,7 @@ void Character::draw()
 	glPopMatrix();
 
 	// Start of the astronaut's gun.
-	glBindTexture(GL_TEXTURE_2D, Texture[2]);
+	glBindTexture(GL_TEXTURE_2D, textureSet[GUN_TEXTURE_ID]);
 
 	// put the gun on the correct start position at the arm; scales with the size of the arm.
 	glTranslatef(-0.05f + (0.555f * armLength), 0.1f - ((0.2f + gunHeight) * turnAround), 0.0f);
@@ -358,7 +322,7 @@ void Character::draw()
 	glDisable(GL_TEXTURE_2D);
 
 	//DEBUG
-	drawAngleRefPos();
+	//drawAngleRefPos();
 }
 
 // Debug purposes; draw a yellow sphere at the location of the reference position.
@@ -370,31 +334,6 @@ void Character::drawAngleRefPos()
 	glTranslatef(refPos[0], refPos[1], 0.0f);
 	glutSolidSphere(0.1, 6, 6);
 	glPopMatrix();
-	glPopAttrib();
-}
-
-
-void Character::initTexture()
-{
-	Texture.resize(3);
-
-	Texture[0] = SOIL_load_OGL_texture(
-		"./Textures/astronaut-arm.png",
-		SOIL_LOAD_AUTO,
-		SOIL_CREATE_NEW_ID,
-		SOIL_FLAG_POWER_OF_TWO | SOIL_FLAG_MIPMAPS | SOIL_FLAG_DDS_LOAD_DIRECT);
-
-	Texture[1] = SOIL_load_OGL_texture(
-		"./Textures/astronaut-body.png",
-		SOIL_LOAD_AUTO,
-		SOIL_CREATE_NEW_ID,
-		SOIL_FLAG_POWER_OF_TWO | SOIL_FLAG_MIPMAPS | SOIL_FLAG_DDS_LOAD_DIRECT);
-
-	Texture[2] = SOIL_load_OGL_texture(
-		"./Textures/astronaut-gun.png",
-		SOIL_LOAD_AUTO,
-		SOIL_CREATE_NEW_ID,
-		SOIL_FLAG_POWER_OF_TWO | SOIL_FLAG_MIPMAPS | SOIL_FLAG_DDS_LOAD_DIRECT);
 }
 
 #pragma endregion

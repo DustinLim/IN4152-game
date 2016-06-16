@@ -4,6 +4,10 @@
 Surface::Surface(){}
 Surface::~Surface(){}
 
+#pragma region "Background"
+
+GLuint Background::texture;
+
 Background::Background()
 {
 	heightMin = -5;			// <- could we set abóve the plateau, so that it reduces drawing stuff :)
@@ -15,8 +19,6 @@ Background::Background()
 	quadHeight = 6;
 	position = 0;
 	speed = 0.1;
-
-	initTexture();
 }
 
 void Surface::move(float deltaTime)
@@ -66,16 +68,11 @@ void Background::draw()
 	glDisable(GL_TEXTURE_2D);
 }
 
-void Background::initTexture()
-{
-	texture = SOIL_load_OGL_texture(
-		"./Textures/space-background.png",
-		SOIL_LOAD_AUTO,
-		SOIL_CREATE_NEW_ID,
-		SOIL_FLAG_POWER_OF_TWO | SOIL_FLAG_MIPMAPS | SOIL_FLAG_DDS_LOAD_DIRECT);
-}
+#pragma endregion
 
+#pragma region "Groundfloor"
 
+GLuint Groundfloor::texture;
 
 Groundfloor::Groundfloor()
 {
@@ -88,7 +85,6 @@ Groundfloor::Groundfloor()
 	textureWidth = 3;
 	textureDepth = textureWidth*depth / (width);
 	speed *= textureWidth / width;
-	initTexture();
 }
 
 void Groundfloor::draw()
@@ -111,15 +107,10 @@ void Groundfloor::draw()
 		glTexCoord2f(0 + position, 0);							glVertex3f(-width / 2.0f, height, startDepth - depth);
 	glEnd();
 
+    // FIXME: balancing with this pop breaks enemy drawing..
+    //glPopAttrib();
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glDisable(GL_TEXTURE_2D);
 }
 
-void Groundfloor::initTexture()
-{
-	texture = SOIL_load_OGL_texture(
-		"./Textures/moon-surface.png",
-		SOIL_LOAD_AUTO,
-		SOIL_CREATE_NEW_ID,
-		SOIL_FLAG_POWER_OF_TWO | SOIL_FLAG_MIPMAPS | SOIL_FLAG_DDS_LOAD_DIRECT);
-}
+#pragma endregion
