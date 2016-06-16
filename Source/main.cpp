@@ -68,13 +68,13 @@ const int bossSpawnDelay = 10000;
 int meshIndex = 0;
 
 //Phong model properties
-float is = 0.0f;
+float is = 1.0f;
 float id = 1.0f;
-float ia = 0.0f;
+float ia = 0.1f;
 
 float ks = 0.5f;
 float kd = 1.0f;
-float ka = 0.0f;
+float ka = 0.5f;
 int alpha = 1;
 
 int indexer = 0;
@@ -96,12 +96,13 @@ Vec3Df computeLighting(Vec3Df &vertexPos, Vec3Df &normal, LightModel lightModel)
 		case PHONG_LIGHTNING:
 		{
 			//Vec3Df lightDir = Vec3Df(LightPos[0], LightPos[1], LightPos[2]) - vertexPos;
-			Vec3Df lightDir = boss.center - vertexPos;
-			lightDir[1] = lightDir[1] + boss.body_height * 0.5f;
+			//Vec3Df lightDir = Vec3Df(0, 0, 0) - vertexPos;
+			Vec3Df lightDir = boss.position - vertexPos;
+			//lightDir[1] = lightDir[1] + boss.body_height * 0.5f;
 			lightDir.normalize();
 
 			if (indexer == 10) {
-				printf("%f, %f, %f\n", lightDir[0], lightDir[1], lightDir[2]);
+				//printf("%f, %f, %f\n", lightDir[0], lightDir[1], lightDir[2]);
 			}
 
 			Vec3Df reflDir = 2 * Vec3Df::dotProduct(lightDir, normal) * normal - lightDir;
@@ -114,7 +115,6 @@ Vec3Df computeLighting(Vec3Df &vertexPos, Vec3Df &normal, LightModel lightModel)
 			float ambiant = std::fmax(0, ka*ia);
 			float diffuse = std::fmax(0, kd*Vec3Df::dotProduct(lightDir, normal)*id);
 			float specular = std::fmax(0, ks*std::pow(std::fmax(0, Vec3Df::dotProduct(reflDir, viewDir)), alpha)*is);
-
 			//float intensity = ka*ia + 
 			//	(kd*Vec3Df::dotProduct(lightDir, normal)*id + 
 			//	ks*std::pow(Vec3Df::dotProduct(reflDir, viewDir), alpha)*is);
@@ -184,11 +184,11 @@ void computeLighting()
 
 		//vec = calculateMatrix(rotateMatrixX(boss.angleHeadZ*M_PI / 180), vec);
 		//vec = calculateMatrix(rotateMatrixY(boss.angleHeadY*M_PI / 180), vec);
-
-		vec = vec * boss.scale;
-		vec = vec + boss.center;
-		//Vec3Df vec = calculateMatrix(rotMat, vertex.p);
 		vec = vec + boss.translation;
+		vec = vec * boss.scale;
+		vec = vec + boss.position;
+		//Vec3Df vec = calculateMatrix(rotMat, vertex.p);
+		
 		
 
 		Vec3Df nor = vertex.n;
@@ -200,11 +200,11 @@ void computeLighting()
 
 		//nor = calculateMatrix(rotateMatrixX(boss.angleHeadZ*M_PI / 180), nor);
 		//nor = calculateMatrix(rotateMatrixY(boss.angleHeadY*M_PI / 180), nor);
-
-		nor = nor * boss.scale;
-		nor = nor + boss.center;
-		//Vec3Df vec = calculateMatrix(rotMat, vertex.p);
 		nor = nor + boss.translation;
+		nor = nor * boss.scale;
+		nor = nor + boss.position;
+		//Vec3Df vec = calculateMatrix(rotMat, vertex.p);
+		
 		
 
 		if (i == i) {

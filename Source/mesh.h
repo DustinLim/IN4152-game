@@ -51,6 +51,8 @@ public:
     void drawSmooth();
     void computeBoundingCube();
 
+	void fillMeshColors();
+
     //Bounding box information
 	//point of bounding box with minimal coordinates ("lower left corner")
     Vec3Df bbOrigin;

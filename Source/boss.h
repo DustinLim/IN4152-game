@@ -51,7 +51,7 @@ private:
 	Vec3Df destination;
 
 	std::vector<Mesh> meshes;
-	int meshIndex = 1;
+	int meshIndex = 0;
 
 	//These variables will by set by init()
 	float body_elevation;

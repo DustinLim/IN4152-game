@@ -142,6 +142,8 @@ Boss::Boss(Vec3Df pos, float speed, float scale)
 	printf("Creating Grid, 4\n");
 	meshes.push_back(Grid::getReduxMesh(mesh, 4));
 
+	translation = Vec3Df(0, body_height + meshes[meshIndex].bbEdgeSize, 0);
+
 	init();
 	nextMove(move);
 }

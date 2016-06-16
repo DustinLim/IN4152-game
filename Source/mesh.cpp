@@ -249,15 +249,19 @@ bool Mesh::loadMesh(const char * filename)
     }
     fclose(in);
 
-	meshColor.resize(vertices.size());
-	for (int i = 0; i < meshColor.size(); i++) {
-		meshColor[i] = Vec3Df(0, 1, 0);
-	}
+	fillMeshColors();
 
     centerAndScaleToUnit ();
     computeVertexNormals();
 	computeBoundingCube();
     return true;
+}
+
+void Mesh::fillMeshColors() {
+	meshColor.resize(vertices.size());
+	for (int i = 0; i < meshColor.size(); i++) {
+		meshColor[i] = Vec3Df(0, 1, 0);
+	}
 }
 
 #ifdef WIN32
