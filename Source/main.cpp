@@ -603,8 +603,8 @@ void init()
 	background.reset(new Background());
 	groundfloor.reset(new Groundfloor());
 	mountains.resize(numberOfRidges);
-	mountains[0] = Ridge(1, 200, 10, -5, 0.0075f, -4, "./Textures/sand.ppm");
-	mountains[1] = Ridge(2, 80, 10, -5, 0.015f, -3, "./Textures/sand.ppm");
+	mountains[0] = Ridge(1, 200, 10, -8, 0.0075f, -4, "./Textures/sand.ppm");
+	mountains[1] = Ridge(2, 80, 10, -8, 0.015f, -3, "./Textures/sand.ppm");
 
 	//TODO change mesh to correct object.
 	/*printf("Loading Mesh\n");

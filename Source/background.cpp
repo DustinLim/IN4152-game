@@ -8,11 +8,11 @@ Background::Background()
 {
 	heightMin = -5;			// <- could we set abóve the plateau, so that it reduces drawing stuff :)
 	heightMax = 5;
-	widthMin = -6;
+	widthMin = -8;
 	widthMax = 8;
 	depth = -5;
 	quadWidth = 8;
-	quadHeight = 8;
+	quadHeight = 6;
 	position = 0;
 	speed = 0.001;
 

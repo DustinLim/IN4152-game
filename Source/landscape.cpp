@@ -29,8 +29,8 @@ Ridge::Ridge(unsigned int rn, int resX, int resZ, float startPos, float spd, dou
 	position = startPos;				
 	speed = spd;			
 	zDepth = depth;			
-	boundaryLeft = -6;			// For now the same for every ridge
-	boundaryRight = 6;			// For now the same for every ridge
+	boundaryLeft = -8;			// For now the same for every ridge
+	boundaryRight = 8;			// For now the same for every ridge
 
 	// INIT the vectors and Textures;
 	initTexture(texLoc);
