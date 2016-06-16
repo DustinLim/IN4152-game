@@ -113,15 +113,13 @@ void computeLighting()
 
 #pragma region "Draw Functions"
 
-//function to draw coordinate simply colored axes with a certain length (1 as a default)
-void drawCoordSystem(float length=1)
+void drawCoordinateSystem(float length=1)
 {
-	//remember GPU state
+	// Setup
     GLboolean lightingWasEnabled = glIsEnabled(GL_LIGHTING);
-
-    //deactivate the lighting state
 	glDisable(GL_LIGHTING);
-	//draw axes
+
+    // Draw
 	glBegin(GL_LINES);
 		glColor3f(1,0,0);
 		glVertex3f(0,0,0);
@@ -136,30 +134,28 @@ void drawCoordSystem(float length=1)
 		glVertex3f(0,0,length);
 	glEnd();
 	
-	//reset to previous state
+	// Cleanup
     if (lightingWasEnabled) {
         glEnable(GL_LIGHTING);
     }
 }
 
-
-void drawLight()
+void drawLightPosition()
 {
-	//remember all states of the GPU
+    // Setup
 	glPushAttrib(GL_ALL_ATTRIB_BITS);
-	//deactivate the lighting state
 	glDisable(GL_LIGHTING);
-	//yellow sphere at light position
-	glColor3f(1, 1, 0);
-	glPushMatrix();
-	glTranslatef(LightPos[0], LightPos[1], LightPos[2]);
-	glutSolidSphere(0.1, 6, 6);
-	glPopMatrix();
+    glPushMatrix();
+	
+    // Draw
+    glTranslatef(LightPos[0], LightPos[1], LightPos[2]);
+    glColor3f(1, 1, 0);
+	glutSolidSphere(0.1, 9, 9);
 
-	//reset to previous state
+    // Cleanup
+    glPopMatrix();
 	glPopAttrib();
 }
-
 
 void display( )
 {
@@ -168,8 +164,8 @@ void display( )
 	case GAME:
 	{
 		glLightfv(GL_LIGHT0, GL_POSITION, LightPos);
-		drawLight();
-		drawCoordSystem();
+		drawLightPosition();
+		drawCoordinateSystem();
 
 		// Note that drawing order has consequences for 'transparancy'
 		background->draw();
@@ -178,10 +174,6 @@ void display( )
 			mountains[i].draw();
 		}
 		groundfloor->draw();
-
-
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 		for (auto &enemy : enemies) {
 			enemy.draw();
@@ -197,8 +189,6 @@ void display( )
 			boss.draw();
 
         character.draw();
-
-		glPopAttrib();
 		
 		break;
 	}
@@ -548,7 +538,6 @@ void calculateWorldSpaceViewportBounds() {
 	bottomRight = farPoint +(ray * fraction);
 }
 
-
 // Load and store all textures in the static textureSets. The ID's of correct textures are denoted in the .h files!
 void initTextures()
 {
@@ -613,27 +602,18 @@ void initTextures()
 
 void init()
 {
+    // Enable transparant textures
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    
     glDisable( GL_LIGHTING );
     glEnable( GL_LIGHT0 );
     glEnable(GL_COLOR_MATERIAL);
     glEnable(GL_NORMALIZE);
-
-	//int MatSpec [4] = {1,1,1,1};
- //   glMaterialiv(GL_FRONT_AND_BACK,GL_SPECULAR,MatSpec);
- //   glMateriali(GL_FRONT_AND_BACK,GL_SHININESS,10);
-
-
-    // Enable Depth test
     glEnable( GL_DEPTH_TEST );
-	
-	//glEnable(GL_CULL_FACE);
-    //glCullFace(GL_BACK);
-	//Draw frontfacing polygons as filled
     glPolygonMode(GL_FRONT,GL_FILL);
-	//draw backfacing polygons as outlined
     glPolygonMode(GL_BACK,GL_LINE);
 	glShadeModel(GL_SMOOTH);
-	//loadMesh("David.obj");
 
 	background.reset(new Background());
 	groundfloor.reset(new Groundfloor());
@@ -641,24 +621,9 @@ void init()
 	mountains[0] = Ridge(1, 50, 10, -3, 0.005f, -4);
 	mountains[1] = Ridge(2, 50, 10, -3, 0.0075f, -3);
 
-	//TODO change mesh to correct object.
-	/*printf("Loading Mesh\n");
-	Mesh mesh = Mesh();
-	mesh.loadMesh("./Models/hoofd.obj");
-	meshes.push_back(mesh);
-	printf("Creating Grid, 16\n");
-	meshes.push_back(Grid::getReduxMesh(mesh, 16));
-	printf("Creating Grid, 8\n");
-	meshes.push_back(Grid::getReduxMesh(mesh, 8));
-	printf("Creating Grid, 4\n");
-	meshes.push_back(Grid::getReduxMesh(mesh, 4));*/
-
     initTextures();
 }
 
-/**
- * Programme principal
- */
 int main(int argc, char** argv)
 {
     glutInit(&argc, argv);
@@ -717,7 +682,6 @@ void displayInternal(void)
     glClearColor (0.0, 0.0, 0.0, 0.0);
     glClear( GL_COLOR_BUFFER_BIT  | GL_DEPTH_BUFFER_BIT); // la couleur et le z
     
-
     glLoadIdentity();  // repere camera
 
     tbVisuTransform(); // origine et orientation de la scene

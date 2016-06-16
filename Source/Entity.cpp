@@ -5,13 +5,6 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-Entity::Entity()
-{
-}
-Entity::~Entity()
-{
-}
-
 void Entity::draw()
 {
 	// Simple quad Entity
@@ -341,7 +334,6 @@ void Character::drawAngleRefPos()
 	glTranslatef(refPos[0], refPos[1], 0.0f);
 	glutSolidSphere(0.1, 6, 6);
 	glPopMatrix();
-	glPopAttrib();
 }
 
 #pragma endregion
