@@ -55,7 +55,7 @@ unique_ptr<Groundfloor> groundfloor;
 std::vector<Ridge> mountains;
 int numberOfRidges = 2;
 bool toggleBoss = false;
-Boss boss = Boss(Vec3Df(6, -1, -2), -1, 0.5);;
+Boss boss = Boss(Vec3Df(8, -1, -2), -1, 0.5);;
 
 // Game timing constants (in ms)
 const int firstEnemySpawnDelay = 3000;
@@ -237,10 +237,6 @@ void display( )
 			mountains[i].draw();
 		}
 		groundfloor->draw();
-
-		for (auto &enemy : enemies) {
-			enemy.draw();
-		}
 		
 		if (toggleBoss)
 			boss.draw();
@@ -252,7 +248,9 @@ void display( )
 		glEnable(GL_DEPTH_TEST);
 
         character.draw();
-		
+		for (auto &enemy : enemies) {
+			enemy.draw();
+		}
 		break;
 	}
     case MESH:
@@ -322,7 +320,7 @@ void animate( )
 	character.position[0] = std::fmin(character.position[0], bottomRight[0] - (character.width / 2.0f) * character.scale);
 
 	character.position[1] = std::fmin(character.position[1], topLeft[1] - (character.height / 2.0f) * character.scale);
-	character.position[1] = std::fmax(character.position[1], bottomRight[1] + (character.height / 2.0f) * character.scale);
+	character.position[1] = std::fmax(character.position[1], bottomRight[1] + (character.height / 2.0f) * character.scale + 1.0);
 
 	if (toggleBoss)
 		boss.animate(deltaTime);
@@ -400,7 +398,7 @@ void spawnEnemy(int unusedValue)
 	if (!toggleBoss)
 	{
 		Enemy enemy = Enemy();
-		enemy.position = Vec3Df(3, (rand() % 11 * 0.2 - 0.4), 0);
+		enemy.position = Vec3Df(4, (rand() % 11 * 0.2 - 0.4), 0);
 		enemy.movementDirection = Vec3Df(-1, 0, 0);
 		enemies.push_back(enemy);
 
@@ -667,6 +665,12 @@ void initTextures()
 		SOIL_CREATE_NEW_ID,
 		SOIL_FLAG_POWER_OF_TWO | SOIL_FLAG_MIPMAPS | SOIL_FLAG_DDS_LOAD_DIRECT);
 	Groundfloor::texture = texture;
+
+	texture = SOIL_load_OGL_texture("./Textures/shadow.png",
+		SOIL_LOAD_AUTO,
+		SOIL_CREATE_NEW_ID,
+		SOIL_FLAG_POWER_OF_TWO | SOIL_FLAG_MIPMAPS | SOIL_FLAG_DDS_LOAD_DIRECT);
+	Entity::shadowTexture = texture;
 
 }
 

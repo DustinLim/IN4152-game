@@ -23,6 +23,7 @@ public:
 	virtual void draw();
 	virtual void animate(int deltaTime);
 	virtual std::vector<Vec3Df> getBoundingBox();
+	static GLuint shadowTexture;
 };
 
 class Enemy : public Entity
