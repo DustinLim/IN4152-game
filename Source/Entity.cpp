@@ -5,6 +5,8 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
+GLuint Entity::shadowTexture;
+
 void Entity::draw()
 {
 	// Simple quad Entity
@@ -77,7 +79,7 @@ void Enemy::draw()
 	glPushMatrix();
 	glTranslatef(position[0], position[1], position[2]);
 	glRotatef(angle, 0.0f, 0.0f, 1.0f);
-	
+	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 	glNormal3f(0, 0, 1);
 	
 	float offsetH = height / 2.0f;
@@ -88,6 +90,21 @@ void Enemy::draw()
 		glTexCoord2f(1.0f, 0.0f);		glVertex3f(offsetW, offsetH, 0);
 		glTexCoord2f(0.0f, 0.0f);		glVertex3f(-offsetW, offsetH, 0);
 	glEnd();
+	glPopMatrix();
+
+	//Draw a shadow
+	glPushMatrix();
+		glTranslatef(position[0] + 0.04f, -1, 0);
+		glScalef(scale, scale, scale);
+		glColor4f(1.0f, 1.0f, 1.0f, 0.9f - 0.1*(position[1] + 0.5));
+		glBindTexture(GL_TEXTURE_2D, shadowTexture);
+		float shadow_size = width * (0.4 + (position[1] + 0.5) / 4.0f);
+		glBegin(GL_QUADS);
+			glTexCoord2f(0.0f, 1.0f); 		glVertex3f(shadow_size, 0.1, -shadow_size);
+			glTexCoord2f(1.0f, 1.0f);		glVertex3f(-shadow_size, 0.1, -shadow_size);
+			glTexCoord2f(1.0f, 0.0f);		glVertex3f(-shadow_size, 0.1, shadow_size);
+			glTexCoord2f(0.0f, 0.0f);		glVertex3f(shadow_size, 0.1, shadow_size);
+		glEnd();
 	glPopMatrix();
 
 	glBindTexture(GL_TEXTURE_2D, 0);
@@ -319,6 +336,22 @@ void Character::draw()
 
 	glPopMatrix();
 	glPopMatrix();
+
+	//Draw a shadow
+	glPushMatrix();
+		glTranslatef(position[0]+0.04f, -0.95f, 0);
+		glScalef(scale, scale, scale);
+		glColor4f(1.0f, 1.0f, 1.0f, 0.9f -0.1*(position[1]+0.5));
+		glBindTexture(GL_TEXTURE_2D, shadowTexture);
+		float shadow_size = width * (0.8 + (position[1] + 0.5) / 4.0f);
+		glBegin(GL_QUADS);
+			glTexCoord2f(0.0f, 1.0f); 		glVertex3f(shadow_size, 0.1, -shadow_size);
+			glTexCoord2f(1.0f, 1.0f);		glVertex3f(-shadow_size, 0.1, -shadow_size);
+			glTexCoord2f(1.0f, 0.0f);		glVertex3f(-shadow_size, 0.1, shadow_size);
+			glTexCoord2f(0.0f, 0.0f);		glVertex3f(shadow_size, 0.1, shadow_size);
+		glEnd();
+	glPopMatrix();
+
 
     // FIXME: should't be here, but fixed windows resizing..
     glPopAttrib();
