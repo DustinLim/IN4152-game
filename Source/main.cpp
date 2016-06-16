@@ -401,7 +401,7 @@ void spawnEnemy(int unusedValue)
 	if (!toggleBoss)
 	{
 		Enemy enemy = Enemy();
-		enemy.position = Vec3Df(4, (rand() % 11 * 0.2 - 0.4), 0);
+		enemy.position = Vec3Df(4, (rand() % 10 * 0.2 - 0.4), 0);
 		enemy.movementDirection = Vec3Df(-1, 0, 0);
 		enemies.push_back(enemy);
 
