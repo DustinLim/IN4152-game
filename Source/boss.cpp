@@ -135,12 +135,20 @@ Boss::Boss(Vec3Df pos, float speed, float scale)
 	Mesh mesh = Mesh();
 	mesh.loadMesh("./Models/hoofd.obj");
 	meshes.push_back(mesh);
+	printf("Creating Grid, 24\n");
+	meshes.push_back(Grid::getReduxMesh(mesh, 24));
+	printf("Creating Grid, 20\n");
+	meshes.push_back(Grid::getReduxMesh(mesh, 20));
 	printf("Creating Grid, 16\n");
 	meshes.push_back(Grid::getReduxMesh(mesh, 16));
+	printf("Creating Grid, 12\n");
+	meshes.push_back(Grid::getReduxMesh(mesh, 12));
 	printf("Creating Grid, 8\n");
 	meshes.push_back(Grid::getReduxMesh(mesh, 8));
 	printf("Creating Grid, 4\n");
 	meshes.push_back(Grid::getReduxMesh(mesh, 4));
+
+	translation = Vec3Df(0, body_height + meshes[meshIndex].bbEdgeSize, 0);
 
 	init();
 	nextMove(move);
@@ -228,7 +236,7 @@ void Boss::drawBody()
 			glTranslatef(0, 0, body_height);
 			gluCylinder(gluNewQuadric(), 0.5, 0.25, body_height/2.0, slices, 1);
 			glTranslatef(0, 0, body_height / 2.0);
-			gluCylinder(gluNewQuadric(), 0, 0.25, 0, slices, 1);
+			gluCylinder(gluNewQuadric(), 0.25, 0, 0, slices, 1);
 		glPopMatrix();
 	glPopMatrix();
 }
@@ -247,10 +255,15 @@ void Boss::drawHead()
 			//The angles to aim at the player
 			float angle_y = -atan2f(delta[2], delta[0]) * 180.0f / M_PI;
 			float angle_z = atan2(delta[1], sqrtf(delta[0] * delta[0] + delta[2] * delta[2])) * 180.0f / M_PI;
-			glRotatef(angle_y, 0, 1, 0);
-			glRotatef(angle_z, 0, 0, 1);
+			angleHeadY = angle_y +90.0f;
+			angleHeadZ = -angle_z;
+			
+			glRotatef(angleHeadY, 0, 1, 0);
+			glRotatef(angleHeadZ, 1, 0, 0);
+
+			
 		}
-		glRotatef(90.0f, 0.0f, 0.0f, 1.0f);
+		//glRotatef(90.0f, 0.0f, 0.0f, 1.0f);
 		meshes[meshIndex].drawSmooth();
 		//glColor3f(1, 1, 1);
 		//gluSphere(gluNewQuadric(), head_radius, 16, 16);
@@ -268,14 +281,23 @@ void Boss::drawHead()
 void Boss::draw()
 {
 	glPushMatrix();
+	
 	glTranslatef(position[0], position[1], position[2]);
 		glScalef(scale, scale, scale);
+		glEnable(GL_LIGHTING);
 		drawBody();
+		glDisable(GL_LIGHTING);
+
 		//Draw the head
 		drawHead();
+
 		//Draw the legs
+		glEnable(GL_LIGHTING);
 		for (int i = 0; i < 6; i++)
 			legs[i].drawLeg();
+
+		glDisable(GL_LIGHTING);
+		
 	glPopMatrix();
 }
 
@@ -367,6 +389,8 @@ void Boss::hit() {
 
 		meshIndex = 0;
 	}
+
+	translation = Vec3Df(0, body_height + meshes[meshIndex].bbEdgeSize, 0);
 }
 
 float Boss::getHeadWidth() {
@@ -386,6 +410,6 @@ std::vector<Vec3Df> Boss::getBoundingBox() {
 	return list;
 }
 
-Mesh Boss::getMesh() {
+Mesh& Boss::getMesh() {
 	return meshes[meshIndex];
 }

@@ -33,9 +33,7 @@ class Boss:  public Entity
 private:
 	Leg legs[6];
 	float slices;
-	float body_height;
 	float body_radius;
-	Vec3Df center = Vec3Df();
 	int move = 0;
 
 	const Vec3Df* target;
@@ -88,5 +86,9 @@ public:
 	float getHeadWidth();
 	//Gets bounding box for head
 	std::vector<Vec3Df> getBoundingBox();
-	Mesh getMesh();
+	Mesh& getMesh();
+	Vec3Df translation;
+	float angleHeadZ, angleHeadY;
+	Vec3Df center = Vec3Df();
+	float body_height;
 };

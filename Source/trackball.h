@@ -12,6 +12,7 @@ BTW all comments here are French. :)
 
 #include <math.h>
 #include "matrix.h"
+#include "Vec3D.h"
 
 static const float speedfact = 0.2;
 
@@ -194,5 +195,20 @@ void tbProject( const GLdouble *m, const GLdouble* p, GLdouble* q )
     //cout<<"proj: "<<pp[0]<<", "<<pp[1]<<", "<<pp[2]<<", "<<pp[3]<<endl;
     project( tb_inverse, pp, q );
     //cout<<"projRep: "<<q[0]<<", "<<q[1]<<", "<<q[2]<<", "<<q[3]<<endl;
+}
+
+void tbProject(const GLdouble* p, GLfloat* q) {
+	project(tb_inverse, p, q);
+}
+
+Vec3Df getCameraPosition() {
+	const GLdouble p[] = { 0, 0, 0, 1 };
+	GLfloat LightP[4];
+	tbProject(p, LightP);
+	Vec3Df LightPos;
+	LightPos[0] = LightP[0];
+	LightPos[1] = LightP[1];
+	LightPos[2] = LightP[2];
+	return LightPos;
 }
 #endif

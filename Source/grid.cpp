@@ -175,7 +175,7 @@ Mesh Grid::getReduxMesh(Mesh mesh, int resolution) {
 	simplified.centerAndScaleToUnit();
 	simplified.computeVertexNormals();
 	simplified.computeBoundingCube();
-
+	simplified.fillMeshColors();
 
 	return simplified;
 }

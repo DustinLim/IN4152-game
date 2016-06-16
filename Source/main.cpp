@@ -33,6 +33,7 @@ unsigned int H_fen = 600;  // screen height
 Vec3Df topLeft, bottomRight;
 
 float LightPos[4] = {0, 1.6, 0, 1};
+Vec3Df camPos;
 
 ////////// Declare your own global variables here:
 void calculateWorldSpaceViewportBounds();
@@ -64,7 +65,17 @@ const int bossSpawnDelay = 1000000;
 //TODO remove this again
 int meshIndex = 0;
 
+//Phong model properties
+float is = 1.0f;
+float id = 1.0f;
+float ia = 0.1f;
 
+float ks = 0.5f;
+float kd = 1.0f;
+float ka = 0.5f;
+int alpha = 1;
+
+////////// Lighting Functions
 #pragma region "Lightning"
 
 /// Computes lighting for a single vertex with given calculation model.
@@ -82,7 +93,25 @@ Vec3Df computeLighting(Vec3Df &vertexPos, Vec3Df &normal, LightModel lightModel)
         }
 		case PHONG_LIGHTNING:
 		{
-			return Vec3Df(1, 0, 0);
+			Vec3Df lightDir = boss.position - vertexPos;
+			lightDir.normalize();
+
+			Vec3Df reflDir = 2 * Vec3Df::dotProduct(lightDir, normal) * normal - lightDir;
+			reflDir.normalize();
+
+			Vec3Df viewDir = camPos - vertexPos;
+			viewDir.normalize();
+
+			//Using only 1 light source
+			float ambiant = std::fmax(0, ka*ia);
+			float diffuse = std::fmax(0, kd*Vec3Df::dotProduct(lightDir, normal)*id);
+			float specular = std::fmax(0, ks*std::pow(std::fmax(0, Vec3Df::dotProduct(reflDir, viewDir)), alpha)*is);
+
+			float intensity = ambiant + diffuse + specular;
+
+			Vec3Df final = intensity * lightColor;
+
+			return final;
 		}
         default:
             return Vec3Df(0, 0, 0);
@@ -114,13 +143,30 @@ void computeLighting()
 	
 	std::vector<Vertex> vertices = boss.getMesh().vertices;
 	std::vector<Vec3Df> meshColors = std::vector<Vec3Df>(vertices.size());
+
+	auto rotMat = matrixMultiplication(
+		rotateMatrixY(boss.angleHeadY*M_PI / 180),
+		rotateMatrixX(boss.angleHeadZ*M_PI / 180)
+		);
+	
 	for (int i = 0; i < vertices.size(); i++)
 	{
 		// Compute for our (single) light
-		Vertex vertex = vertices[i];
-		Vec3Df lighting = computeLighting(vertex.p, vertex.n, PHONG_LIGHTNING);
+ 		Vertex vertex = vertices[i];
+		Vec3Df vec = vertex.p;
+		vec = calculateMatrix(rotMat, vec);
+		vec = vec + boss.translation;
+		vec = vec * boss.scale;
+		vec = vec + boss.position;
 
-		// Pass computed values to Ridge
+		Vec3Df nor = vertex.n;
+		nor = calculateMatrix(rotMat, nor);
+		nor = nor + boss.translation;
+		nor = nor * boss.scale;
+		nor = nor + boss.position;
+
+		Vec3Df lighting = computeLighting(vec, nor, PHONG_LIGHTNING);
+
 		meshColors[i] = lighting;
 	}
 	boss.getMesh().meshColor = meshColors;
@@ -191,17 +237,15 @@ void display( )
 			mountains[i].draw();
 		}
 		groundfloor->draw();
-
-		
-        
-        glDisable(GL_DEPTH_TEST);
-        for (auto &projectile : projectiles) {
-			projectile.draw();
-		}
-        glEnable(GL_DEPTH_TEST);
 		
 		if (toggleBoss)
 			boss.draw();
+
+		glDisable(GL_DEPTH_TEST);
+		for (auto &projectile : projectiles) {
+			projectile.draw();
+		}
+		glEnable(GL_DEPTH_TEST);
 
         character.draw();
 		for (auto &enemy : enemies) {
@@ -217,8 +261,8 @@ void display( )
         //glRotatef(-90.0f, 0.0f, 0.0f, 1.0f);
         //glRotatef(-90.0f, 0.0f, 1.0f, 0.0f);
 		//hoofd
-		glRotatef(90.0f, 0.0f, 0.0f, 1.0f);
-		glRotatef(-90.0f, 1.0f, 0.0f, 0.0f);
+		//glRotatef(90.0f, 0.0f, 0.0f, 1.0f);
+		//glRotatef(-90.0f, 1.0f, 0.0f, 0.0f);
         meshes[meshIndex].drawSmooth();
         glPopMatrix();
         glDisable(GL_LIGHTING);
@@ -515,6 +559,7 @@ void mouse(int button, int state, int x, int y)
         // Pass this event to trackball.h
         tbMouseFunc(button, state, x, y);
 		calculateWorldSpaceViewportBounds();
+		camPos = getCameraPosition();
     }
 }
 
@@ -528,6 +573,7 @@ void mouseMotion(int x, int y) {
 		// Pass this event to trackball.h
 		tbMotionFunc(x, y);
 		calculateWorldSpaceViewportBounds();
+		camPos = getCameraPosition();
 	}
 }
 
@@ -737,6 +783,7 @@ void reshape(int w, int h)
 
 	calculateWorldSpaceViewportBounds();
     LightPos[0] = topLeft[0]; //init light position
+	camPos = getCameraPosition();
 }
 
 #pragma endregion
