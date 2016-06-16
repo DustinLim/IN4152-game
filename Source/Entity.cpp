@@ -183,6 +183,8 @@ std::vector<GLuint> Character::textureSet;
 
 Character::Character()
 {
+	movementSpeed = 2;
+
 	armAngle = 0.0f;
 	turnAround = 0;
 	width = 0.8f;			

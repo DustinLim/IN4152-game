@@ -59,7 +59,7 @@ Boss boss = Boss(Vec3Df(6, -1, -2), -1, 0.5);;
 // Game timing constants (in ms)
 const int firstEnemySpawnDelay = 3000;
 const int enemyRespawnDelay = 1500;
-const int bossSpawnDelay = 10000;
+const int bossSpawnDelay = 1000000;
 
 //TODO remove this again
 int meshIndex = 0;
@@ -329,15 +329,18 @@ void collisionDetection() {
 // Method parameter is required to be registered by glutTimerFunc()
 void spawnEnemy(int unusedValue)
 {
+	// randomize the delay between enemies, with the base from the constant enemyRespawnDelay
+	float delay = enemyRespawnDelay + ((rand() % 6 * 200) - 1000);
+
 	if (!toggleBoss)
 	{
 		Enemy enemy = Enemy();
-		enemy.position = Vec3Df(3, (rand() % 4 * 0.5 - 0.5), 0);
+		enemy.position = Vec3Df(3, (rand() % 5 * 0.5 - 0.4), 0);
 		enemy.movementDirection = Vec3Df(-1, 0, 0);
 		enemies.push_back(enemy);
 
 		// Repeat this
-		glutTimerFunc(enemyRespawnDelay, spawnEnemy, 0);
+		glutTimerFunc(delay, spawnEnemy, 0);
 	}
 }
 
