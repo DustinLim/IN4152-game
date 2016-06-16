@@ -60,7 +60,7 @@ Boss boss = Boss(Vec3Df(8, -1, -2), -1, 0.5);;
 // Game timing constants (in ms)
 const int firstEnemySpawnDelay = 3000;
 const int enemyRespawnDelay = 1500;
-const int bossSpawnDelay = 1000000;
+const int bossSpawnDelay = 30000;
 
 //TODO remove this again
 int meshIndex = 0;
@@ -70,8 +70,8 @@ float is = 1.0f;
 float id = 1.0f;
 float ia = 0.1f;
 
-float ks = 0.5f;
-float kd = 1.0f;
+float ks = 1.0f;
+float kd = 0.8f;
 float ka = 0.5f;
 int alpha = 1;
 
@@ -82,6 +82,7 @@ int alpha = 1;
 Vec3Df computeLighting(Vec3Df &vertexPos, Vec3Df &normal, LightModel lightModel)
 {
     const Vec3Df lightColor = Vec3Df(1,1,1);
+	const Vec3Df lightColorBoss = Vec3Df(1, 0, 0);
     
     switch (lightModel) {
         case DIFFUSE_LIGHTING:
@@ -109,7 +110,7 @@ Vec3Df computeLighting(Vec3Df &vertexPos, Vec3Df &normal, LightModel lightModel)
 
 			float intensity = ambiant + diffuse + specular;
 
-			Vec3Df final = intensity * lightColor;
+			Vec3Df final = intensity * lightColorBoss;
 
 			return final;
 		}
@@ -141,35 +142,37 @@ void computeLighting()
         }
     }
 	
-	std::vector<Vertex> vertices = boss.getMesh().vertices;
-	std::vector<Vec3Df> meshColors = std::vector<Vec3Df>(vertices.size());
+	if (toggleBoss) {
+		std::vector<Vertex> vertices = boss.getMesh().vertices;
+		std::vector<Vec3Df> meshColors = std::vector<Vec3Df>(vertices.size());
 
-	auto rotMat = matrixMultiplication(
-		rotateMatrixY(boss.angleHeadY*M_PI / 180),
-		rotateMatrixX(boss.angleHeadZ*M_PI / 180)
-		);
-	
-	for (int i = 0; i < vertices.size(); i++)
-	{
-		// Compute for our (single) light
- 		Vertex vertex = vertices[i];
-		Vec3Df vec = vertex.p;
-		vec = calculateMatrix(rotMat, vec);
-		vec = vec + boss.translation;
-		vec = vec * boss.scale;
-		vec = vec + boss.position;
+		auto rotMat = matrixMultiplication(
+			rotateMatrixY(boss.angleHeadY*M_PI / 180),
+			rotateMatrixX(boss.angleHeadZ*M_PI / 180)
+			);
 
-		Vec3Df nor = vertex.n;
-		nor = calculateMatrix(rotMat, nor);
-		nor = nor + boss.translation;
-		nor = nor * boss.scale;
-		nor = nor + boss.position;
+		for (int i = 0; i < vertices.size(); i++)
+		{
+			// Compute for our (single) light
+			Vertex vertex = vertices[i];
+			Vec3Df vec = vertex.p;
+			vec = calculateMatrix(rotMat, vec);
+			vec = vec + boss.translation;
+			vec = vec * boss.scale;
+			vec = vec + boss.position;
 
-		Vec3Df lighting = computeLighting(vec, nor, PHONG_LIGHTNING);
+			Vec3Df nor = vertex.n;
+			nor = calculateMatrix(rotMat, nor);
+			nor = nor + boss.translation;
+			nor = nor * boss.scale;
+			nor = nor + boss.position;
 
-		meshColors[i] = lighting;
+			Vec3Df lighting = computeLighting(vec, nor, PHONG_LIGHTNING);
+
+			meshColors[i] = lighting;
+		}
+		boss.getMesh().meshColor = meshColors;
 	}
-	boss.getMesh().meshColor = meshColors;
 }
 
 #pragma endregion
@@ -393,12 +396,12 @@ void collisionDetection() {
 void spawnEnemy(int unusedValue)
 {
 	// randomize the delay between enemies, with the base from the constant enemyRespawnDelay
-	float delay = enemyRespawnDelay + ((rand() % 6 * 200) - 700);
+	float delay = enemyRespawnDelay + ((rand() % 6 * 200) - 500);
 
 	if (!toggleBoss)
 	{
 		Enemy enemy = Enemy();
-		enemy.position = Vec3Df(4, (rand() % 11 * 0.2 - 0.4), 0);
+		enemy.position = Vec3Df(4, (rand() % 10 * 0.2 - 0.4), 0);
 		enemy.movementDirection = Vec3Df(-1, 0, 0);
 		enemies.push_back(enemy);
 
