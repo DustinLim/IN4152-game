@@ -320,6 +320,9 @@ void Character::draw()
 	glPopMatrix();
 	glPopMatrix();
 
+    // FIXME: should't be here, but fixed windows resizing..
+    glPopAttrib();
+
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glDisable(GL_TEXTURE_2D);
 
