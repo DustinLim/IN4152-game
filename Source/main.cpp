@@ -60,7 +60,7 @@ Boss boss = Boss(Vec3Df(8, -1, -2), -1, 0.5);;
 // Game timing constants (in ms)
 const int firstEnemySpawnDelay = 3000;
 const int enemyRespawnDelay = 1500;
-const int bossSpawnDelay = 1000000;
+const int bossSpawnDelay = 30000;
 
 //TODO remove this again
 int meshIndex = 0;
@@ -396,7 +396,7 @@ void collisionDetection() {
 void spawnEnemy(int unusedValue)
 {
 	// randomize the delay between enemies, with the base from the constant enemyRespawnDelay
-	float delay = enemyRespawnDelay + ((rand() % 6 * 200) - 700);
+	float delay = enemyRespawnDelay + ((rand() % 6 * 200) - 500);
 
 	if (!toggleBoss)
 	{
