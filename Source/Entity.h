@@ -23,10 +23,9 @@ public:
 	float height = 0.5f;
 	Vec3Df color = Vec3Df(1, 1, 1);
 
-	void draw();
-	void animate(int deltaTime);
-
-	std::vector<Vec3Df> getBoundingBox();
+	virtual void draw();
+	virtual void animate(int deltaTime);
+	virtual std::vector<Vec3Df> getBoundingBox();
 };
 
 class Enemy : public Entity
@@ -88,6 +87,7 @@ public:
 
 	// Overriding
 	void draw();
+	void animate(int deltaTime);
 
 	// Correct arm and bullets
 	Vec3Df getAngleRefPos();

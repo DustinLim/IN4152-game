@@ -242,6 +242,11 @@ void Character::updateArmAngle(Vec3Df mousePos)
 		setShoulderPos();
 }
 
+void Character::animate(int deltaTime)
+{
+	Entity::animate(deltaTime);
+}
+
 void Character::draw()
 {
 	glEnable(GL_TEXTURE_2D);

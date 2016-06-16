@@ -4,6 +4,11 @@
 Surface::Surface(){}
 Surface::~Surface(){}
 
+void Surface::move()
+{
+	position = (position >= 1) ? 0 : position + speed;
+}
+
 #pragma region "Background"
 
 GLuint Background::texture;
@@ -19,11 +24,6 @@ Background::Background()
 	quadHeight = 8;
 	position = 0;
 	speed = 0.001;
-}
-
-void Surface::move()
-{
-	position = (position >= 1) ? 0 : position + speed;
 }
 
 void Background::draw()

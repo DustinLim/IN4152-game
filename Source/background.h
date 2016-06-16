@@ -13,7 +13,8 @@ public:
 	float position;
 	float speed;
 
-	void move(void);
+	void move();
+	virtual void draw() {};
 
 };
 
@@ -38,7 +39,7 @@ public:
 	int quadWidth;
 	int quadHeight;
 
-	void draw(void);
+	void draw();
 };
 
 class Groundfloor : public Surface
@@ -48,5 +49,5 @@ public:
 
 	static GLuint texture;
 
-	void draw(void);
+	void draw();
 };
