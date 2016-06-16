@@ -19,8 +19,6 @@
 
 
 //Use the enum values to define different rendering modes 
-//The mode is used by the function display and the mode is 
-//chosen during execution with the keys 1-9
 enum DisplayModeType {GAME=1, MESH=2};
 DisplayModeType DisplayMode = GAME;
 
@@ -61,13 +59,13 @@ Boss boss = Boss(Vec3Df(6, -1, -2), -1, 0.5);;
 // Game timing constants (in ms)
 const int firstEnemySpawnDelay = 3000;
 const int enemyRespawnDelay = 1500;
-const int bossSpawnDelay = 10000;
+const int bossSpawnDelay = 1000000;
 
 //TODO remove this again
 int meshIndex = 0;
 
 
-////////// Lighting Functions
+#pragma region "Lightning"
 
 /// Computes lighting for a single vertex with given calculation model.
 Vec3Df computeLighting(Vec3Df &vertexPos, Vec3Df &normal, LightModel lightModel)
@@ -128,20 +126,17 @@ void computeLighting()
 	boss.getMesh().meshColor = meshColors;
 }
 
+#pragma endregion
 
-////////// Draw Functions
+#pragma region "Draw Functions"
 
-//function to draw coordinate axes with a certain length (1 as a default)
-void drawCoordSystem(float length=1)
+void drawCoordinateSystem(float length=1)
 {
-	//draw simply colored axes
-	
-	//remember GPU state
+	// Setup
     GLboolean lightingWasEnabled = glIsEnabled(GL_LIGHTING);
-
-    //deactivate the lighting state
 	glDisable(GL_LIGHTING);
-	//draw axes
+
+    // Draw
 	glBegin(GL_LINES);
 		glColor3f(1,0,0);
 		glVertex3f(0,0,0);
@@ -156,30 +151,28 @@ void drawCoordSystem(float length=1)
 		glVertex3f(0,0,length);
 	glEnd();
 	
-	//reset to previous state
+	// Cleanup
     if (lightingWasEnabled) {
         glEnable(GL_LIGHTING);
     }
 }
 
-
-void drawLight()
+void drawLightPosition()
 {
-	//remember all states of the GPU
+    // Setup
 	glPushAttrib(GL_ALL_ATTRIB_BITS);
-	//deactivate the lighting state
 	glDisable(GL_LIGHTING);
-	//yellow sphere at light position
-	glColor3f(1, 1, 0);
-	glPushMatrix();
-	glTranslatef(LightPos[0], LightPos[1], LightPos[2]);
-	glutSolidSphere(0.1, 6, 6);
-	glPopMatrix();
+    glPushMatrix();
+	
+    // Draw
+    glTranslatef(LightPos[0], LightPos[1], LightPos[2]);
+    glColor3f(1, 1, 0);
+	glutSolidSphere(0.1, 9, 9);
 
-	//reset to previous state
+    // Cleanup
+    glPopMatrix();
 	glPopAttrib();
 }
-
 
 void display( )
 {
@@ -188,8 +181,8 @@ void display( )
 	case GAME:
 	{
 		glLightfv(GL_LIGHT0, GL_POSITION, LightPos);
-		drawLight();
-		drawCoordSystem();
+		drawLightPosition();
+		//drawCoordinateSystem();
 
 		// Note that drawing order has consequences for 'transparancy'
 		background->draw();
@@ -236,6 +229,8 @@ void display( )
 	}
 }
 
+#pragma endregion
+
 bool isHit(std::vector<Vec3Df> bb1, std::vector<Vec3Df> bb2) {
 	//std::vector<Vec3Df> bb1 = ent1.getBoundingBox();
 	//std::vector<Vec3Df> bb2 = ent2.getBoundingBox();
@@ -254,18 +249,20 @@ bool isHit(std::vector<Vec3Df> bb1, std::vector<Vec3Df> bb2) {
  */
 void animate( )
 {
+	int currentTime = glutGet(GLUT_ELAPSED_TIME);
+	int deltaTime = currentTime - glutElapsedTime;
+	glutElapsedTime = currentTime;
+
+
     LightPos[0] += 0.002;
     
 	for (int i = 0; i < numberOfRidges; i++)
 	{
-		mountains[i].move();
+		mountains[i].move(deltaTime);
 	}
-	background->move();
-	groundfloor->move();
+	background->move(deltaTime);
+	groundfloor->move(deltaTime);
 
-	int currentTime = glutGet(GLUT_ELAPSED_TIME);
-	int deltaTime = currentTime - glutElapsedTime;
-	glutElapsedTime = currentTime;
 
 	for (auto &enemy : enemies) {
 		enemy.animate(deltaTime);
@@ -351,15 +348,18 @@ void collisionDetection() {
 // Method parameter is required to be registered by glutTimerFunc()
 void spawnEnemy(int unusedValue)
 {
+	// randomize the delay between enemies, with the base from the constant enemyRespawnDelay
+	float delay = enemyRespawnDelay + ((rand() % 6 * 200) - 700);
+
 	if (!toggleBoss)
 	{
 		Enemy enemy = Enemy();
-		enemy.position = Vec3Df(3, (rand() % 3 - 1), 0);
-		enemy.movementDirection = Vec3Df(-1, 0.2, 0);
+		enemy.position = Vec3Df(3, (rand() % 11 * 0.2 - 0.4), 0);
+		enemy.movementDirection = Vec3Df(-1, 0, 0);
 		enemies.push_back(enemy);
 
 		// Repeat this
-		glutTimerFunc(enemyRespawnDelay, spawnEnemy, 0);
+		glutTimerFunc(delay, spawnEnemy, 0);
 	}
 }
 
@@ -395,6 +395,8 @@ void updateCharacterMovementDirection()
     if (keyPressed['d']) { direction += Vec3Df(1, 0, 0); }
     character.movementDirection = direction;
 }
+
+#pragma region "Input"
 
 //take keyboard input into account
 void keyboard(unsigned char key, int x, int y)
@@ -432,25 +434,6 @@ void keyboard(unsigned char key, int x, int y)
 		//turn lighting off
 		glDisable(GL_LIGHTING);
 		break;
-	// MOVING THE LIGHT IN THE X,Y,Z DIRECTION -> We should do something with shadows in a later stadium.
-	case 'f':
-		LightPos[0] -= 0.1f;
-		break;
-	case 'h':
-		LightPos[0] += 0.1f;
-		break;
-	case 't':
-		LightPos[1] += 0.1f;
-		break;
-	case 'g':
-		LightPos[1] -= 0.1f;
-		break;
-	case 'r':
-		LightPos[2] += 0.1f;
-		break;
-	case 'y':
-		LightPos[2] -= 0.1f;
-		break;	
 	case 'b':
 		spawnBoss(0);
 		break;
@@ -559,6 +542,11 @@ void mousePassiveMotion(int x, int y) {
 	}
 }
 
+#pragma endregion
+
+void displayInternal(void);
+void reshape(int w, int h);
+
 void calculateWorldSpaceViewportBounds() {
 	Vec3Df nearPoint, farPoint;
 	calculateMouseRay(0, 0, &nearPoint, &farPoint);
@@ -572,25 +560,66 @@ void calculateWorldSpaceViewportBounds() {
 	bottomRight = farPoint +(ray * fraction);
 }
 
-
-void displayInternal(void);
-void reshape(int w, int h);
-
+// Load and store all textures in the static textureSets. The ID's of correct textures are denoted in the .h files!
 void initTextures()
 {
-    GLuint texture =
-    SOIL_load_OGL_texture("./Textures/bullet1.png",
-                          SOIL_LOAD_AUTO,
-                          SOIL_CREATE_NEW_ID,
-                          SOIL_FLAG_POWER_OF_TWO | SOIL_FLAG_MIPMAPS | SOIL_FLAG_DDS_LOAD_DIRECT);
+	GLuint texture;
+
+	// PROJECTILE
+	texture = SOIL_load_OGL_texture("./Textures/bullet1.png",
+									SOIL_LOAD_AUTO,
+									SOIL_CREATE_NEW_ID,
+									SOIL_FLAG_POWER_OF_TWO | SOIL_FLAG_MIPMAPS | SOIL_FLAG_DDS_LOAD_DIRECT);
     Projectile::textureSet.push_back(texture);
 
-    texture =
-    SOIL_load_OGL_texture("./Textures/bullet2.png",
-                          SOIL_LOAD_AUTO,
-                          SOIL_CREATE_NEW_ID,
-                          SOIL_FLAG_POWER_OF_TWO | SOIL_FLAG_MIPMAPS | SOIL_FLAG_DDS_LOAD_DIRECT);
+	texture = SOIL_load_OGL_texture("./Textures/bullet2.png",
+									SOIL_LOAD_AUTO,
+									SOIL_CREATE_NEW_ID,
+									SOIL_FLAG_POWER_OF_TWO | SOIL_FLAG_MIPMAPS | SOIL_FLAG_DDS_LOAD_DIRECT);
     Projectile::textureSet.push_back(texture);
+
+	// ENEMY
+	texture = SOIL_load_OGL_texture("./Textures/alien_1.png",
+									SOIL_LOAD_AUTO,
+									SOIL_CREATE_NEW_ID,
+									SOIL_FLAG_POWER_OF_TWO | SOIL_FLAG_MIPMAPS | SOIL_FLAG_DDS_LOAD_DIRECT);
+	Enemy::textureSet.push_back(texture);
+
+	// CHARACTER
+	texture = SOIL_load_OGL_texture("./Textures/astronaut-body.png",
+									SOIL_LOAD_AUTO,
+									SOIL_CREATE_NEW_ID,
+									SOIL_FLAG_POWER_OF_TWO | SOIL_FLAG_MIPMAPS | SOIL_FLAG_DDS_LOAD_DIRECT);
+	Character::textureSet.push_back(texture);
+
+	texture = SOIL_load_OGL_texture("./Textures/astronaut-arm.png",
+									SOIL_LOAD_AUTO,
+									SOIL_CREATE_NEW_ID,
+									SOIL_FLAG_POWER_OF_TWO | SOIL_FLAG_MIPMAPS | SOIL_FLAG_DDS_LOAD_DIRECT);
+	Character::textureSet.push_back(texture);
+
+	texture = SOIL_load_OGL_texture("./Textures/astronaut-gun.png",
+									SOIL_LOAD_AUTO,
+									SOIL_CREATE_NEW_ID,
+									SOIL_FLAG_POWER_OF_TWO | SOIL_FLAG_MIPMAPS | SOIL_FLAG_DDS_LOAD_DIRECT);
+	Character::textureSet.push_back(texture);
+
+	// MOUNTAINS -- slightly different due to usage of .ppm
+	Ridge::initTexture("./Textures/sand.ppm");
+
+	// BACKGROUND AND GROUNDFLOOR
+	texture = SOIL_load_OGL_texture("./Textures/space-background.png",
+		SOIL_LOAD_AUTO,
+		SOIL_CREATE_NEW_ID,
+		SOIL_FLAG_POWER_OF_TWO | SOIL_FLAG_MIPMAPS | SOIL_FLAG_DDS_LOAD_DIRECT);
+	Background::texture = texture;
+
+	texture = SOIL_load_OGL_texture("./Textures/moon-surface.png",
+		SOIL_LOAD_AUTO,
+		SOIL_CREATE_NEW_ID,
+		SOIL_FLAG_POWER_OF_TWO | SOIL_FLAG_MIPMAPS | SOIL_FLAG_DDS_LOAD_DIRECT);
+	Groundfloor::texture = texture;
+
 }
 
 void init()
@@ -603,49 +632,23 @@ void init()
     glEnable( GL_LIGHT0 );
     glEnable(GL_COLOR_MATERIAL);
     glEnable(GL_NORMALIZE);
-
-	//int MatSpec [4] = {1,1,1,1};
- //   glMaterialiv(GL_FRONT_AND_BACK,GL_SPECULAR,MatSpec);
- //   glMateriali(GL_FRONT_AND_BACK,GL_SHININESS,10);
-
-
-    // Enable Depth test
     glEnable( GL_DEPTH_TEST );
-	
-	//glEnable(GL_CULL_FACE);
-    //glCullFace(GL_BACK);
-	//Draw frontfacing polygons as filled
     glPolygonMode(GL_FRONT,GL_FILL);
-	//draw backfacing polygons as outlined
     glPolygonMode(GL_BACK,GL_LINE);
 	glShadeModel(GL_SMOOTH);
-	//loadMesh("David.obj");
 
 	background.reset(new Background());
 	groundfloor.reset(new Groundfloor());
 	mountains.resize(numberOfRidges);
-	mountains[0] = Ridge(1, 50, 10, -3, 0.005f, -4, "./Textures/sand.ppm");
-	mountains[1] = Ridge(2, 50, 10, -3, 0.0075f, -3, "./Textures/sand.ppm");
 
-	//TODO change mesh to correct object.
-	/*printf("Loading Mesh\n");
-	Mesh mesh = Mesh();
-	mesh.loadMesh("./Models/hoofd.obj");
-	meshes.push_back(mesh);
-	printf("Creating Grid, 16\n");
-	meshes.push_back(Grid::getReduxMesh(mesh, 16));
-	printf("Creating Grid, 8\n");
-	meshes.push_back(Grid::getReduxMesh(mesh, 8));
-	printf("Creating Grid, 4\n");
-	meshes.push_back(Grid::getReduxMesh(mesh, 4));*/
+	mountains[0] = Ridge(1, 200, 10, -8, 0.5f, -4);
+	mountains[1] = Ridge(2, 80, 10, -8, 1.0f, -3);
 
-	character.initTexture();
     initTextures();
 }
 
-/**
- * Programme principal
- */
+#pragma region "Programme Principal"
+
 int main(int argc, char** argv)
 {
     glutInit(&argc, argv);
@@ -704,7 +707,6 @@ void displayInternal(void)
     glClearColor (0.0, 0.0, 0.0, 0.0);
     glClear( GL_COLOR_BUFFER_BIT  | GL_DEPTH_BUFFER_BIT); // la couleur et le z
     
-
     glLoadIdentity();  // repere camera
 
     tbVisuTransform(); // origine et orientation de la scene
@@ -731,3 +733,4 @@ void reshape(int w, int h)
     LightPos[0] = topLeft[0]; //init light position
 }
 
+#pragma endregion

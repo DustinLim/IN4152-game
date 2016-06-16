@@ -4,24 +4,26 @@
 Surface::Surface(){}
 Surface::~Surface(){}
 
+#pragma region "Background"
+
+GLuint Background::texture;
+
 Background::Background()
 {
 	heightMin = -5;			// <- could we set abóve the plateau, so that it reduces drawing stuff :)
 	heightMax = 5;
-	widthMin = -6;
+	widthMin = -8;
 	widthMax = 8;
 	depth = -5;
 	quadWidth = 8;
-	quadHeight = 8;
+	quadHeight = 6;
 	position = 0;
-	speed = 0.001;
-
-	initTexture();
+	speed = 0.1;
 }
 
-void Surface::move()
+void Surface::move(float deltaTime)
 {
-	position = (position >= 1) ? 0 : position + speed;
+	position = (position >= 1) ? position - 1 + deltaTime*speed / 1000.0f : position + deltaTime*speed / 1000.0f;
 }
 
 void Background::draw()
@@ -66,23 +68,23 @@ void Background::draw()
 	glDisable(GL_TEXTURE_2D);
 }
 
-void Background::initTexture()
-{
-	texture = SOIL_load_OGL_texture(
-		"./Textures/space-background.png",
-		SOIL_LOAD_AUTO,
-		SOIL_CREATE_NEW_ID,
-		SOIL_FLAG_POWER_OF_TWO | SOIL_FLAG_MIPMAPS | SOIL_FLAG_DDS_LOAD_DIRECT);
-}
+#pragma endregion
 
+#pragma region "Groundfloor"
 
+GLuint Groundfloor::texture;
 
 Groundfloor::Groundfloor()
 {
 	position = 0;
-	speed = 0.002;
-
-	initTexture();
+	speed = 1;
+	width = 12.5f;
+	height = -1.0f;
+	depth = 5.0f;
+	startDepth = 2.0f;
+	textureWidth = 3;
+	textureDepth = textureWidth*depth / (width);
+	speed *= textureWidth / width;
 }
 
 void Groundfloor::draw()
@@ -98,23 +100,17 @@ void Groundfloor::draw()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-
 	glBegin(GL_QUADS);
-		glTexCoord2f(0 + position, 1);			glVertex3f(-3.0f, -1.0f, 5.0f);
-		glTexCoord2f(1 + position, 1);			glVertex3f(3.0f, -1.0f, 5.0f);
-		glTexCoord2f(1 + position, 0);			glVertex3f(3.0f, -1.0f, -3.0f);
-		glTexCoord2f(0 + position, 0);			glVertex3f(-3.0f, -1.0f, -3.0f);
+		glTexCoord2f(0 + position, textureDepth);				glVertex3f(-width / 2.0f, height, startDepth);
+		glTexCoord2f(textureWidth + position, textureDepth);	glVertex3f(width / 2.0f, height, startDepth);
+		glTexCoord2f(textureWidth + position, 0);				glVertex3f(width / 2.0f, height, startDepth - depth);
+		glTexCoord2f(0 + position, 0);							glVertex3f(-width / 2.0f, height, startDepth - depth);
 	glEnd();
 
+    // FIXME: balancing with this pop breaks enemy drawing..
+    //glPopAttrib();
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glDisable(GL_TEXTURE_2D);
 }
 
-void Groundfloor::initTexture()
-{
-	texture = SOIL_load_OGL_texture(
-		"./Textures/moon-surface.png",
-		SOIL_LOAD_AUTO,
-		SOIL_CREATE_NEW_ID,
-		SOIL_FLAG_POWER_OF_TWO | SOIL_FLAG_MIPMAPS | SOIL_FLAG_DDS_LOAD_DIRECT);
-}
+#pragma endregion
