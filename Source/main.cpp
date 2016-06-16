@@ -75,7 +75,6 @@ float kd = 1.0f;
 float ka = 0.5f;
 int alpha = 1;
 
-int indexer = 0;
 ////////// Lighting Functions
 #pragma region "Lightning"
 
@@ -94,15 +93,8 @@ Vec3Df computeLighting(Vec3Df &vertexPos, Vec3Df &normal, LightModel lightModel)
         }
 		case PHONG_LIGHTNING:
 		{
-			//Vec3Df lightDir = Vec3Df(LightPos[0], LightPos[1], LightPos[2]) - vertexPos;
-			//Vec3Df lightDir = Vec3Df(0, 0, 0) - vertexPos;
 			Vec3Df lightDir = boss.position - vertexPos;
-			//lightDir[1] = lightDir[1] + boss.body_height * 0.5f;
 			lightDir.normalize();
-
-			if (indexer == 10) {
-				//printf("%f, %f, %f\n", lightDir[0], lightDir[1], lightDir[2]);
-			}
 
 			Vec3Df reflDir = 2 * Vec3Df::dotProduct(lightDir, normal) * normal - lightDir;
 			reflDir.normalize();
@@ -114,9 +106,6 @@ Vec3Df computeLighting(Vec3Df &vertexPos, Vec3Df &normal, LightModel lightModel)
 			float ambiant = std::fmax(0, ka*ia);
 			float diffuse = std::fmax(0, kd*Vec3Df::dotProduct(lightDir, normal)*id);
 			float specular = std::fmax(0, ks*std::pow(std::fmax(0, Vec3Df::dotProduct(reflDir, viewDir)), alpha)*is);
-			//float intensity = ka*ia + 
-			//	(kd*Vec3Df::dotProduct(lightDir, normal)*id + 
-			//	ks*std::pow(Vec3Df::dotProduct(reflDir, viewDir), alpha)*is);
 
 			float intensity = ambiant + diffuse + specular;
 
@@ -155,60 +144,26 @@ void computeLighting()
 	std::vector<Vertex> vertices = boss.getMesh().vertices;
 	std::vector<Vec3Df> meshColors = std::vector<Vec3Df>(vertices.size());
 
-	indexer = 0;
 	auto rotMat = matrixMultiplication(
 		rotateMatrixY(boss.angleHeadY*M_PI / 180),
-				//matrixMultiplication(
 		rotateMatrixX(boss.angleHeadZ*M_PI / 180)
-				//matrixMultiplication(
-		//rotateMatrixY(M_PI + M_2_PI),
-		//rotateMatrixZ(M_2_PI)
-		//)
-		)
-		//)
-		;
-	//printf("%f, %f\n", boss.angleHeadY, boss.angleHeadZ);
+		);
+	
 	for (int i = 0; i < vertices.size(); i++)
 	{
 		// Compute for our (single) light
  		Vertex vertex = vertices[i];
-		indexer++;
 		Vec3Df vec = vertex.p;
-		//vec = calculateMatrix(rotateMatrixZ(M_2_PI), vec);
-		//vec = calculateMatrix(rotateMatrixY(M_PI + M_2_PI), vec);
-		//vec = calculateMatrix(rotateMatrixY(boss.angleHeadY*M_PI / 180), vec);
-		//vec = calculateMatrix(rotateMatrixX(M_PI), vec);
-		//vec = calculateMatrix(rotateMatrixX(boss.angleHeadZ*M_PI / 180), vec);
 		vec = calculateMatrix(rotMat, vec);
-
-		//vec = calculateMatrix(rotateMatrixX(boss.angleHeadZ*M_PI / 180), vec);
-		//vec = calculateMatrix(rotateMatrixY(boss.angleHeadY*M_PI / 180), vec);
 		vec = vec + boss.translation;
 		vec = vec * boss.scale;
 		vec = vec + boss.position;
-		//Vec3Df vec = calculateMatrix(rotMat, vertex.p);
-		
-		
 
 		Vec3Df nor = vertex.n;
-		//nor = calculateMatrix(rotateMatrixZ(M_2_PI), nor);
-		//nor = calculateMatrix(rotateMatrixY(M_PI + M_2_PI), nor);
-		//nor = calculateMatrix(rotateMatrixY(boss.angleHeadY*M_PI / 180), nor);
-		//nor = calculateMatrix(rotateMatrixX(boss.angleHeadZ*M_PI / 180), nor);
 		nor = calculateMatrix(rotMat, nor);
-
-		//nor = calculateMatrix(rotateMatrixX(boss.angleHeadZ*M_PI / 180), nor);
-		//nor = calculateMatrix(rotateMatrixY(boss.angleHeadY*M_PI / 180), nor);
 		nor = nor + boss.translation;
 		nor = nor * boss.scale;
 		nor = nor + boss.position;
-		//Vec3Df vec = calculateMatrix(rotMat, vertex.p);
-		
-		
-
-		if (i == i) {
-			//printf("%f, %f, %f\n", vec[0], vec[1], vec[2]);
-		}
 
 		Vec3Df lighting = computeLighting(vec, nor, PHONG_LIGHTNING);
 

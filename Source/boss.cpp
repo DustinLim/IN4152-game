@@ -135,8 +135,14 @@ Boss::Boss(Vec3Df pos, float speed, float scale)
 	Mesh mesh = Mesh();
 	mesh.loadMesh("./Models/hoofd.obj");
 	meshes.push_back(mesh);
+	printf("Creating Grid, 24\n");
+	meshes.push_back(Grid::getReduxMesh(mesh, 24));
+	printf("Creating Grid, 20\n");
+	meshes.push_back(Grid::getReduxMesh(mesh, 20));
 	printf("Creating Grid, 16\n");
 	meshes.push_back(Grid::getReduxMesh(mesh, 16));
+	printf("Creating Grid, 12\n");
+	meshes.push_back(Grid::getReduxMesh(mesh, 12));
 	printf("Creating Grid, 8\n");
 	meshes.push_back(Grid::getReduxMesh(mesh, 8));
 	printf("Creating Grid, 4\n");
