@@ -35,6 +35,7 @@ unsigned int H_fen = 600;  // screen height
 Vec3Df topLeft, bottomRight;
 
 float LightPos[4] = {0, 1.6, 0, 1};
+Vec3Df camPos;
 
 ////////// Declare your own global variables here:
 void calculateWorldSpaceViewportBounds();
@@ -66,6 +67,16 @@ const int bossSpawnDelay = 10000;
 //TODO remove this again
 int meshIndex = 0;
 
+//Phong model properties
+float is = 1.0f;
+float id = 1.0f;
+float ia = 1.0f;
+
+float ks = 0.5f;
+float kd = 0.2f;
+float ka = 0.1f;
+int alpha = 1;
+
 
 ////////// Lighting Functions
 
@@ -84,7 +95,21 @@ Vec3Df computeLighting(Vec3Df &vertexPos, Vec3Df &normal, LightModel lightModel)
         }
 		case PHONG_LIGHTNING:
 		{
-			return Vec3Df(1, 0, 0);
+			Vec3Df lightDir = Vec3Df(LightPos[0], LightPos[1], LightPos[2]) - vertexPos;
+			lightDir.normalize();
+
+			Vec3Df reflDir = 2 * Vec3Df::dotProduct(lightDir, normal)  *normal - lightDir;
+			reflDir.normalize();
+
+			Vec3Df viewDir = vertexPos - camPos;
+			viewDir.normalize();
+
+			//Using only 1 light source
+			float intentsity = ka*ia + (kd*Vec3Df::dotProduct(lightDir, normal)*id + ks*std::pow(Vec3Df::dotProduct(reflDir, viewDir), alpha)*is);
+
+			Vec3Df final = intentsity * lightColor;
+
+			return final;
 		}
         default:
             return Vec3Df(0, 0, 0);
@@ -120,9 +145,16 @@ void computeLighting()
 	{
 		// Compute for our (single) light
 		Vertex vertex = vertices[i];
-		Vec3Df lighting = computeLighting(vertex.p, vertex.n, PHONG_LIGHTNING);
 
-		// Pass computed values to Ridge
+		Vec3Df vec = rotateMatrixZ(90, vertex.p);
+		vec = rotateMatrixZ(boss.angleHeadZ, vec);
+		vec = rotateMatrixY(boss.angleHeadY, vec);
+		vec = vec + boss.translation;
+		vec = vec * boss.scale;
+		vec = vec + boss.position;
+
+		Vec3Df lighting = computeLighting(vec, vertex.n, PHONG_LIGHTNING);
+
 		meshColors[i] = lighting;
 	}
 	boss.getMesh().meshColor = meshColors;
@@ -202,15 +234,15 @@ void display( )
 		for (auto &enemy : enemies) {
 			enemy.draw();
 		}
-        
-        glDisable(GL_DEPTH_TEST);
-        for (auto &projectile : projectiles) {
-			projectile.draw();
-		}
-        glEnable(GL_DEPTH_TEST);
 		
 		if (toggleBoss)
 			boss.draw();
+
+		glDisable(GL_DEPTH_TEST);
+		for (auto &projectile : projectiles) {
+			projectile.draw();
+		}
+		glEnable(GL_DEPTH_TEST);
 
         character.draw();
 		
@@ -532,6 +564,7 @@ void mouse(int button, int state, int x, int y)
         // Pass this event to trackball.h
         tbMouseFunc(button, state, x, y);
 		calculateWorldSpaceViewportBounds();
+		camPos = getCameraPosition();
     }
 }
 
@@ -545,6 +578,7 @@ void mouseMotion(int x, int y) {
 		// Pass this event to trackball.h
 		tbMotionFunc(x, y);
 		calculateWorldSpaceViewportBounds();
+		camPos = getCameraPosition();
 	}
 }
 
@@ -729,5 +763,6 @@ void reshape(int w, int h)
 
 	calculateWorldSpaceViewportBounds();
     LightPos[0] = topLeft[0]; //init light position
+	camPos = getCameraPosition();
 }
 
